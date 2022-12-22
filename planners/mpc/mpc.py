@@ -124,7 +124,9 @@ class DoMPCController:
         self._mpc.setup()
         
     
-    def get_ref_direction(self, p_rob_init: np.ndarray, p_rob_ref: np.ndarray) -> np.ndarray:
+    def get_ref_direction(self, 
+                          p_rob_init: np.ndarray, 
+                          p_rob_ref: np.ndarray) -> np.ndarray:
         """ Get direction angle of reference position
         
         This helps MPC to find solution when the reference point is located behind the robot.
@@ -141,29 +143,27 @@ class DoMPCController:
         return np.array([p_rob_ref[0], p_rob_ref[1], math.atan2(y_goal_polar, x_goal_polar)])
     
     
-    def get_next_state(self, p_k: List[float], dt: float) -> List[float]:
-        """ Function returns next state for the given state vector
+    def propagate_all_pedestrians(self, 
+                                  p_peds_k: np.ndarray, 
+                                  dt: float): 
+        """ Function returns next state for the specified pedestrians
         
         Propagation model with constant velocity
 
         Args:
-            p_k (List[float]): state vector: [x_init,  y_init, vx, vy], [m, m, m/s, m/s]
-            
+            p_peds_k (np.ndarray): state vector of all pedestrians: [x_init,  y_init, vx, vy], [m, m, m/s, m/s]
+            dt (float): time step
+             
         Return:
-            p_k+1 (List[float]): state vector at k + 1
+            p_peds_k+1 (np.ndarray): state vector at k + 1
         """
-        x_k = p_k[0]
-        y_k = p_k[1]
-        vx = p_k[2]
-        vy = p_k[3]
-        return [x_k + vx * dt, y_k + vy * dt, vx, vy]
-    
-    
-    def propagate_all_pedestrians(self, p_peds_k: List[np.ndarray], dt: float, total_peds: int):
         p_peds_k_1 = p_peds_k
-        for i in range(total_peds):
-            next_peds_state = self.get_next_state(p_peds_k[:, i], dt)
-            p_peds_k_1[:, i] = casadi.hcat(next_peds_state).T
+        x = p_peds_k_1[0, :]
+        y = p_peds_k_1[1, :]
+        vx = p_peds_k_1[2, :]
+        vy = p_peds_k_1[3, :]
+        p_peds_k_1[0, :] = x + vx * dt
+        p_peds_k_1[1, :] = y + vy * dt
         return p_peds_k_1
 
 
