@@ -1,9 +1,9 @@
-# Robot Model: Unicycle Double Integration Model with State Vector: [x, y, phi, v, w]
+# Robot Model: Unicycle Model with State Vector: [x, y, phi]
 # Pedestrian Model: Velocity Propagation with State Vector: [x, y, vx, vy] inside MPC propagation and SFM for simulator
 
 # General
-X_rob_init: [4, -4, 0, 0, 0]             # Initial robot state vector: [x_rob_init, y_rob_init, phi_rob_init, v_rob_init, w_rob_init], [m, m, rad, m/s, rad/s]
-p_rob_ref:  [-4, 4, 0]                 # Reference robot position: [x_rob_ref,  y_rob_ref,  phi_rob_ref], [m, m, rad]
+X_rob_init: [4, -4, 0]                  # Initial robot state vector: [x_rob_init, y_rob_init, phi_rob_init], [m, m, rad, m/s, rad/s]
+p_rob_ref:  [-4, 4, 0]                  # Reference robot position: [x_rob_ref,  y_rob_ref,  phi_rob_ref], [m, m, rad]
 dt: 0.1                                 # Time interval, [s]
 n_horizon: 30                           # MPC planning horizon, [steps]
 Q: [[10000, 0, 0],
@@ -14,8 +14,8 @@ R: [[1, 0],
 r_rob: 0.35                             # Robot radius, [m]
 r_ped: 0.3                              # Pedestrian radius, [m]
 simulation_time: 20                     # Simulation time, [s]
-lb: [0, -2, -3, -3]                     # Lower bounds for NLP: [v, w, u_a, u_alpha], [m/s, rad/s, m/s^2, rad/s^2]
-ub: [2, 2, 3, 3]                        # Upper bounds for NLP: [v, w, u_a, u_alpha], [m/s, rad/s, m/s^2, rad/s^2]
+lb: [0, -2]                             # Lower bounds for NLP: [v, w, u_a, u_alpha], [m/s, rad/s]
+ub: [2, 2]                              # Upper bounds for NLP: [v, w, u_a, u_alpha], [m/s, rad/s]
 min_safe_dist: 0.5                      # Minimum safe distance to pedestrians and other objects, [m]
 total_peds: 6                           # Amount of pedestrians
 ped_dect_range: 4                       # Pedestrian detector max range, [m]

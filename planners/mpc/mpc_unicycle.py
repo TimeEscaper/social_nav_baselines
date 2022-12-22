@@ -17,7 +17,7 @@ import yaml
 from pyminisim.core import Simulation
 from pyminisim.pedestrians import (HeadedSocialForceModelPolicy,
                                    RandomWaypointTracker)
-from pyminisim.robot import UnicycleDoubleIntegratorRobotModel
+from pyminisim.robot import UnicycleRobotModel
 from pyminisim.sensors import (PedestrianDetector, PedestrianDetectorConfig,
                                PedestrianDetectorNoise)
 from pyminisim.visual import CircleDrawing, Renderer
@@ -61,17 +61,17 @@ class DoMPCController:
         self.x = self._model.set_variable('_x', 'x')
         self.y = self._model.set_variable('_x', 'y')
         self.phi = self._model.set_variable('_x', 'phi')
-        self.v = self._model.set_variable('_x', 'v')
-        self.w = self._model.set_variable('_x', 'w')
         # control input variables
-        self.u_a = self._model.set_variable('_u', 'u_a')
-        self.u_alpha = self._model.set_variable('_u', 'u_alpha')
+        self.v = self._model.set_variable('_u', 'v')
+        self.w = self._model.set_variable('_u', 'w')
+        #self.u_a = self._model.set_variable('_u', 'u_a')
+        #self.u_alpha = self._model.set_variable('_u', 'u_alpha')
         # discrete equations of motion/en/latest/project_structure.html
         self._model.set_rhs('x', self.x + self.v * casadi.cos(self.phi) * dt)
         self._model.set_rhs('y', self.y + self.v * casadi.sin(self.phi) * dt)
         self._model.set_rhs('phi', self.phi + self.w * dt)
-        self._model.set_rhs('v', self.v + self.u_a * dt)
-        self._model.set_rhs('w', self.w + self.u_alpha * dt)
+        #self._model.set_rhs('v', self.v + self.u_a * dt)
+        #self._model.set_rhs('w', self.w + self.u_alpha * dt)
         # pedestrians
         self.p_peds = self._model.set_variable('_tvp', 'p_peds', shape=(4, self._total_peds))
         #setup
@@ -94,18 +94,14 @@ class DoMPCController:
         self.terminal_cost = (self.p_rob_N - self._p_rob_ref).T @ self._Q @ (self.p_rob_N - self._p_rob_ref)
         # set cost
         self._mpc.set_objective(lterm=self.stage_cost, mterm=self.terminal_cost)
-        self._mpc.set_rterm(u_a=1e-2, u_alpha=1e-2)
+        self._mpc.set_rterm(v=1e-2, w=1e-2)
         # bounds
         # lb
-        self._mpc.bounds['lower', '_x', 'v'] = self._lb[0]
-        self._mpc.bounds['lower', '_x', 'w'] = self._lb[1]
-        self._mpc.bounds['lower', '_u', 'u_a'] = self._lb[2] 
-        self._mpc.bounds['lower', '_u', 'u_alpha'] = self._lb[3]
+        self._mpc.bounds['lower', '_u', 'v'] = self._lb[0]
+        self._mpc.bounds['lower', '_u', 'w'] = self._lb[1]
         # ub
-        self._mpc.bounds['upper', '_x', 'v'] = self._ub[0]
-        self._mpc.bounds['upper', '_x', 'w'] = self._ub[1]
-        self._mpc.bounds['upper', '_u', 'u_a'] = self._ub[2]
-        self._mpc.bounds['upper', '_u', 'u_alpha'] = self._ub[3]
+        self._mpc.bounds['upper', '_u', 'v'] = self._ub[0]
+        self._mpc.bounds['upper', '_u', 'w'] = self._ub[1]
         # distance to pedestrians
         self.ub_cons = (self._r_rob + self._r_ped + self._min_safe_dist) ** 2
         self.ub_cons_vect = np.array([self.ub_cons for _ in range(self._total_peds)])
@@ -175,8 +171,8 @@ def create_sim(p_rob_init: np.ndarray,
                ped_dect_fov, 
                misdetection_prob, 
                is_robot_visible: bool) -> Tuple[Simulation, Renderer]:
-    robot_model = UnicycleDoubleIntegratorRobotModel(initial_state=p_rob_init,
-                                                     initial_control=np.array([0., np.deg2rad(0.)]))
+    robot_model = UnicycleRobotModel(initial_pose=p_rob_init,
+                                     initial_control=np.array([0., np.deg2rad(0.)]))
     tracker = RandomWaypointTracker(world_size=(10.0, 15.0))
     pedestrians_model = HeadedSocialForceModelPolicy(n_pedestrians=total_peds,
                                                      waypoint_tracker=tracker,
@@ -210,7 +206,7 @@ def main() -> None:
     with open(rf'{config_path}/{file_name}_config.yaml') as f:
         config = yaml.safe_load(f)
         # General
-        X_rob_init: np.ndarray = np.array(config['X_rob_init'])
+        p_rob_init: np.ndarray = np.array(config['X_rob_init'])
         p_rob_ref: np.ndarray = np.array(config['p_rob_ref'])
         dt: float = config['dt']
         n_horizon: int = config['n_horizon']
@@ -236,7 +232,7 @@ def main() -> None:
     
     
     # Initialization
-    sim, renderer = create_sim(X_rob_init,
+    sim, renderer = create_sim(p_rob_init,
                                dt/10,
                                total_peds,
                                ped_dect_range,
@@ -245,7 +241,7 @@ def main() -> None:
                                is_robot_visible)
     renderer.initialize()
     controller = DoMPCController(dt, 
-                                 X_rob_init, 
+                                 p_rob_init, 
                                  p_rob_ref, 
                                  sim, 
                                  total_peds, 
@@ -273,7 +269,7 @@ def main() -> None:
     n_frames = 0
     u_pred = np.array([0., 0.])
     hold_time = sim.sim_dt
-    controller._mpc.x0 = X_rob_init
+    controller._mpc.x0 = p_rob_init
     controller._mpc.set_initial_guess()
     pred_peds_traj = np.zeros([int(simulation_time/dt), total_peds, n_horizon+1, 2 ])
     gt_peds_traj = np.zeros([int(simulation_time/dt), total_peds*2])
@@ -348,9 +344,9 @@ def main() -> None:
                                  file_name,
                                  col_hex, 
                                  config)           
-    graphic_tools.mpc_step_response(controller._mpc.data, 
-                                    results_path, 
-                                    file_name)
+    #graphic_tools.mpc_step_response(controller._mpc.data, 
+    #                                results_path, 
+    #                                file_name)
 
 
 
