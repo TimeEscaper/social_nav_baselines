@@ -64,14 +64,10 @@ class DoMPCController:
         # control input variables
         self.v = self._model.set_variable('_u', 'v')
         self.w = self._model.set_variable('_u', 'w')
-        #self.u_a = self._model.set_variable('_u', 'u_a')
-        #self.u_alpha = self._model.set_variable('_u', 'u_alpha')
         # discrete equations of motion/en/latest/project_structure.html
         self._model.set_rhs('x', self.x + self.v * casadi.cos(self.phi) * dt)
         self._model.set_rhs('y', self.y + self.v * casadi.sin(self.phi) * dt)
         self._model.set_rhs('phi', self.phi + self.w * dt)
-        #self._model.set_rhs('v', self.v + self.u_a * dt)
-        #self._model.set_rhs('w', self.w + self.u_alpha * dt)
         # pedestrians
         self.p_peds = self._model.set_variable('_tvp', 'p_peds', shape=(4, self._total_peds))
         #setup
@@ -94,7 +90,7 @@ class DoMPCController:
         self.terminal_cost = (self.p_rob_N - self._p_rob_ref).T @ self._Q @ (self.p_rob_N - self._p_rob_ref)
         # set cost
         self._mpc.set_objective(lterm=self.stage_cost, mterm=self.terminal_cost)
-        self._mpc.set_rterm(v=1e-2, w=1e-2)
+        self._mpc.set_rterm(v=1e-2, w=1e-2) #TODO: Вот этот терм для обычной unicycle модели важен, так по сути будет сглаживать скорости и делать движение плавнее
         # bounds
         # lb
         self._mpc.bounds['lower', '_u', 'v'] = self._lb[0]
