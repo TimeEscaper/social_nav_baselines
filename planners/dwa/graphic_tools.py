@@ -60,7 +60,9 @@ def make_animation(y_rob_plt: np.ndarray,
     # config parse
     # General
     X_rob_init: np.ndarray = np.array(config['X_rob_init'])
+    X_rob_init[0], X_rob_init[1] = X_rob_init[1], X_rob_init[0]
     p_rob_ref: np.ndarray = np.array(config['p_rob_ref'])
+    p_rob_ref[0], p_rob_ref[1] = p_rob_ref[1], p_rob_ref[0]
     dt: float = config['dt']
     r_rob: float = config['r_rob']
     r_ped: float = config['r_ped']
@@ -119,12 +121,12 @@ def make_animation(y_rob_plt: np.ndarray,
         ax.plot(float(p_rob_ref[0]), float(p_rob_ref[1]), 'y*', markersize=10)
         # annotate robot goal
         goal_coord = (round(float(p_rob_ref[0]), 2), round(float(p_rob_ref[1]), 2))
-        ax.annotate(f'Start: {goal_coord}', goal_coord - np.array([0, r_rob]) - annotation_offset,  ha='center') # Какой-то баг, я почему в анимации стартую из гола, а еду в старт, сделал костыль пока и поменял слова местами))))))
+        ax.annotate(f'Goal: {goal_coord}', goal_coord - np.array([0, r_rob]) - annotation_offset,  ha='center') 
         # plot robot start
         ax.plot(float(X_rob_init[0]), float(X_rob_init[1]), 'yo', markersize=10)
         # annotate robot start
         start_coord = (round(float(X_rob_init[0]), 2), round(float(X_rob_init[1]), 2))
-        ax.annotate(f'Goal: {start_coord}', start_coord - np.array([0, r_rob]) - annotation_offset,  ha='center')
+        ax.annotate(f'Start: {start_coord}', start_coord - np.array([0, r_rob]) - annotation_offset,  ha='center')
         # plot robot direction arrow
         plt.arrow(x_rob_plt[cnt], y_rob_plt[cnt], np.sin(phi_rob_plt[cnt])*r_rob,  np.cos(phi_rob_plt[cnt])*r_rob, color='b', width=r_rob/5)
         # plot predicted robot trajectory

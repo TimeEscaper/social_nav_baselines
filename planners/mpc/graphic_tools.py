@@ -60,7 +60,9 @@ def make_animation(y_rob_plt: np.ndarray,
     # config parse
     # General
     X_rob_init: np.ndarray = np.array(config['X_rob_init'])
+    X_rob_init[0], X_rob_init[1] = X_rob_init[1], X_rob_init[0]
     p_rob_ref: np.ndarray = np.array(config['p_rob_ref'])
+    p_rob_ref[0], p_rob_ref[1] = p_rob_ref[1], p_rob_ref[0]
     dt: float = config['dt']
     r_rob: float = config['r_rob']
     r_ped: float = config['r_ped']
