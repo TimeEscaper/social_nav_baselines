@@ -1,32 +1,30 @@
-import math
-import os
-import pathlib
-import random
-import sys
-import time
-from typing import *
-
-import numpy as np
-import pygame
-import yaml
-from pyminisim.core import Simulation
-from pyminisim.pedestrians import (HeadedSocialForceModelPolicy,
-                                   RandomWaypointTracker)
-from pyminisim.robot import UnicycleRobotModel
+from pyminisim.world_map import EmptyWorld
+from pyminisim.visual import CircleDrawing, Renderer
 from pyminisim.sensors import (PedestrianDetector, PedestrianDetectorConfig,
                                PedestrianDetectorNoise)
-from pyminisim.visual import CircleDrawing, Renderer
-from pyminisim.world_map import EmptyWorld
+from pyminisim.robot import UnicycleRobotModel
+from pyminisim.pedestrians import (HeadedSocialForceModelPolicy,
+                                   RandomWaypointTracker)
+from pyminisim.core import Simulation
+import yaml
+import pygame
+import numpy as np
+from typing import *
+import time
+import random
+import math
+import os
+import sys
 
 sys.path.append('../')
 
+import pathlib
 planners_path = str(pathlib.Path(__file__).parent.parent.parent.resolve())
 sys.path.append(planners_path)
-
 from planners.utils import graphic_tools
 
 def propagate_all_pedestrians(p_peds_k: np.ndarray,
-                              dt: float) -> np.ndarray:
+                              dt: float):
     """ Function returns next state for the specified pedestrians
 
     Propagation model with constant velocity
@@ -76,6 +74,20 @@ def create_sim(p_rob_init: np.ndarray,
     return sim, renderer
 
 
+def hex_to_rgb(value: str) -> Tuple[int]:
+    """Function convert HEX format color to RGB
+
+    Args:
+        value (str): HEX color: '#f2a134'
+
+    Returns:
+        Tuple[int]: RGB color: (242, 161, 52)
+    """
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
+
+
 def dwa_make_step(X_rob_cur: np.ndarray,
                   propagation_ped_traj: np.ndarray,
                   p_rob_ref: np.ndarray,
@@ -93,14 +105,18 @@ def dwa_make_step(X_rob_cur: np.ndarray,
     """
     minG = math.inf
 
-    alpha = config['weights'][0]
-    betta = config['weights'][1]
+    sigma = config['weights'][0]
+    alpha = config['weights'][1]
+    betta = config['weights'][2]
+    gamma = config['weights'][3]
+
+    v_max = config['ub'][0]
 
     best_u = [0.0, 0.0]
 
     best_pred_rob_traj = np.zeros([n_horizon, 3])
 
-    # Get speed window
+    # посчитаем допустимые скорости для движения
     v_range = np.arange(config['lb'][0], config['ub']
                         [0], config['v_resolution'])
     if 0 not in v_range:
@@ -110,15 +126,19 @@ def dwa_make_step(X_rob_cur: np.ndarray,
     if 0 not in w_range:
         np.append(w_range, 0)
 
-    # Calculate cost based on the chosen velocities
+    # Будем выбирать такую скорость, что функция стоимости была минимальной
     for v in v_range:
-        for w in w_range:
-
+        for w in w_range:  # Нужно чтобы обязательно была возможность сделать нулевую скорость, чтобы у робота был шанс остановиться
+            # Посчитаем предсказанную траекторию робота с выбранными скоростями
             pred_rob_traj = get_pred_rob_traj(X_rob_cur, v, w, n_horizon, dt)
+            # Посчитаем стоимость такой комбинации
+            G = sigma * (alpha * heading(pred_rob_traj, p_rob_ref, n_horizon) + \
+                         betta * dist(pred_rob_traj, propagation_ped_traj, n_horizon) + \
+                         gamma * (v_max - v))
 
-            G = alpha * dist_to_goal(pred_rob_traj, p_rob_ref) + \
-                betta * dist_to_peds(pred_rob_traj,
-                                     propagation_ped_traj, n_horizon)
+            # А что если я буду минимизировать расстояние до цели
+            #G = alpha * dist_to_goal(pred_rob_traj, p_rob_ref) + \
+            #    betta * dist(pred_rob_traj, propagation_ped_traj, n_horizon)
 
             if G < minG:
                 minG = G
@@ -129,18 +149,7 @@ def dwa_make_step(X_rob_cur: np.ndarray,
 
 
 def get_pred_rob_traj(X_rob_cur, v, w, n_horizon, dt) -> np.ndarray:
-    """Get robot trajectory along prediction horizon with selected pair of velocities
-
-    Args:
-        X_rob_cur (_type_): current robot state vector
-        v (_type_): selected velocity v
-        w (_type_): selected velocity w
-        n_horizon (_type_): prediction horizon
-        dt (_type_): time interval
-
-    Returns:
-        np.ndarray: predicted robot trajectory
-    """
+    # propagate rob trajectory along horizon
     pred_trajectory = np.zeros([n_horizon, 3])
     pred_trajectory[0, :] = X_rob_cur
     for i in range(1, n_horizon):
@@ -154,16 +163,9 @@ def get_pred_rob_traj(X_rob_cur, v, w, n_horizon, dt) -> np.ndarray:
     return pred_trajectory
 
 
-def dist_to_goal(pred_rob_traj, p_rob_ref) -> float:
-    """Get normalized distance to the goal after prediction propagation
-
-    Args:
-        pred_rob_traj (_type_): predicted robot trajectory with selected pair of velocities
-        p_rob_ref (_type_): reference robot position
-
-    Returns:
-        float: normalized distance: [0, 1]
-    """
+def dist_to_goal(pred_rob_traj, p_rob_ref):
+    # будем оптимизировать дистанцию до конечной цели
+    # чем ближе к цели -> тем меньше кост
     dx_0 = pred_rob_traj[0, 0] - p_rob_ref[0]
     dy_0 = pred_rob_traj[0, 1] - p_rob_ref[1]
     dist_at_beginning = math.sqrt(dx_0 ** 2 + dy_0 ** 2)
@@ -174,25 +176,36 @@ def dist_to_goal(pred_rob_traj, p_rob_ref) -> float:
 
     normalized_dist = dist_after_pred / dist_at_beginning
 
+    # print(normalized_dist)
+
     return normalized_dist
 
 
-def dist_to_peds(pred_rob_traj, propagation_ped_traj, n_horizon) -> float:
-    """Get normalized distance among each pedestrian at each timestep
+def heading(pred_rob_traj, p_rob_ref, n_horizon) -> float:
+    # is the sum of heading errors along defined path
+    sum_cost_heading = 0
+    for pred_rob_pos in pred_rob_traj:
+        dx = p_rob_ref[0] - pred_rob_pos[0]
+        dy = p_rob_ref[1] - pred_rob_pos[1]
+        error_angle = math.atan2(dy, dx)
+        overall_deviation_angle = error_angle - pred_rob_pos[2]
+        overall_deviation_angle = (
+            overall_deviation_angle + np.pi) % (2 * np.pi) - np.pi
+        # TODO: Это я типа нормализацию придумал подобно статье
+        cost = abs(overall_deviation_angle) / np.pi
+        sum_cost_heading += cost
+    return sum_cost_heading / n_horizon
 
-    Args:
-        pred_rob_traj (_type_): predicted robot trajectory with selected pair of velocities
-        propagation_ped_traj (_type_): predicted pedestrian trajectories
-        n_horizon (_type_): horizon step
 
-    Returns:
-        float: normalized distance to all the pedestrians at each time step: [0, 1]
-    """
+def dist(pred_rob_traj, propagation_ped_traj, n_horizon):
+    # функция стоимости дистанции до каждого пешехода
+    # в каждый момент времени будем искать ближайшего пешехода, при этом сами пешеходы тоже идут
+    # считать стоимость до него и суммировать в финалиную стоимость
     sum_cost_dist = 0
     for step in range(n_horizon):
         ox = propagation_ped_traj[step, :, 0]
         oy = propagation_ped_traj[step, :, 1]
-        dx = pred_rob_traj[step, 0] - ox[:, None]
+        dx = pred_rob_traj[step, 0] - ox[:, None]  # TODO: Проверить в дебагере
         dy = pred_rob_traj[step, 1] - oy[:, None]
         r = np.hypot(dx, dy)
         min_r = np.min(r)
@@ -200,6 +213,7 @@ def dist_to_peds(pred_rob_traj, propagation_ped_traj, n_horizon) -> float:
         sum_cost_dist += cost
 
     normalized_sum = sum_cost_dist / n_horizon
+    # print(normalized_sum)
     return normalized_sum
 
 
@@ -219,7 +233,14 @@ def main() -> None:
         p_rob_ref: np.ndarray = np.array(config['p_rob_ref'])
         dt: float = config['dt']
         n_horizon: int = config['n_horizon']
+        Q: np.ndarray = np.array(config['Q'])
+        R: np.ndarray = np.array(config['R'])
+        r_rob: float = config['r_rob']
+        r_ped: float = config['r_ped']
         simulation_time: float = config['simulation_time']
+        lb: List[float] = config['lb']
+        ub: List[float] = config['ub']
+        min_safe_dist: float = config['min_safe_dist']
         total_peds: int = config['total_peds']
         ped_dect_range: float = config['ped_dect_range']
         ped_dect_fov: float = np.deg2rad(config['ped_dect_fov'])
@@ -231,8 +252,7 @@ def main() -> None:
         col_hex: List[str] = config['col_hex']
         if len(col_hex) < total_peds:
             col_hex.append('#' + "%06x" % random.randint(0, 0xFFFFFF))
-        col_rgb: List[Tuple[int]] = [
-            graphic_tools.hex_to_rgb(col) for col in col_hex]
+        col_rgb: List[Tuple[int]] = [hex_to_rgb(col) for col in col_hex]
 
     # Initialization
     sim, renderer = create_sim(X_rob_init,
@@ -294,7 +314,7 @@ def main() -> None:
             gt_peds_traj[sim_step] = sim.current_state.world.pedestrians.poses[:, :2].flatten(
             )
 
-            # propagation of pedestrians inside horizon
+            # propagation of pedestrians inside horizonbest_u
             for k in range(n_horizon):
                 if k == 0:
                     propagation_ped_traj[k, :, :] = gt_ped_data
@@ -314,6 +334,7 @@ def main() -> None:
                 X_rob_cur, propagation_ped_traj, p_rob_ref, n_horizon, dt, config)
             pred_rob_traj[sim_step, :] = rob_traj[:, :2]
             sim_step += 1
+            # print(pred_rob_traj)
             for i in range(n_horizon):
                 renderer.draw(
                     f"{1000+i}", CircleDrawing(rob_traj[i, :2], 0.03, (255, 100, 0), 0))

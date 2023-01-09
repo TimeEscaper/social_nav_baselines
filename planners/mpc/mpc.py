@@ -9,7 +9,6 @@ from pyminisim.core import Simulation
 import yaml
 import pygame
 import numpy as np
-import graphic_tools
 import do_mpc
 import casadi
 from typing import *
@@ -21,6 +20,10 @@ import sys
 
 sys.path.append('..')
 
+import pathlib
+planners_path = str(pathlib.Path(__file__).parent.parent.parent.resolve())
+sys.path.append(planners_path)
+from planners.utils import graphic_tools
 
 class DoMPCController:
     def __init__(self, dt: float,
