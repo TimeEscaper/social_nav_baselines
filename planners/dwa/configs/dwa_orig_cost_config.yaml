@@ -42,4 +42,4 @@ col_hex: ['#1f77b4',                    # HEX Colors that used for visualization
           '#7f7f7f', 
           '#bcbd22', 
           '#17becf']
-animation_format: '.mp4'                # Animation format: .gif, .mp4
+animation_format: '.gif'                # Animation format: .gif, .mp4
