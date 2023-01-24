@@ -136,3 +136,6 @@ planners/dwa/results/*
 
 # VS Code
 .vscode/
+
+# Cache
+__pycache__/

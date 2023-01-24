@@ -14,7 +14,6 @@ import casadi
 from typing import *
 import time
 import random
-import math
 import os
 import sys
 
@@ -139,7 +138,7 @@ class DoMPCController:
         """
         x_goal_polar = p_rob_ref[0] - p_rob_init[0]
         y_goal_polar = p_rob_ref[1] - p_rob_init[1]
-        return np.array([p_rob_ref[0], p_rob_ref[1], math.atan2(y_goal_polar, x_goal_polar)])
+        return np.array([p_rob_ref[0], p_rob_ref[1], np.arctan2(y_goal_polar, x_goal_polar)])
 
     def propagate_all_pedestrians(self,
                                   p_peds_k: np.ndarray,
@@ -155,7 +154,7 @@ class DoMPCController:
         Return:
             p_peds_k+1 (np.ndarray): state vector at k + 1
         """
-        p_peds_k_1 = p_peds_k
+        p_peds_k_1 = p_peds_k.copy()
         x = p_peds_k_1[0, :]
         y = p_peds_k_1[1, :]
         vx = p_peds_k_1[2, :]

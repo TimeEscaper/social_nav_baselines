@@ -12,7 +12,6 @@ import numpy as np
 from typing import *
 import time
 import random
-import math
 import os
 import sys
 
@@ -36,7 +35,7 @@ def propagate_all_pedestrians(p_peds_k: np.ndarray,
     Return:
         p_peds_k+1 (np.ndarray): state vector at k + 1
     """
-    p_peds_k_1 = p_peds_k
+    p_peds_k_1 = p_peds_k.copy()
     x = p_peds_k_1[:, 0]
     y = p_peds_k_1[:, 1]
     vx = p_peds_k_1[:, 2]
@@ -103,7 +102,7 @@ def dwa_make_step(X_rob_cur: np.ndarray,
     Returns:
         np.ndarray: Control input
     """
-    minG = math.inf
+    minG = np.inf
 
     sigma = config['weights'][0]
     alpha = config['weights'][1]
@@ -168,11 +167,11 @@ def dist_to_goal(pred_rob_traj, p_rob_ref):
     # чем ближе к цели -> тем меньше кост
     dx_0 = pred_rob_traj[0, 0] - p_rob_ref[0]
     dy_0 = pred_rob_traj[0, 1] - p_rob_ref[1]
-    dist_at_beginning = math.sqrt(dx_0 ** 2 + dy_0 ** 2)
+    dist_at_beginning = np.sqrt(dx_0 ** 2 + dy_0 ** 2)
 
     dx_f = pred_rob_traj[-1, 0] - p_rob_ref[0]
     dy_f = pred_rob_traj[-1, 1] - p_rob_ref[1]
-    dist_after_pred = math.sqrt(dx_f ** 2 + dy_f ** 2)
+    dist_after_pred = np.sqrt(dx_f ** 2 + dy_f ** 2)
 
     normalized_dist = dist_after_pred / dist_at_beginning
 
@@ -187,7 +186,7 @@ def heading(pred_rob_traj, p_rob_ref, n_horizon) -> float:
     for pred_rob_pos in pred_rob_traj:
         dx = p_rob_ref[0] - pred_rob_pos[0]
         dy = p_rob_ref[1] - pred_rob_pos[1]
-        error_angle = math.atan2(dy, dx)
+        error_angle = np.arctan2(dy, dx)
         overall_deviation_angle = error_angle - pred_rob_pos[2]
         overall_deviation_angle = (
             overall_deviation_angle + np.pi) % (2 * np.pi) - np.pi
@@ -295,7 +294,7 @@ def main() -> None:
         if hold_time >= dt:  # Every ten-th step of simulation we calculate control
             X_rob_cur = sim.current_state.world.robot.state
 
-            cur_dist_to_goal = math.sqrt(
+            cur_dist_to_goal = np.sqrt(
                 (X_rob_cur[0] - p_rob_ref[0]) ** 2 + (X_rob_cur[1] - p_rob_ref[1]) ** 2)
             if cur_dist_to_goal <= min_ref_dist:
                 end_time = current_time
