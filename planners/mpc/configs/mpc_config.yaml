@@ -2,8 +2,8 @@
 # Pedestrian Model: Velocity Propagation with State Vector: [x, y, vx, vy] inside MPC propagation and SFM for simulator
 
 # General
-X_rob_init: [4, -4, 0, 0, 0]             # Initial robot state vector: [x_rob_init, y_rob_init, phi_rob_init, v_rob_init, w_rob_init], [m, m, rad, m/s, rad/s]
-p_rob_ref:  [-4, 4, 0]                 # Reference robot position: [x_rob_ref,  y_rob_ref,  phi_rob_ref], [m, m, rad]
+X_rob_init: [4, -4, 0, 0, 0]            # Initial robot state vector: [x_rob_init, y_rob_init, phi_rob_init, v_rob_init, w_rob_init], [m, m, rad, m/s, rad/s]
+p_rob_ref:  [-4, 4, 0]                  # Reference robot position: [x_rob_ref,  y_rob_ref,  phi_rob_ref], [m, m, rad]
 dt: 0.1                                 # Time interval, [s]
 n_horizon: 30                           # MPC planning horizon, [steps]
 Q: [[10000, 0, 0],
@@ -17,7 +17,7 @@ simulation_time: 20                     # Simulation time, [s]
 lb: [0, -2, -3, -3]                     # Lower bounds for NLP: [v, w, u_a, u_alpha], [m/s, rad/s, m/s^2, rad/s^2]
 ub: [2, 2, 3, 3]                        # Upper bounds for NLP: [v, w, u_a, u_alpha], [m/s, rad/s, m/s^2, rad/s^2]
 min_safe_dist: 0.5                      # Minimum safe distance to pedestrians and other objects, [m]
-total_peds: 6                           # Amount of pedestrians
+total_peds: 5                           # Amount of pedestrians
 ped_dect_range: 4                       # Pedestrian detector max range, [m]
 ped_dect_fov: 120                       # Pedestrian detector max fov, [deg] 
 misdetection_prob: 0.3                  # Probability of pedestrian misdetection

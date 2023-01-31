@@ -154,7 +154,7 @@ class DoMPCController:
         Return:
             p_peds_k+1 (np.ndarray): state vector at k + 1
         """
-        p_peds_k_1 = p_peds_k.copy()
+        p_peds_k_1 = p_peds_k[:]
         x = p_peds_k_1[0, :]
         y = p_peds_k_1[1, :]
         vx = p_peds_k_1[2, :]
@@ -174,9 +174,12 @@ def create_sim(p_rob_init: np.ndarray,
     robot_model = UnicycleRobotModel(initial_pose=p_rob_init,
                                      initial_control=np.array([0., np.deg2rad(0.)]))
     tracker = RandomWaypointTracker(world_size=(10.0, 15.0))
-    pedestrians_model = HeadedSocialForceModelPolicy(n_pedestrians=total_peds,
+    if total_peds > 0:
+        pedestrians_model = HeadedSocialForceModelPolicy(n_pedestrians=total_peds,
                                                      waypoint_tracker=tracker,
                                                      robot_visible=is_robot_visible)
+    else:
+        pedestrians_model = None
     pedestrian_detector_config = PedestrianDetectorConfig(ped_dect_range,
                                                           ped_dect_fov)
     sensors = [PedestrianDetector(config=pedestrian_detector_config,
@@ -286,8 +289,7 @@ def main() -> None:
                                          sim.current_state.world.pedestrians.velocities[:, :2]], axis=1)
             gt_ped_data[undetect_ped_ind] = x_dummy_ped
             # save for matplotlib
-            gt_peds_traj[sim_step] = sim.current_state.world.pedestrians.poses[:, :2].flatten(
-            )
+            gt_peds_traj[sim_step] = sim.current_state.world.pedestrians.poses[:, :2].flatten()
             # propagation of pedestrians inside horizon
             for k in range(n_horizon + 1):
                 if k == 0:

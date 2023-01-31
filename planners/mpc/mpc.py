@@ -161,7 +161,7 @@ class DoMPCController:
         Return:
             p_peds_k+1 (np.ndarray): state vector at k + 1
         """
-        p_peds_k_1 = p_peds_k.copy()
+        p_peds_k_1 = p_peds_k[:]
         x = p_peds_k_1[0, :]
         y = p_peds_k_1[1, :]
         vx = p_peds_k_1[2, :]
