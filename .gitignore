@@ -129,10 +129,7 @@ dmypy.json
 .pyre/
 
 # Result folders
-planners/mpc/results/*
-!planners/mpc/results/.gitkeep
-planners/dwa/results/*
-!planners/dwa/results/.gitkeep
+results/
 
 # VS Code
 .vscode/
