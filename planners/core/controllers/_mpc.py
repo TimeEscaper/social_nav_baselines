@@ -43,6 +43,7 @@ class DoMPCController(AbstractController):
             r_ped (float): Pedestrian radius, [m]
             min_safe_dist (float): Minimal safe distance between robot and pedestrian, [m]
             predictor (AbstractPredictor): Predictor, [Constant Velocity Predictor, Neural Predictor]
+            # TODO
 
         Returns:
             _type_: None
@@ -88,7 +89,7 @@ class DoMPCController(AbstractController):
         self._model.set_rhs("y", y + v * casadi.sin(phi) * dt)
         self._model.set_rhs("phi", phi + w * dt)
         # pedestrians
-        state_peds = self._model.set_variable(
+        self._state_peds = self._model.set_variable(
             "_tvp", "p_peds", shape=(4, total_peds))
         # goal
         current_goal = self._model.set_variable(
@@ -146,7 +147,7 @@ class DoMPCController(AbstractController):
         # Horizontally concatenated array of robot current position for all the pedestrians
         p_rob_hcat = casadi.hcat([self._model._x.cat[:2]
                                  for _ in range(total_peds)])
-        p_peds = state_peds[:2, :]
+        p_peds = self._state_peds[:2, :]
         dx_dy_square = (p_rob_hcat - p_peds) ** 2
         peds_dists_square = dx_dy_square[0, :] + dx_dy_square[1, :]
         self._mpc.set_nl_cons("dist_to_peds", -peds_dists_square,
@@ -169,7 +170,7 @@ class DoMPCController(AbstractController):
     def get_ref_direction(self,
                           state: np.ndarray,
                           goal: np.ndarray) -> np.ndarray:
-        """ Get direction angle of reference position
+        """Get direction angle of reference position
 
         This helps MPC to find solution when the reference point is located behind the robot.
 

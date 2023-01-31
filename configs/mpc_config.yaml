@@ -8,7 +8,7 @@
 init_state: [-4, -4, 0]                    # Initial robot state vector: [x_rob_init, y_rob_init, phi_rob_init], [m, m, rad, m/s, rad/s]
 goal: [4, 4, 0]                            # Reference robot position: [x_rob_ref,  y_rob_ref,  phi_rob_ref], [m, m, rad]
 dt: 0.1                                    # Time interval, [s]
-horizon: 10                                # MPC planning horizon, [steps]
+horizon: 25                                # MPC planning horizon, [steps]
 model_type: "unicycle"                     # Robot model, ["unicycle", "unicycle double integrator"]
 ped_predictor: "constant velocity"         # Pedestrian predictor, ["constant velocity", "neural"]
 Q: [[10000, 0, 0],   

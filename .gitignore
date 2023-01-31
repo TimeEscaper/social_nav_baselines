@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # Result folders
-results/
+results
 
 # VS Code
 .vscode/
