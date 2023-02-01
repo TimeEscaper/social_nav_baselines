@@ -25,7 +25,8 @@ class DoMPCController(AbstractController):
                  predictor: AbstractPredictor,
                  is_store_robot_predicted_trajectory: bool,
                  max_ghost_tracking_time: int,
-                 state_dummy_ped: List[float]) -> None:
+                 state_dummy_ped: List[float],
+                 solver: str) -> None:
         """Initiazition of the class instance
 
         Args:
@@ -104,7 +105,10 @@ class DoMPCController(AbstractController):
             "n_horizon": horizon,
             "t_step": dt,
             "store_full_solution": is_store_robot_predicted_trajectory,
-            "nlpsol_opts": {"ipopt.print_level": 0, "ipopt.sb": "yes", "print_time": 0}
+            "nlpsol_opts": {"ipopt.print_level": 0, 
+                            "ipopt.sb": "yes", 
+                            "print_time": 0,
+                            'ipopt.linear_solver': solver}
         }
         self._mpc.set_param(**setup_mpc)
         # stage cost

@@ -5,7 +5,7 @@
 # Pedestrian Model for the controller, [ped_predictor]: 
 #       1. Constant Velocity Propagation with State Vector: [x, y, vx, vy]
 
-init_state: [-4, -4, 0]                    # Initial robot state vector: [x_rob_init, y_rob_init, phi_rob_init], [m, m, rad, m/s, rad/s]
+init_state: [-4, -4, 0]                    # Initial robot state vector: [x_rob_init, y_rob_init, phi_rob_init], [m, m, rad]
 goal: [4, 4, 0]                            # Reference robot position: [x_rob_ref,  y_rob_ref,  phi_rob_ref], [m, m, rad]
 dt: 0.1                                    # Time interval, [s]
 horizon: 25                                # MPC planning horizon, [steps]
@@ -30,3 +30,4 @@ is_robot_visible: True                     # Boolean flag of robot visibility fo
 tollerence_error: 0.1                      # Tollernce error for the Euclidean distance to the goal, [m]
 is_store_robot_predicted_trajectory: True  # Flag to store robot predicted trajectory, [True, False]
 max_ghost_tracking_time: 15                # Amount of steps to track ghost pedestrian, [step]
+solver: "MA57"                             # NLP Solver for Casadi, ["MUMPS", "MA27", "MA57", "MA77", "MA86", "MA97"]

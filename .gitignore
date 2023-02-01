@@ -129,10 +129,13 @@ dmypy.json
 .pyre/
 
 # Result folders
-results
+results/
 
 # VS Code
 .vscode/
 
 # Cache
 __pycache__/
+
+# Solvers
+solvers/

@@ -62,7 +62,8 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
                                  predictor,
                                  config["is_store_robot_predicted_trajectory"],
                                  config["max_ghost_tracking_time"],
-                                 config["state_dummy_ped"])
+                                 config["state_dummy_ped"],
+                                 config["solver"])
     visualizer = Visualizer(config["total_peds"],
                             renderer)
 
