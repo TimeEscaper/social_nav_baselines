@@ -35,7 +35,7 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
                                 0.1,
                                 (255, 0, 0),
                                 0))
-    if config["ped_predictor"] == "constant velocity":
+    if config["ped_predictor"] == "constant_velocity":
         if config["total_peds"] > 0:
             predictor = ConstantVelocityPredictor(config["dt"],
                                                   config["total_peds"],

@@ -152,7 +152,7 @@ class DoMPCController:
                                   dt: float):
         """ Function returns next state for the specified pedestrians
 
-        Propagation model with constant velocity
+        Propagation model with constant_velocity
 
         Args:
             p_peds_k (np.ndarray): state vector of all pedestrians: [x_init,  y_init, vx, vy], [m, m, m/s, m/s]

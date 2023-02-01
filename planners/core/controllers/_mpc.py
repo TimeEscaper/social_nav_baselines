@@ -34,7 +34,7 @@ class DoMPCController(AbstractController):
             goal (np.ndarray): Goal of the system
             horizon (int): Prediction horizon of the controller, [steps]
             dt (float): Time delta, [s]
-            model_type (str): Type of the model, ["unicycle", "unicycle double integrator"]
+            model_type (str): Type of the model, ["unicycle", "unicycle_double_integrator"]
             total_peds (int): Amount of pedestrians in the system, >= 0
             Q (np.ndarray): State weighted matrix, [state_dim * state_dim]
             R (np.ndarray): Control weighted matrix, [control_dim * control_dim]
@@ -75,7 +75,7 @@ class DoMPCController(AbstractController):
             # control input variables
             v = self._model.set_variable("_u", "v")
             w = self._model.set_variable("_u", "w")
-        elif model_type == "unicycle double integrator":
+        elif model_type == "unicycle_double_integrator":
             # state variables
             v = self._model.set_variable("_x", "v")
             w = self._model.set_variable("_x", "w")
@@ -123,7 +123,7 @@ class DoMPCController(AbstractController):
                                 mterm=terminal_cost)
         if model_type == "unicycle":
             self._mpc.set_rterm(v=1e-2, w=1e-2)
-        elif model_type == "unicycle double integrator":                      
+        elif model_type == "unicycle_double_integrator":                      
             self._mpc.set_rterm(u_a=1e-2, u_alpha=1e-2)
         # bounds
         if model_type == "unicycle":
@@ -133,17 +133,17 @@ class DoMPCController(AbstractController):
             # ub
             self._mpc.bounds['upper', '_u', 'v'] = ub[0]
             self._mpc.bounds['upper', '_u', 'w'] = ub[1]
-        elif model_type == "unicycle double integrator":
+        elif model_type == "unicycle_double_integrator":
             # lb
             self._mpc.bounds["lower", "_x", "v"] = lb[0]
             self._mpc.bounds["lower", "_x", "w"] = lb[1]
-            self._mpc.bounds["lower", "_u", "u_a"] = lb[2]
-            self._mpc.bounds["lower", "_u", "u_alpha"] = lb[3]
+            self._mpc.bounds["lower", "_u", "u_a"] = -3
+            self._mpc.bounds["lower", "_u", "u_alpha"] = -3
             # ub
             self._mpc.bounds["upper", "_x", "v"] = ub[0]
             self._mpc.bounds["upper", "_x", "w"] = ub[1]
-            self._mpc.bounds["upper", "_u", "u_a"] = ub[2]
-            self._mpc.bounds["upper", "_u", "u_alpha"] = ub[3]
+            self._mpc.bounds["upper", "_u", "u_a"] = 3
+            self._mpc.bounds["upper", "_u", "u_alpha"] = 3
         # distance to pedestrians
         lb_dist_square = (r_rob + r_ped + min_safe_dist) ** 2
         lb_dists_square = np.array([lb_dist_square for _ in range(total_peds)])

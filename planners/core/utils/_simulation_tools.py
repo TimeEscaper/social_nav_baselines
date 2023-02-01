@@ -21,7 +21,7 @@ def create_sim(init_state: np.ndarray,
 
     Args:
         init_state (np.ndarray): Initial state of the system
-        model_type (str): Type of the model, ["unicycle", "unicycle double integrator"]
+        model_type (str): Type of the model, ["unicycle", "unicycle_double_integrator"]
         total_peds (int): Amount of pedestrians in the system, >= 0
         is_robot_visible (bool): Robot visibity flag for pedestrians
         ped_dect_range (float): Range of the pedestrian detector, [m]
@@ -35,7 +35,7 @@ def create_sim(init_state: np.ndarray,
     if model_type == "unicycle":
         robot_model = UnicycleRobotModel(initial_pose=init_state,
                                      initial_control=np.array([0., np.deg2rad(0.)]))
-    elif model_type == "unicycle double integrator":
+    elif model_type == "unicycle_double_integrator":
         robot_model = UnicycleDoubleIntegratorRobotModel(initial_state=init_state,
                                                         initial_control=np.array([0., np.deg2rad(0.)]))
     pedestrians_model = None
