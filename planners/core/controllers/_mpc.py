@@ -58,9 +58,6 @@ class DoMPCController(AbstractController):
                          max_ghost_tracking_time)
         self._predictor = predictor
         self._is_store_robot_predicted_trajectory = is_store_robot_predicted_trajectory
-        #self._ghost_tracking_times : List[int]= [0] * total_peds
-        #self._max_ghost_tracking_time = max_ghost_tracking_time
-        #self._state_dummy_ped = state_dummy_ped
 
         # Architecture requires at least one dummy pedestrian in the system
         if total_peds == 0:
