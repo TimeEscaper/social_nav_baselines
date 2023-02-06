@@ -171,8 +171,10 @@ class Visualizer():
             # plot robot position
             ax.plot(x_rob_plt[:cnt], y_rob_plt[:cnt],
                     linewidth=3, color='blue', label='Robot')
-            ax.set_xlim([min_x_plt - r_rob - 0.5, max_x_plt + r_rob + 0.5])
-            ax.set_ylim([min_y_plt - r_rob - 0.5, max_y_plt + r_rob + 0.5])
+            ax.set_xlim([-5, 5])
+            ax.set_ylim([-5, 5])
+            #ax.set_xlim([min_x_plt - r_rob - 0.5, max_x_plt + r_rob + 0.5])
+            #ax.set_ylim([min_y_plt - r_rob - 0.5, max_y_plt + r_rob + 0.5])
             # plot robot area
             robot_radius_plot = plt.Circle(
                 (x_rob_plt[cnt], y_rob_plt[cnt]), r_rob, fill=False, linewidth=5, color='blue')
@@ -186,11 +188,10 @@ class Visualizer():
                         np.array([0, r_rob]) + annotation_offset,  ha='center')
             # plot robot goal
             goal: np.ndarray = self._set_of_goals[cnt]
-            goal[0], goal[1] = goal[1], goal[0]
-            ax.plot(float(goal[0]), float(goal[1]), 'y*', markersize=10)
+            ax.plot(float(goal[1]), float(goal[0]), 'y*', markersize=10)
             # annotate robot goal
-            goal_coord = (round(float(goal[0]), 2), round(
-                float(goal[1]), 2))
+            goal_coord = (round(float(goal[1]), 2), round(
+                float(goal[0]), 2))
             ax.annotate(f'Goal: {goal_coord}', goal_coord +
                         np.array([0, r_rob]) + annotation_offset,  ha='center')
             # plot robot start

@@ -31,7 +31,7 @@ is_robot_visible: True                     # Boolean flag of robot visibility fo
 tollerence_error: 0.1                      # Tollernce error for the Euclidean distance to the goal, [m]
 is_store_robot_predicted_trajectory: True  # Flag to store robot predicted trajectory, [True, False]
 max_ghost_tracking_time: 0                 # Amount of steps to track ghost pedestrian, [step]
-solver: "MA27"                             # NLP Solver for Casadi, ["MUMPS", "MA27", "MA57", "MA77", "MA86", "MA97"]
+solver: "MA57"                             # NLP Solver for Casadi, ["MUMPS", "MA27", "MA57", "MA77", "MA86", "MA97"]
 waypoint_tracker: "fixed"                  # Choose a waypoint tracker for pedestrians: ["random", "fixed"]
 pedestrians_init_states: [                 # Only for "fixed" waypoint_tracker
   [ 4,  0,  0],                            # Provide initial states of the pedestrians according to the amount specified in total_peds, [x, y, phi], [m, m, rad]
