@@ -20,6 +20,7 @@ class Visualizer():
         self._total_peds = total_peds
         self._palette_hex = DEFAULT_COLOR_HEX_PALETTE
         self._palette_rgb: List[int] = []
+        self._set_of_goals: List[np.ndarray] = []
         if len(self._palette_hex) < total_peds:
             self._palette_hex.append('#' + "%06x" % random.randint(0, 0xFFFFFF))
         for color_hex in self._palette_hex:
@@ -60,6 +61,8 @@ class Visualizer():
     def append_ground_truth_robot_state(self,
                                         ground_truth_robot_state: List[float]) -> None:
         self._ground_truth_robot_trajectory.append(ground_truth_robot_state)
+        # Goal propagation 
+        self._set_of_goals.append(self._set_of_goals[-1])
 
     def append_predicted_pedestrians_trajectories(self,
                                            predicted_pedestrians_poses: List[List[float]]) -> None:
@@ -104,6 +107,7 @@ class Visualizer():
                                           0.1,
                                           (255, 0, 0),
                                           0))
+        self._set_of_goals.append(new_goal)
 
     def make_animation(self,
                        title: str,
@@ -112,8 +116,6 @@ class Visualizer():
         # General
         init_state: np.ndarray = np.array(config['init_state'])
         init_state[0], init_state[1] = init_state[1], init_state[0]
-        goal: np.ndarray = np.array(config['goal'])
-        goal[0], goal[1] = goal[1], goal[0]
         dt: float = config['dt']
         r_rob: float = config['r_rob']
         r_ped: float = config['r_ped']
@@ -183,12 +185,14 @@ class Visualizer():
             ax.annotate(f'Robot: {robot_coord}', robot_coord +
                         np.array([0, r_rob]) + annotation_offset,  ha='center')
             # plot robot goal
+            goal: np.ndarray = self._set_of_goals[cnt]
+            goal[0], goal[1] = goal[1], goal[0]
             ax.plot(float(goal[0]), float(goal[1]), 'y*', markersize=10)
             # annotate robot goal
             goal_coord = (round(float(goal[0]), 2), round(
                 float(goal[1]), 2))
-            ax.annotate(f'Goal: {goal_coord}', goal_coord -
-                        np.array([0, r_rob]) - annotation_offset,  ha='center')
+            ax.annotate(f'Goal: {goal_coord}', goal_coord +
+                        np.array([0, r_rob]) + annotation_offset,  ha='center')
             # plot robot start
             ax.plot(float(init_state[0]), float(
                 init_state[1]), 'yo', markersize=10)

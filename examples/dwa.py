@@ -1,4 +1,4 @@
-from planners.core.controllers import DoMPCController
+from planners.core.controllers import DWAController
 from planners.core.predictors import ConstantVelocityPredictor
 from planners.core.utils import create_sim
 from planners.core.visualizer import Visualizer
@@ -10,18 +10,18 @@ import pathlib
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_CONFIG_PATH = r"configs/mpc_config.yaml"
-DEFAULT_RESULT_PATH = r"results/mpc.gif"
+DEFAULT_CONFIG_PATH = r"configs/dwa_config.yaml"
+DEFAULT_RESULT_PATH = r"results/dwa.gif"
 
 def main(config_path: str = DEFAULT_CONFIG_PATH,
          result_path: str = DEFAULT_RESULT_PATH) -> None:
-
+    
     # Initialization
     with open(config_path) as f:
         config = yaml.safe_load(f)
 
     simulator, renderer = create_sim(np.array(config["init_state"]),
-                                     config["model_type"],
+                                     "unicycle",
                                      config["total_peds"],
                                      config["is_robot_visible"],
                                      config["ped_dect_range"],
@@ -40,34 +40,30 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
                                                   config["horizon"])
     elif config["ped_predictor"] == "neural":
         pass
-    controller = DoMPCController(np.array(config["init_state"]),
-                                 np.array(config["goal"]),
-                                 config["horizon"],
-                                 config["dt"],
-                                 config["model_type"],
-                                 config["total_peds"],
-                                 np.array(config["Q"]),
-                                 np.array(config["R"]),
-                                 config["lb"],
-                                 config["ub"],
-                                 config["r_rob"],
-                                 config["r_ped"],
-                                 config["min_safe_dist"],
-                                 predictor,
-                                 config["is_store_robot_predicted_trajectory"],
-                                 config["max_ghost_tracking_time"],
-                                 config["state_dummy_ped"],
-                                 config["solver"])
+    controller = DWAController(np.array(config["init_state"]),
+                               np.array(config["goal"]),
+                               config["dt"],
+                               config["horizon"],
+                               predictor,
+                               config["cost_function"],
+                               config["v_res"],
+                               config["w_res"],
+                               config["lb"],
+                               config["ub"],
+                               config["weights"],
+                               config["total_peds"],
+                               config["state_dummy_ped"],
+                               config["max_ghost_tracking_time"])
     visualizer = Visualizer(config["total_peds"],
                             renderer)
     visualizer.visualize_goal(config["goal"])
-    
+
     # Loop
     simulator.step()
     hold_time = simulator.sim_dt
     state = config["init_state"]
     control = np.array([0, 0]) 
-
+    
     while True:
         renderer.render()
         if hold_time >= controller.dt:
@@ -111,7 +107,7 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
         hold_time += simulator.sim_dt
     pygame.quit()
 
-    visualizer.make_animation("Model Predictive Control",
+    visualizer.make_animation("Dynamic Window Approach",
                               DEFAULT_RESULT_PATH,
                               config)
 

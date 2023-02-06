@@ -53,13 +53,14 @@ class DoMPCController(AbstractController):
                          self.get_ref_direction(init_state,
                                                 goal),
                          horizon,
-                         dt)
+                         dt,
+                         state_dummy_ped,
+                         max_ghost_tracking_time)
         self._predictor = predictor
         self._is_store_robot_predicted_trajectory = is_store_robot_predicted_trajectory
-        self._previously_detected_pedestrians: Set[int] = set()
-        self._ghost_tracking_times : List[int]= [0] * total_peds
-        self._max_ghost_tracking_time = max_ghost_tracking_time
-        self._state_dummy_ped = state_dummy_ped
+        #self._ghost_tracking_times : List[int]= [0] * total_peds
+        #self._max_ghost_tracking_time = max_ghost_tracking_time
+        #self._state_dummy_ped = state_dummy_ped
 
         # Architecture requires at least one dummy pedestrian in the system
         if total_peds == 0:
@@ -171,24 +172,6 @@ class DoMPCController(AbstractController):
         self.set_new_goal(init_state,
                           goal)
 
-    def get_ref_direction(self,
-                          state: np.ndarray,
-                          goal: np.ndarray) -> np.ndarray:
-        """Get direction angle of reference position
-
-        This helps MPC to find solution when the reference point is located behind the robot.
-
-        Args:
-            state (np.ndarray): initial robot state vector (for more details see config file)
-            goal (np.ndarray): reference robot position (for more details see config file)
-
-        Returns:
-            np.ndarray: goal (np.ndarray): reference robot position with a changed direction
-        """
-        x_goal_polar = goal[0] - state[0]
-        y_goal_polar = goal[1] - state[1]
-        return np.array([goal[0], goal[1], np.arctan2(y_goal_polar, x_goal_polar)])
-
     def predict(self,
                 ground_truth_pedestrians_state: np.ndarray) -> np.ndarray:
         """Method predicts pedestrian trajectories with specified predictor
@@ -219,36 +202,9 @@ class DoMPCController(AbstractController):
     def set_new_goal(self,
                      current_state: np.ndarray,
                      new_goal: np.ndarray) -> None:
-        new_goal = self.get_ref_direction(current_state,
-                                          new_goal)
-        self._mpc_tvp_fun['_tvp', :, 'current_goal'] = new_goal
-        self.goal = new_goal
-
-    def get_pedestrains_ghosts_states(self,
-                                      ground_truth_pedestrians_state: np.ndarray,
-                                      undetected_pedestrian_indices: List[int]) -> np.ndarray:
-        """Methods returns states for the pedestrians taking into account the ghosts.
-
-        Ghost is a pedestrian that was previously seen and dissepeared from the vision field.
-        This method helps the controller to take into account stored trajectories of the ghosts
-
-        Args:
-            ground_truth_pedestrians_state (np.ndarray): This is the structure of ground truth states. Here every ghost has a dummy pedestrian state.
-            undetected_pedestrian_indices (List[int]): Structure to keep undetected pedestrians at this time step.
-
-        Returns:
-            np.ndarray: Structure with ground truth states of detected pedestrians, memorized states of the missed but previously seen pedestrians and dummy states for previously not seen pedestrians.
-        """
-        pedestrains_ghosts_states = np.copy(ground_truth_pedestrians_state)
-        for undetected_pedestrian in undetected_pedestrian_indices:
-            if undetected_pedestrian in self._previously_detected_pedestrians:
-                pedestrains_ghosts_states[undetected_pedestrian] = self._predicted_pedestrians_trajectories[1, undetected_pedestrian]
-                self._ghost_tracking_times[undetected_pedestrian] += 1
-                if self._ghost_tracking_times[undetected_pedestrian] > self._max_ghost_tracking_time:
-                    self._ghost_tracking_times[undetected_pedestrian] = 0
-                    pedestrains_ghosts_states[undetected_pedestrian] = self._state_dummy_ped
-                    self._previously_detected_pedestrians.remove(undetected_pedestrian)
-        return pedestrains_ghosts_states
+        super().set_new_goal(current_state,
+                             new_goal)
+        self._mpc_tvp_fun['_tvp', :, 'current_goal'] = self.goal
 
     @property
     def predictor(self) -> AbstractPredictor:
@@ -261,15 +217,6 @@ class DoMPCController(AbstractController):
     @property
     def ghost_tracking_times(self) -> List[int]:
         return self._ghost_tracking_times
-    
-    @property
-    def previously_detected_pedestrians(self) -> Set[int]:
-        return self._previously_detected_pedestrians
-
-    @previously_detected_pedestrians.setter
-    def previously_detected_pedestrians(self,
-                                        new_detected_pedestrians: Set[int]) -> Set[int]:
-        self._previously_detected_pedestrians = new_detected_pedestrians
     
     @property
     def max_ghost_tracking_time(self) -> int:
