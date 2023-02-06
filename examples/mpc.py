@@ -1,7 +1,7 @@
-from planners.core.controllers import DoMPCController
-from planners.core.predictors import ConstantVelocityPredictor
-from planners.core.utils import create_sim
-from planners.core.visualizer import Visualizer
+from core.controllers import DoMPCController
+from core.predictors import ConstantVelocityPredictor
+from core.utils import create_sim
+from core.visualizer import Visualizer
 import numpy as np
 import fire
 import yaml

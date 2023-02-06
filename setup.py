@@ -3,16 +3,13 @@ from setuptools import setup
 
 setup(
     name='planners',
-    version='0.1.0',
+    version='0.1.1',
     packages=[
-        'planners',
-        'planners.core',
-        'planners.core.configurator',
-        'planners.core.controllers',
-        'planners.core.predictors',
-        'planners.core.utils',
-        'planners.core.visualizer',
-        'planners.configs',
+        'core',
+        'core.controllers',
+        'core.predictors',
+        'core.utils',
+        'core.visualizer'
     ],
     install_requires=[
         'pygame',

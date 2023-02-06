@@ -1,9 +1,9 @@
 from ._controller import AbstractController
-from planners.core.predictors import AbstractPredictor
+from core.predictors import AbstractPredictor
 import numpy as np
 import do_mpc
 import casadi
-from typing import List, Set
+from typing import List
 
 
 class DoMPCController(AbstractController):
@@ -58,7 +58,8 @@ class DoMPCController(AbstractController):
                          max_ghost_tracking_time)
         self._predictor = predictor
         self._is_store_robot_predicted_trajectory = is_store_robot_predicted_trajectory
-
+        self._ghost_tracking_times : List[int]= [0] * total_peds
+        
         # Architecture requires at least one dummy pedestrian in the system
         if total_peds == 0:
             total_peds = 1

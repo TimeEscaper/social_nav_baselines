@@ -1,5 +1,5 @@
 from ._controller import AbstractController
-from planners.core.predictors import AbstractPredictor
+from core.predictors import AbstractPredictor
 import numpy as np
 from typing import List
 
