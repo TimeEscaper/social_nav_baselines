@@ -1,4 +1,4 @@
 [submodule "pyminisim"]
 	path = pyminisim
 	url = https://github.com/TimeEscaper/pyminisim.git
-	branch = baseline_setup
+	branch = experimental_improvements

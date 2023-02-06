@@ -6,8 +6,9 @@ from pyminisim.sensors import (PedestrianDetector, PedestrianDetectorConfig,
                                PedestrianDetectorNoise)
 from pyminisim.robot import UnicycleDoubleIntegratorRobotModel, UnicycleRobotModel
 from pyminisim.pedestrians import (HeadedSocialForceModelPolicy,
-                                   RandomWaypointTracker)
+                                   RandomWaypointTracker, FixedWaypointTracker)
 from pyminisim.core import Simulation
+from typing import List
 
 def create_sim(init_state: np.ndarray,
                model_type: str,
@@ -16,7 +17,10 @@ def create_sim(init_state: np.ndarray,
                ped_dect_range: float,
                ped_dect_fov: int,
                misdetection_prob: float,
-               dt: float) -> Tuple[Simulation, Renderer]:
+               dt: float,
+               waypoint_tracker: str,
+               pedestrians_init_states: List[List[float]],
+               pedestrians_goals: List[List[List[float]]]) -> Tuple[Simulation, Renderer]:
     """Function sets up simulation parameters
 
     Args:
@@ -28,6 +32,9 @@ def create_sim(init_state: np.ndarray,
         ped_dect_fov (int): Field of view of the pedestrian detector, [deg]
         misdetection_prob (float): Misdetection probability, range(0, 1)
         dt (float): Time delta, [s]
+        waypoint_tracker (str): Waypoint tracker for pedestrians: ["random", "fixed"]
+        pedestrians_init_states (List[List[float]]): Initial states of the pedestrians according to the amount specified in total_peds
+        pedestrians_goals (List[List[List[float]]]): Goals for the pedestrians according to the amount specified in total_peds
 
     Returns:
         Tuple[Simulation, Renderer]: Simulator and Renderer instances
@@ -41,10 +48,17 @@ def create_sim(init_state: np.ndarray,
     pedestrians_model = None
     sensors = []
     if total_peds > 0:
-        tracker = RandomWaypointTracker(world_size=(10.0, 15.0))
+        if waypoint_tracker == "random":
+            tracker = RandomWaypointTracker(world_size=(10.0, 15.0))
+            initial_poses = None
+        elif waypoint_tracker == "fixed":
+            waypoints = np.array(pedestrians_goals)
+            tracker = FixedWaypointTracker(waypoints=waypoints)
+            initial_poses = np.array(pedestrians_init_states)
         pedestrians_model = HeadedSocialForceModelPolicy(n_pedestrians=total_peds,
-                                                        waypoint_tracker=tracker,
-                                                        robot_visible=is_robot_visible) # initial_poses=np.array([[1000., 1000, 0]])                    
+                                                         waypoint_tracker=tracker,
+                                                         robot_visible=is_robot_visible,
+                                                         initial_poses=initial_poses)
         pedestrian_detector_config = PedestrianDetectorConfig(ped_dect_range,
                                                               ped_dect_fov)
         sensors = [PedestrianDetector(config=pedestrian_detector_config,

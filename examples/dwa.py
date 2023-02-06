@@ -26,7 +26,10 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                                      config["ped_dect_range"],
                                      np.deg2rad(config["ped_dect_fov"]),
                                      config["misdetection_prob"],
-                                     config["dt"] / 10)
+                                     config["dt"] / 10,
+                                     config["waypoint_tracker"],
+                                     config["pedestrians_init_states"],
+                                     config["pedestrians_goals"])
     renderer.initialize()
     if config["ped_predictor"] == "constant_velocity":
         if config["total_peds"] > 0:
