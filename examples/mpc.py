@@ -13,8 +13,7 @@ pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 DEFAULT_CONFIG_PATH = r"configs/mpc_config.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.gif"
 
-def main(config_path: str = DEFAULT_CONFIG_PATH,
-         result_path: str = DEFAULT_RESULT_PATH) -> None:
+def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
 
     # Initialization
     with open(config_path) as f:
