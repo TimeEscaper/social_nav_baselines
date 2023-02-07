@@ -80,6 +80,7 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                                                                      simulator.current_state.world.pedestrians.velocities[:, :2]], axis=1)
                     ground_truth_pedestrians_state[undetected_pedestrian_indices] = config["state_dummy_ped"]
                     controller.previously_detected_pedestrians |= set(detected_pedestrian_indices)
+                    pedestrians_ghosts_states = ground_truth_pedestrians_state
                     if undetected_pedestrian_indices:
                         pedestrians_ghosts_states = controller.get_pedestrains_ghosts_states(ground_truth_pedestrians_state,
                                                                                              undetected_pedestrian_indices)
