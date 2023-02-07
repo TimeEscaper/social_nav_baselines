@@ -30,7 +30,3 @@ class AbstractPredictor(ABC):
     @property
     def total_peds(self) -> float:
         return self._total_peds
-    
-    @property
-    def dt(self) -> float:
-        return self._total_peds

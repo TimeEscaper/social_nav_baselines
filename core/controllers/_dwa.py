@@ -43,10 +43,10 @@ class DWAController(AbstractController):
                            v_res: float,
                            w_res: float) -> np.ndarray:
         v_range = np.arange(lb[0], ub[0], v_res)
-        if 0 not in v_range:
+        if 0 not in v_range: # To be sure that 0 velocity is the possible velocity
             np.append(v_range, 0)
         w_range = np.arange(lb[1], ub[1], w_res)
-        if 0 not in w_range:
+        if 0 not in w_range: # To be sure that 0 angular velocity is the possible velocity
             np.append(w_range, 0)
         return v_range, w_range
 
@@ -85,9 +85,7 @@ class DWAController(AbstractController):
         
         min_cost = np.inf
         control = [0, 0]
-        self._predicted_pedestrians_trajectories = self._predictor.predict(ground_truth_pedestrians_state,
-                                                                           self.dt,
-                                                                           self.horizon)
+        self._predicted_pedestrians_trajectories = self._predictor.predict(ground_truth_pedestrians_state)
         for v in self._v_range:
             for w in self._w_range:
                 predicted_robot_trajectory = self._calculate_robot_trajectory(state,

@@ -23,8 +23,8 @@ lb: [0, -2]                                # Lower bounds for NLP: [v, w], [m/s,
 ub: [2, 2]                                 # Upper bounds for NLP: [v, w], [m/s, rad/s]
 min_safe_dist: 1                           # Minimum safe distance to pedestrians and other objects, [m]
 total_peds: 7                              # Amount of pedestrians
-ped_dect_range: 4                          # Pedestrian detector max range, [m]
-ped_dect_fov: 120                          # Pedestrian detector max fov, [deg] 
+ped_detc_range: 4                          # Pedestrian detector max range, [m]
+ped_detc_fov: 120                          # Pedestrian detector max fov, [deg] 
 misdetection_prob: 0.2                     # Probability of pedestrian misdetection
 state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
 is_robot_visible: True                     # Boolean flag of robot visibility for pedestrians

@@ -14,8 +14,8 @@ def create_sim(init_state: np.ndarray,
                model_type: str,
                total_peds: int,
                is_robot_visible: bool,
-               ped_dect_range: float,
-               ped_dect_fov: int,
+               ped_detc_range: float,
+               ped_detc_fov: int,
                misdetection_prob: float,
                dt: float,
                waypoint_tracker: str,
@@ -28,8 +28,8 @@ def create_sim(init_state: np.ndarray,
         model_type (str): Type of the model, ["unicycle", "unicycle_double_integrator"]
         total_peds (int): Amount of pedestrians in the system, >= 0
         is_robot_visible (bool): Robot visibity flag for pedestrians
-        ped_dect_range (float): Range of the pedestrian detector, [m]
-        ped_dect_fov (int): Field of view of the pedestrian detector, [deg]
+        ped_detc_range (float): Range of the pedestrian detector, [m]
+        ped_detc_fov (int): Field of view of the pedestrian detector, [deg]
         misdetection_prob (float): Misdetection probability, range(0, 1)
         dt (float): Time delta, [s]
         waypoint_tracker (str): Waypoint tracker for pedestrians: ["random", "fixed"]
@@ -59,8 +59,8 @@ def create_sim(init_state: np.ndarray,
                                                          waypoint_tracker=tracker,
                                                          robot_visible=is_robot_visible,
                                                          initial_poses=initial_poses)
-        pedestrian_detector_config = PedestrianDetectorConfig(ped_dect_range,
-                                                              ped_dect_fov)
+        pedestrian_detector_config = PedestrianDetectorConfig(ped_detc_range,
+                                                              ped_detc_fov)
         sensors = [PedestrianDetector(config=pedestrian_detector_config,
                                     noise=PedestrianDetectorNoise(0, 0, 0, 0, misdetection_prob))]
     sim = Simulation(sim_dt=dt,

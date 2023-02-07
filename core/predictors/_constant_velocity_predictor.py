@@ -12,8 +12,7 @@ class ConstantVelocityPredictor(AbstractPredictor):
                          horizon)
 
     def predict_one_step(self,
-                         state_peds_k: np.ndarray,
-                         dt: float) -> np.ndarray:
+                         state_peds_k: np.ndarray) -> np.ndarray:
         """Method returns next state for the specified pedestrians
 
         Propagation model with constant_velocity
@@ -29,14 +28,12 @@ class ConstantVelocityPredictor(AbstractPredictor):
         y = state_peds_k_1[1, :]
         vx = state_peds_k_1[2, :]
         vy = state_peds_k_1[3, :]
-        state_peds_k_1[0, :] = x + vx * dt
-        state_peds_k_1[1, :] = y + vy * dt
+        state_peds_k_1[0, :] = x + vx * self._dt
+        state_peds_k_1[1, :] = y + vy * self._dt
         return state_peds_k_1
 
     def predict(self,
-                state_peds_k: np.ndarray,
-                dt: float,
-                horizon: int) -> np.ndarray:
+                state_peds_k: np.ndarray) -> np.ndarray:
         """Methods predicts trajectories for all pedestrians across all prediction horizon
 
         Args:
@@ -47,11 +44,11 @@ class ConstantVelocityPredictor(AbstractPredictor):
         Returns:
             np.ndarray: Coordinates of the pedestrians trajectories, [horizon_dim, tota_peds, state_dim]
         """
-        states_peds = np.zeros([horizon + 1, *np.shape(state_peds_k)])
+        states_peds = np.zeros([self._horizon + 1, *np.shape(state_peds_k)])
         states_peds[0, :, :] = state_peds_k
         # copy velocities
         states_peds[1:, :, 2:] = states_peds[0, :, 2:]
         # propagate coordinates
-        for step in range(1, horizon + 1):
-            states_peds[step, :, :2] = states_peds[step-1, :, :2] + states_peds[step-1, :, 2:] * dt
+        for step in range(1, self._horizon + 1):
+            states_peds[step, :, :2] = states_peds[step-1, :, :2] + states_peds[step-1, :, 2:] * self._dt
         return states_peds

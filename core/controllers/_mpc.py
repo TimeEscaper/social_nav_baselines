@@ -136,8 +136,8 @@ class DoMPCController(AbstractController):
             # lb
             self._mpc.bounds["lower", "_x", "v"] = lb[0]
             self._mpc.bounds["lower", "_x", "w"] = lb[1]
-            self._mpc.bounds["lower", "_u", "u_a"] = -3
-            self._mpc.bounds["lower", "_u", "u_alpha"] = -3
+            self._mpc.bounds["lower", "_u", "u_a"] = -3      # We do not care much on acceleration constraints
+            self._mpc.bounds["lower", "_u", "u_alpha"] = -3  # Hence, we constraint them with constants in this file
             # ub
             self._mpc.bounds["upper", "_x", "v"] = ub[0]
             self._mpc.bounds["upper", "_x", "w"] = ub[1]
@@ -177,9 +177,7 @@ class DoMPCController(AbstractController):
         Args:
             ground_truth_pedestrians_state (np.ndarray): Current state of the pedestrians, [2-d numpy array]
         """
-        predicted_pedestrians_trajectories: np.ndarray = self._predictor.predict(ground_truth_pedestrians_state,
-                                                                                 self.dt,
-                                                                                 self.horizon)
+        predicted_pedestrians_trajectories: np.ndarray = self._predictor.predict(ground_truth_pedestrians_state)
         for step in range(len(self._mpc_tvp_fun['_tvp', :, 'p_peds'])):
             self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_pedestrians_trajectories[step].T
         return predicted_pedestrians_trajectories
