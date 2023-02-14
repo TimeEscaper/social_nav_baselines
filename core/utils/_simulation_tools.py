@@ -62,7 +62,8 @@ def create_sim(init_state: np.ndarray,
             pedestrians_model = OptimalReciprocalCollisionAvoidance(dt=dt,
                                                                     waypoint_tracker=tracker,
                                                                     n_pedestrians=total_peds,
-                                                                    initial_poses=initial_poses)
+                                                                    initial_poses=initial_poses,
+                                                                    robot_visible=is_robot_visible)
         elif pedestrian_model == "HSFM":
             pedestrians_model = HeadedSocialForceModelPolicy(n_pedestrians=total_peds,
                                                              waypoint_tracker=tracker,

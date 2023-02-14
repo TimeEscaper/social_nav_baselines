@@ -29,10 +29,10 @@ ub: [2, 2]                                 # Upper bounds for NLP: [v, w], [m/s,
 min_safe_dist: 1                           # Minimum safe distance to pedestrians and other objects, [m]
 total_peds: 7                              # Amount of pedestrians
 ped_detc_range: 4                          # Pedestrian detector max range, [m]
-ped_detc_fov: 180                          # Pedestrian detector max fov, [deg] 
+ped_detc_fov: 120                          # Pedestrian detector max fov, [deg] 
 misdetection_prob: 0.2                     # Probability of pedestrian misdetection
 state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
-is_robot_visible: True                     # Boolean flag of robot visibility for pedestrians
+is_robot_visible: False                    # Boolean flag of robot visibility for pedestrians
 tollerence_error: 0.1                      # Tollernce error for the Euclidean distance to the goal, [m]
 is_store_robot_predicted_trajectory: True  # Flag to store robot predicted trajectory, [True, False]
 max_ghost_tracking_time: 20                # Amount of steps to track ghost pedestrian, [step]
