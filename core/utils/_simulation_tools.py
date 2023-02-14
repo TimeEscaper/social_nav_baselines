@@ -6,7 +6,7 @@ from pyminisim.sensors import (PedestrianDetector, PedestrianDetectorConfig,
                                PedestrianDetectorNoise)
 from pyminisim.robot import UnicycleDoubleIntegratorRobotModel, UnicycleRobotModel
 from pyminisim.pedestrians import (HeadedSocialForceModelPolicy,
-                                   RandomWaypointTracker, FixedWaypointTracker)
+                                   RandomWaypointTracker, FixedWaypointTracker, OptimalReciprocalCollisionAvoidance)
 from pyminisim.core import Simulation
 from typing import List
 
@@ -20,7 +20,8 @@ def create_sim(init_state: np.ndarray,
                dt: float,
                waypoint_tracker: str,
                pedestrians_init_states: List[List[float]],
-               pedestrians_goals: List[List[List[float]]]) -> Tuple[Simulation, Renderer]:
+               pedestrians_goals: List[List[List[float]]],
+               pedestrian_model: str) -> Tuple[Simulation, Renderer]:
     """Function sets up simulation parameters
 
     Args:
@@ -48,6 +49,7 @@ def create_sim(init_state: np.ndarray,
     pedestrians_model = None
     sensors = []
     if total_peds > 0:
+
         if waypoint_tracker == "random":
             tracker = RandomWaypointTracker(world_size=(10.0, 15.0))
             initial_poses = None
@@ -55,10 +57,18 @@ def create_sim(init_state: np.ndarray,
             waypoints = np.array(pedestrians_goals)
             tracker = FixedWaypointTracker(waypoints=waypoints)
             initial_poses = np.array(pedestrians_init_states)
-        pedestrians_model = HeadedSocialForceModelPolicy(n_pedestrians=total_peds,
-                                                         waypoint_tracker=tracker,
-                                                         robot_visible=is_robot_visible,
-                                                         initial_poses=initial_poses)
+            
+        if pedestrian_model == "ORCA":
+            pedestrians_model = OptimalReciprocalCollisionAvoidance(dt=dt,
+                                                                    waypoint_tracker=tracker,
+                                                                    n_pedestrians=total_peds,
+                                                                    initial_poses=initial_poses)
+        elif pedestrian_model == "HSFM":
+            pedestrians_model = HeadedSocialForceModelPolicy(n_pedestrians=total_peds,
+                                                             waypoint_tracker=tracker,
+                                                             robot_visible=is_robot_visible,
+                                                             initial_poses=initial_poses)
+                                                             
         pedestrian_detector_config = PedestrianDetectorConfig(ped_detc_range,
                                                               ped_detc_fov)
         sensors = [PedestrianDetector(config=pedestrian_detector_config,

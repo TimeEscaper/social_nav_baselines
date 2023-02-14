@@ -56,16 +56,34 @@ class Visualizer():
 
     def append_ground_truth_pedestrians_pose(self,
                                              ground_truth_pedestrians_pose: np.ndarray) -> None:
+        """Append ground truth pedestrians pose
+
+        Args:
+            ground_truth_pedestrians_pose (np.ndarray): Two-dimensional numpy array of pedestrians poses, [[x0, y0],
+                                                                                                           [x1, y1],
+                                                                                                           ...
+                                                                                                           [xn, yn]]
+        """
         self._ground_truth_pedestrian_trajectories.append(ground_truth_pedestrians_pose)
 
     def append_ground_truth_robot_state(self,
                                         ground_truth_robot_state: List[float]) -> None:
+        """Append ground truth robot state
+
+        Args:
+            ground_truth_robot_state (List[float]): State of the robot, [x, y, theta]
+        """
         self._ground_truth_robot_trajectory.append(ground_truth_robot_state)
         # Goal propagation 
         self._set_of_goals.append(self._set_of_goals[-1])
 
     def append_predicted_pedestrians_trajectories(self,
                                            predicted_pedestrians_poses: List[List[float]]) -> None:
+        """Append predicted pedestrians trajectories
+
+        Args:
+            predicted_pedestrians_poses (List[List[float]]): _description_
+        """
         self._predicted_pedestrians_trajectories.append(predicted_pedestrians_poses)
 
     def append_predicted_robot_trajectory(self,
@@ -119,7 +137,6 @@ class Visualizer():
         dt: float = config['dt']
         r_rob: float = config['r_rob']
         r_ped: float = config['r_ped']
-        total_peds: int = config['total_peds']
         # Graphics
         annotation_offset: np.ndarray = np.array([0, 0.2])
 
@@ -208,7 +225,7 @@ class Visualizer():
             # plot predicted robot trajectory
             ax.plot(self.predicted_robot_trajectory[cnt, :, 1], self.predicted_robot_trajectory[cnt, :, 0], linewidth=1, color='blue', linestyle='dashed')
 
-            for i in range(total_peds):
+            for i in range(self._total_peds):
                 plot_pedestrian(x_peds_plt[:, i], y_peds_plt[:, i], cnt, i)
 
             # legend

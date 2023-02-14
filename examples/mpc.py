@@ -29,7 +29,8 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                                      config["dt"] / 10,
                                      config["waypoint_tracker"],
                                      config["pedestrians_init_states"],
-                                     config["pedestrians_goals"])
+                                     config["pedestrians_goals"],
+                                     config["ped_model"])
     renderer.initialize()
     if config["ped_predictor"] == "constant_velocity":
         if config["total_peds"] > 0:
@@ -112,6 +113,12 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                                         new_goal)
         simulator.step(control)
         hold_time += simulator.sim_dt
+        # Terminate the simulation anytime by pressing ESC
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    pygame.quit()
     pygame.quit()
 
     visualizer.make_animation("Model Predictive Control",
