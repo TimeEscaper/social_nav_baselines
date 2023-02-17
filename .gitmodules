@@ -1,4 +1,4 @@
 [submodule "pyminisim"]
 	path = pyminisim
 	url = https://github.com/TimeEscaper/pyminisim.git
-	branch = rvo_dev
+	branch = experimental_improvements

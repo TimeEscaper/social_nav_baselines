@@ -4,7 +4,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.animation import FuncAnimation
-from pyminisim.visual import CircleDrawing, Renderer
+from pyminisim.visual import CircleDrawing, Renderer, Covariance2dDrawing
 
 DEFAULT_COLOR_HEX_PALETTE = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
@@ -103,6 +103,16 @@ class Visualizer():
             for pedestrian in range(len(predicted_pedestrians_trajectories[0])):
                 self._renderer.draw(f"ped_{step}_{pedestrian}", CircleDrawing(
                         predicted_pedestrians_trajectories[step][pedestrian], 0.05, self._palette_rgb[pedestrian], 0))
+
+    def visualize_predicted_pedestrians_trajectory_with_covariances(self,
+                                                                    predicted_pedestrians_trajectories: List[List[float]],
+                                                                    predicted_pedestrians_covariances: np.ndarray) -> None:
+        assert self._renderer, f"You should provide renderer instance of the pyminisim to use this method!"
+        for step in range(len(predicted_pedestrians_trajectories)):
+            for pedestrian in range(len(predicted_pedestrians_trajectories[0])):
+                pos = predicted_pedestrians_trajectories[step][pedestrian]
+                self._renderer.draw(f"ped_{step}_{pedestrian}", CircleDrawing(pos, 0.05, self._palette_rgb[pedestrian], 0))
+                self._renderer.draw(f"cov_{step}_{pedestrian}", Covariance2dDrawing(pos, predicted_pedestrians_covariances[step, pedestrian, :, :], self._palette_rgb[pedestrian], 0.1))
 
     @staticmethod
     def hex_to_rgb(value: str) -> List[int]:
