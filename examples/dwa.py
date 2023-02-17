@@ -1,5 +1,5 @@
 from core.controllers import DWAController
-from core.predictors import ConstantVelocityPredictor
+from core.predictors import ConstantVelocityPredictor, NeuralPredictor
 from core.utils import create_sim
 from core.visualizer import Visualizer
 import numpy as np
@@ -42,7 +42,14 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                                                   1,
                                                   config["horizon"])
     elif config["ped_predictor"] == "neural":
-        pass
+        if config["total_peds"] > 0:
+            predictor = NeuralPredictor(config["dt"],
+                                        config["total_peds"],
+                                        config["horizon"])
+        elif config["total_peds"] == 0:
+            predictor = NeuralPredictor(config["dt"],
+                                        1,
+                                        config["horizon"])
     controller = DWAController(np.array(config["init_state"]),
                                np.array(config["goal"]),
                                config["dt"],

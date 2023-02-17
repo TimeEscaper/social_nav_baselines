@@ -1,5 +1,5 @@
 from core.controllers import DoMPCController
-from core.predictors import ConstantVelocityPredictor
+from core.predictors import ConstantVelocityPredictor, NeuralPredictor
 from core.utils import create_sim
 from core.visualizer import Visualizer
 import numpy as np
@@ -42,7 +42,14 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                                                   1,
                                                   config["horizon"])
     elif config["ped_predictor"] == "neural":
-        pass
+        if config["total_peds"] > 0:
+            predictor = NeuralPredictor(config["dt"],
+                                        config["total_peds"],
+                                        config["horizon"])
+        elif config["total_peds"] == 0:
+            predictor = NeuralPredictor(config["dt"],
+                                        1,
+                                        config["horizon"])
     controller = DoMPCController(np.array(config["init_state"]),
                                  np.array(config["goal"]),
                                  config["horizon"],
@@ -51,6 +58,7 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                                  config["total_peds"],
                                  np.array(config["Q"]),
                                  np.array(config["R"]),
+                                 config["W"],
                                  config["lb"],
                                  config["ub"],
                                  config["r_rob"],
@@ -93,8 +101,8 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                     visualizer.append_ground_truth_pedestrians_pose(simulator.current_state.world.pedestrians.poses[:, :2])
                 elif config["total_peds"] == 0:
                     pedestrians_ghosts_states = np.array([config["state_dummy_ped"]])
-                control, predicted_pedestrians_trajectories = controller.make_step(state,
-                                                                                   pedestrians_ghosts_states)
+                control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = controller.make_step(state,
+                                                                                                                      pedestrians_ghosts_states)
                 visualizer.append_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
                 visualizer.visualize_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
                 predicted_robot_trajectory = controller.get_predicted_robot_trajectory()      
