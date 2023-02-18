@@ -51,4 +51,18 @@ class ConstantVelocityPredictor(AbstractPredictor):
         # propagate coordinates
         for step in range(1, self._horizon + 1):
             states_peds[step, :, :2] = states_peds[step-1, :, :2] + states_peds[step-1, :, 2:] * self._dt
-        return states_peds
+
+         # covariance
+        """
+        Code below is a place holder for covariance propagation.
+        """
+        init_covariance = np.array(((0.0001, 0), (0, 0.0001)))
+        init_covariance_peds = np.tile(init_covariance, (np.shape(state_peds_k)[0], 1, 1))
+
+        covariance_peds = np.zeros([self._horizon + 1, np.shape(state_peds_k)[0], 2, 2])
+        covariance_peds[0, :, :, :] = init_covariance_peds
+        # covariance propagation
+        for step in range(1, self._horizon + 1):
+            covariance_peds[step, :, :, :] = covariance_peds[step - 1, :, :, :]
+
+        return states_peds, covariance_peds

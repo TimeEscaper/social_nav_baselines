@@ -22,7 +22,7 @@ Q: [[10000, 0, 0],
     [0,   0,   1]]                         # State weighted matrix: [dx, dy, dphi]
 R: [[1, 0],   
     [0, 1]]                                # Control input weighted matrix
-W: 0.5                                       # Mahalanobis distance weight
+W: 0.3                                     # Mahalanobis distance weight
 r_rob: 0.35                                # Robot radius, [m]
 r_ped: 0.3                                 # Pedestrian radius, [m]
 lb: [0, -2]                                # Lower bounds for NLP: [v, w], [m/s, rad/s]

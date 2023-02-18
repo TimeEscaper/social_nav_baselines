@@ -1,5 +1,5 @@
 from ._controller import AbstractController
-from core.predictors import AbstractPredictor
+from core.predictors import AbstractPredictor, NeuralPredictor, ConstantVelocityPredictor
 import numpy as np
 import do_mpc
 import casadi
@@ -128,7 +128,10 @@ class DoMPCController(AbstractController):
 
         # stage cost
         u = self._model._u.cat
-        stage_cost = u.T @ R @ u + W * _get_inversed_sum_of_mahalanobis_distances(p_rob_hcat, p_peds, self._covariances_peds)
+        if isinstance(predictor, NeuralPredictor):
+            stage_cost = u.T @ R @ u + W * _get_inversed_sum_of_mahalanobis_distances(p_rob_hcat, p_peds, self._covariances_peds)
+        elif isinstance(predictor, ConstantVelocityPredictor):
+            stage_cost = u.T @ R @ u
         # terminal cost
         p_rob_N = self._model._x.cat[:3]
         terminal_cost = (p_rob_N - current_goal).T @ Q @ (p_rob_N - current_goal)
@@ -214,7 +217,7 @@ class DoMPCController(AbstractController):
         self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances = self.predict(ground_truth_pedestrians_state)
         control = self._mpc.make_step(state).T[0]
         return control, self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances
-
+    
     def set_new_goal(self,
                      current_state: np.ndarray,
                      new_goal: np.ndarray) -> None:

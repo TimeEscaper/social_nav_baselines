@@ -139,3 +139,6 @@ __pycache__/
 
 # Solvers
 solvers/
+
+# Notebook files
+test.ipynb
