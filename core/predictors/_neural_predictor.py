@@ -58,7 +58,7 @@ class NeuralPredictor(AbstractPredictor):
         Code below should be changed for proper neural network,
         this is just a test
         """
-        init_covariance = np.array(((0.07, 0), (0, 0.07)))
+        init_covariance = np.array(((0.7, 0), (0, 2)))
         init_covariance_peds = np.tile(init_covariance, (np.shape(state_peds_k)[0], 1, 1))
 
         covariance_peds = np.zeros([self._horizon + 1, np.shape(state_peds_k)[0], 2, 2])

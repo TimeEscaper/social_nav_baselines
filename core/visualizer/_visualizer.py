@@ -3,6 +3,7 @@ from typing import Dict, List, Optional
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.linalg import cholesky
 from matplotlib.animation import FuncAnimation
 from pyminisim.visual import CircleDrawing, Renderer, Covariance2dDrawing
 
@@ -16,6 +17,7 @@ class Visualizer():
         self._ground_truth_robot_trajectory: List[np.ndarray] = []
         self._predicted_pedestrians_trajectories: List[np.ndarray] = []
         self._predicted_robot_trajectory: List[np.ndarray] = []
+        self._predicted_pedestrians_covariances: List = []
         self._renderer = renderer
         self._total_peds = total_peds
         self._palette_hex = DEFAULT_COLOR_HEX_PALETTE
@@ -37,6 +39,10 @@ class Visualizer():
     @property
     def predicted_pedestrians_trajectories(self) -> np.ndarray:
         return np.asarray(self._predicted_pedestrians_trajectories)
+
+    @property
+    def predicted_pedestrians_covariances(self) -> np.ndarray:
+        return np.asarray(self._predicted_pedestrians_covariances)
 
     @property
     def predicted_robot_trajectory(self) -> np.ndarray:
@@ -78,13 +84,22 @@ class Visualizer():
         self._set_of_goals.append(self._set_of_goals[-1])
 
     def append_predicted_pedestrians_trajectories(self,
-                                           predicted_pedestrians_poses: List[List[float]]) -> None:
+                                                  predicted_pedestrians_poses: List[List[float]]) -> None:
         """Append predicted pedestrians trajectories
 
         Args:
-            predicted_pedestrians_poses (List[List[float]]): _description_
+            predicted_pedestrians_poses (List[List[float]]): Predicted pedestrian trajectories
         """
         self._predicted_pedestrians_trajectories.append(predicted_pedestrians_poses)
+
+    def append_predicted_pedestrians_covariances(self,
+                                                 predicted_pedestrians_covariances: np.ndarray) -> None:
+        """Append predicted pedestrians trajectories
+
+        Args:
+            predicted_pedestrians_covariances (np.ndarray): Predicted pedestrian covariances
+        """
+        self._predicted_pedestrians_covariances.append(predicted_pedestrians_covariances.tolist())
 
     def append_predicted_robot_trajectory(self,
                                           predicted_robot_trajectory: List[List[float]]) -> None:
@@ -163,6 +178,40 @@ class Visualizer():
         # animation function
         cnt = 0
 
+        def plot2dcov(mean, cov, k=1, n=30, color='blue'):
+            """Plots the 2d contour
+
+            Args:
+                mean -  Distribution mean
+                cov  -  Distribution covariance matrix
+                k    -  iso-counter value (Radius of the corresponded circle) (1, 2, 3, "all")
+                n    -  Number of points to calculate
+
+            Returns:
+                plot - Plot of the ellipsoid corresponded to the sigma-level k
+
+            """
+            # Check k value
+            assert (k == 1 or k == 2 or k == 3 or k == "all"), f'Check the value k! You put k={k}. Possible values of k:(1, 2, 3, "all")'
+            # Check cov matrix
+            assert np.shape(cov) == (2, 2), f"Covariance matrix should have a (2,2) shape form. You put {np.shape(cov)} shape form."
+            assert (cov[0,0]) >= 0 and (cov[1,1]) >= 0, f"Covariance matrix matrix should be positively defined. You put cov={cov}"
+            # Check mean
+            assert len(mean) == 2, f"Mean vector should have only 2 values. You put {len(mean)} values."
+            # Get the lower-case triangular matrix form Cholesky decomposition
+            L = cholesky(cov, lower=True)
+            # Generate an array of coordinates of the circle for the N(x, 0, 1)
+            t = np.linspace(0, 2*np.pi, n)
+            x =  k * np.cos(t)
+            y =  k * np.sin(t)
+            # Transpose the circle accordingly the covariance
+            coords = L @ np.array((x,y))
+            coords[0] += mean[0]
+            coords[1] += mean[1]
+
+            # Plot figure
+            ax.plot(coords[0], coords[1], linestyle='dashed', linewidth=1, color=color)
+
         def plot_pedestrian(x_ped_plt, y_ped_plt, cnt, i) -> None:
             # plot pedestrian i position
             ax.plot(x_ped_plt[:cnt], y_ped_plt[:cnt], linewidth=3,
@@ -177,7 +226,12 @@ class Visualizer():
                         np.array([0, r_ped]) + annotation_offset,  ha='center')
             # plot pedestrian prediction
             ax.plot(self.predicted_pedestrians_trajectories[cnt, :, i, 1], self.predicted_pedestrians_trajectories[cnt, :,
-                    i, 0], color=self._palette_hex[i], linestyle='dashed', linewidth=1)
+                    i, 0], color=self._palette_hex[i], linestyle='dashed', linewidth=3)
+            # plot pedestrian covariances
+            for prediction_step in range(config["horizon"]):
+                plot2dcov((self.predicted_pedestrians_trajectories[cnt, prediction_step, i, 1], self.predicted_pedestrians_trajectories[cnt, prediction_step, i, 0]), 
+                           np.flip(self.predicted_pedestrians_covariances[cnt, prediction_step, i, :, :]), color=self._palette_hex[i])
+            
 
         # Data parsing
         x_rob_plt = self.ground_truth_robot_trajectory[:, 1]
@@ -185,7 +239,7 @@ class Visualizer():
         phi_rob_plt = self.ground_truth_robot_trajectory[:, 2]
         x_peds_plt = self.ground_truth_pedestrian_trajectories[:, :, 1]
         y_peds_plt = self.ground_truth_pedestrian_trajectories[:, :, 0]
-
+        
         # find max, min for plots
         max_x_plt = np.max(x_rob_plt)
         min_x_plt = np.min(x_rob_plt)
@@ -234,9 +288,11 @@ class Visualizer():
                 phi_rob_plt[cnt])*r_rob,  np.cos(phi_rob_plt[cnt])*r_rob, color='b', width=r_rob/5)
             # plot predicted robot trajectory
             ax.plot(self.predicted_robot_trajectory[cnt, :, 1], self.predicted_robot_trajectory[cnt, :, 0], linewidth=1, color='blue', linestyle='dashed')
-
+            # plot pedestrians
             for i in range(self._total_peds):
                 plot_pedestrian(x_peds_plt[:, i], y_peds_plt[:, i], cnt, i)
+
+
 
             # legend
             ax.set_xlabel('$y$ [m]')

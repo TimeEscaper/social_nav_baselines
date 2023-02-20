@@ -123,7 +123,7 @@ class DoMPCController(AbstractController):
             S = 0
             delta = (p_rob_hcat - p_peds) 
             for ped_ind in range(self._total_peds):
-                S += 1 / (delta[:, ped_ind].T @ casadi.reshape(covariances[:, ped_ind], 2, 2) @ delta[:, ped_ind])
+                S += -casadi.log((delta[:, ped_ind].T @ casadi.reshape(covariances[:, ped_ind], 2, 2) @ delta[:, ped_ind]))
             return S
 
         # stage cost
