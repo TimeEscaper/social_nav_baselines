@@ -171,6 +171,7 @@ class Visualizer():
         mpl.rcParams['axes.grid'] = True
 
         # set figure
+        #fig, axs = plt.subplots(1, 2, figsize=[32, 16], constrained_layout=True, facecolor='white')
         fig, ax = plt.subplots(figsize=[16, 16], facecolor='white')
         ax.set_aspect('equal', adjustable='box')
         fig.suptitle(title, fontsize=35)
