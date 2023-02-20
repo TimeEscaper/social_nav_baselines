@@ -56,7 +56,8 @@ class ConstantVelocityPredictor(AbstractPredictor):
         """
         Code below is a place holder for covariance propagation.
         """
-        init_covariance = np.array(((0.0001, 0), (0, 0.0001)))
+        init_covariance = np.array([[0.2, 0.0],
+                                    [0.0, 2.]])
         init_covariance_peds = np.tile(init_covariance, (np.shape(state_peds_k)[0], 1, 1))
 
         covariance_peds = np.zeros([self._horizon + 1, np.shape(state_peds_k)[0], 2, 2])
