@@ -99,6 +99,9 @@ class DoMPCController(AbstractController):
         # goal
         current_goal = self._model.set_variable(
             "_tvp", "current_goal", shape=(len(goal)))
+        # initial position on the prediction step
+        p_rob_0 = self._model.set_variable(
+            "_tvp", "p_rob_0", shape=(len(goal)))
         # setup
         self._model.setup()
 
@@ -134,7 +137,9 @@ class DoMPCController(AbstractController):
             stage_cost = u.T @ R @ u
         # terminal cost
         p_rob_N = self._model._x.cat[:3]
-        terminal_cost = (p_rob_N - current_goal).T @ Q @ (p_rob_N - current_goal)
+        delta_p = casadi.norm_2(p_rob_N - current_goal) / casadi.norm_2(p_rob_0 - current_goal)
+        #terminal_cost = delta_p.T @ Q @ delta_p
+        terminal_cost = Q * delta_p ** 2 # GO-MPC Cost-function
 
         # set cost
         self._mpc.set_objective(lterm=stage_cost,
@@ -168,8 +173,9 @@ class DoMPCController(AbstractController):
         # inequality constrain for pedestrians
         dx_dy_square = (p_rob_hcat - p_peds) ** 2
         pedestrians_distances_squared = dx_dy_square[0, :] + dx_dy_square[1, :]
-        #self._mpc.set_nl_cons("dist_to_peds", -pedestrians_distances_squared,
-        #                      ub=-lb_dists_square)
+        self._mpc.set_nl_cons("dist_to_peds", -pedestrians_distances_squared,
+                              ub=-lb_dists_square)
+
         # time-variable-parameter function for pedestrian
         self._mpc_tvp_fun = self._mpc.get_tvp_template()
 

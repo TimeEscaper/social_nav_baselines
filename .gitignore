@@ -142,4 +142,5 @@ solvers/
 
 # Notebook files
 test.ipynb
+test.py
 *.npy

@@ -69,4 +69,5 @@ class NeuralPredictor(AbstractPredictor):
 
         data = np.load("/home/aleksandr/Research/social_nav_baselines/cov.npy")
         data = data[:, np.newaxis, :, :]
+        data = np.repeat(data, self.total_peds, axis=1)
         return states_peds, data # covariance_peds

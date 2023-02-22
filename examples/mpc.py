@@ -131,7 +131,7 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                     pygame.quit()
     pygame.quit()
 
-    visualizer.make_animation(f"MPC Neural W={config['W']} Cov X", 
+    visualizer.make_animation(f"MPC", 
                               DEFAULT_RESULT_PATH, 
                               config)
 
