@@ -134,11 +134,16 @@ results/
 # VS Code
 .vscode/
 
+# JetBrains IDE
+*.idea
+
 # Cache
 __pycache__/
 
 # Solvers
 solvers/
+
+
 
 # Notebook files
 test.ipynb
