@@ -85,7 +85,7 @@ class DWAController(AbstractController):
         
         min_cost = np.inf
         control = [0, 0]
-        self._predicted_pedestrians_trajectories = self._predictor.predict(ground_truth_pedestrians_state)
+        self._predicted_pedestrians_trajectories, _ = self._predictor.predict(ground_truth_pedestrians_state)
         for v in self._v_range:
             for w in self._w_range:
                 predicted_robot_trajectory = self._calculate_robot_trajectory(state,

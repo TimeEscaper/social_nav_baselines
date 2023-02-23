@@ -7,15 +7,9 @@ import numpy as np
 import fire
 import yaml
 import pygame
-import pathlib
 
-pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
-
-DEFAULT_CONFIG_PATH = r"configs/mpc_config.yaml"
-DEFAULT_RESULT_PATH = r"results/mpc.gif"
-
-def main(config_path: str = DEFAULT_CONFIG_PATH,
-         result_path: str = DEFAULT_RESULT_PATH) -> None:
+def main(config_path: str,
+         result_path: str = "") -> Statistics:
 
     # Initialization
     with open(config_path) as f:
@@ -75,7 +69,8 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
                             renderer)
     visualizer.visualize_goal(config["goal"])
     
-    statistics = Statistics(simulator)
+    statistics = Statistics(simulator,
+                            config_path)
 
     # Loop
     simulator.step()
@@ -83,7 +78,13 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
     state = config["init_state"]
     control = np.array([0, 0]) 
 
-    while True:
+    while statistics.simulation_ticks < 3000:
+
+        # if simulation time exceeded
+        if statistics.simulation_ticks >= 3000:
+            statistics.set_failure_flag()
+            break
+
         renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(controller.goal[:2] - state[:2])
@@ -109,13 +110,14 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
                                                                                                                       pedestrians_ghosts_states)
                 visualizer.append_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
                 #visualizer.visualize_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
-                visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)
+                #visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)
                 predicted_robot_trajectory = controller.get_predicted_robot_trajectory()      
                 visualizer.append_predicted_robot_trajectory(predicted_robot_trajectory)
-                visualizer.visualize_predicted_robot_trajectory(predicted_robot_trajectory)          
+                #visualizer.visualize_predicted_robot_trajectory(predicted_robot_trajectory)          
                 visualizer.append_predicted_pedestrians_covariances(predicted_pedestrians_covariances)          
                 hold_time = 0.
             else:
+                break
                 simulator.step(np.array([0, 0]))
                 print("The goal", *["{0:0.2f}".format(i) for i in controller.goal], "was reached!")
                 input_value = input("Enter new goal in format '0 0 0' or type 'exit' to exit: ")
@@ -137,12 +139,14 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
                     pygame.quit()
     pygame.quit()
 
-    print(f"Collisions: {statistics.total_collisions}")
-    print(f"Simulation ticks: {statistics.simulation_ticks}")
+    #print(f"Collisions: {statistics.total_collisions}")
+    #print(f"Simulation ticks: {statistics.simulation_ticks}")
     """
     visualizer.make_animation(f"MPC", 
                               result_path, 
                               config)
     """
+    return statistics
+
 if __name__ == "__main__":
     fire.Fire(main)

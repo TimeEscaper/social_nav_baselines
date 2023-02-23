@@ -20,15 +20,15 @@ ped_predictor: "neural"                    # Pedestrian predictor, ["constant_ve
 Q: 1000                                    # Terminal cost weight
 R: [[1, 0],   
     [0, 1]]                                # Control input weighted matrix
-W: 0.5                                       # Mahalanobis distance weight
+W: 0.5                                     # Mahalanobis distance weight
 r_rob: 0.35                                # Robot radius, [m]
 r_ped: 0.3                                 # Pedestrian radius, [m]
-lb: [-0.5, -2]                                # Lower bounds for NLP: [v, w], [m/s, rad/s]
+lb: [-0.5, -2]                             # Lower bounds for NLP: [v, w], [m/s, rad/s]
 ub: [2, 2]                                 # Upper bounds for NLP: [v, w], [m/s, rad/s]
 min_safe_dist: 1                           # Minimum safe distance to pedestrians and other objects, [m]
 total_peds: 7                              # Amount of pedestrians
 ped_detc_range: 3                          # Pedestrian detector max range, [m]
-ped_detc_fov: 120                           # Pedestrian detector max fov, [deg] 
+ped_detc_fov: 120                          # Pedestrian detector max fov, [deg] 
 misdetection_prob: 0                       # Probability of pedestrian misdetection
 state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
 is_robot_visible: False                    # Boolean flag of robot visibility for pedestrians

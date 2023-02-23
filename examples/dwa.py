@@ -2,6 +2,7 @@ from core.controllers import DWAController
 from core.predictors import ConstantVelocityPredictor, NeuralPredictor
 from core.utils import create_sim
 from core.visualizer import Visualizer
+from core.statistics import Statistics
 import numpy as np
 import fire
 import yaml
@@ -13,7 +14,8 @@ pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 DEFAULT_CONFIG_PATH = r"configs/dwa_config.yaml"
 DEFAULT_RESULT_PATH = r"results/dwa.gif"
 
-def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
+def main(config_path: str = DEFAULT_CONFIG_PATH,
+         result_path: str = DEFAULT_RESULT_PATH) -> None:
     
     # Initialization
     with open(config_path) as f:
@@ -68,6 +70,8 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                             renderer)
     visualizer.visualize_goal(config["goal"])
 
+    statistics = Statistics(simulator)
+
     # Loop
     simulator.step()
     hold_time = simulator.sim_dt
@@ -115,6 +119,8 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                 controller.set_new_goal(state,
                                         new_goal)
         simulator.step(control)
+        statistics.track_collisions()
+        statistics.track_simulation_ticks()
         hold_time += simulator.sim_dt
         # Terminate the simulation anytime by pressing ESC
         events = pygame.event.get()
@@ -124,9 +130,12 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                     pygame.quit()
     pygame.quit()
 
-    visualizer.make_animation("Dynamic Window Approach",
-                              DEFAULT_RESULT_PATH,
-                              config)
+    print(f"Collisions: {statistics.total_collisions}")
+    print(f"Simulation ticks: {statistics.simulation_ticks}")
+
+    #visualizer.make_animation("Dynamic Window Approach",
+    #                          DEFAULT_RESULT_PATH,
+    #                          config)
 
 if __name__ == "__main__":
     fire.Fire(main)

@@ -1,0 +1,23 @@
+{
+"scenarios_root": "",
+"circular_crossing": {
+    "1": {
+        "0" : {
+            "failure_status": false,
+            "simulation_ticks": 1154,
+            "total_collisions": 0
+        },
+        "1" : {
+            "failure_status": false,
+            "simulation_ticks": 1154,
+            "total_collisions": 0
+        },
+    }
+
+}
+"evaluation/methods/mpc/configs/mpc_circular_crossing_1.yaml": {
+"failure_status": false,
+"simulation_ticks": 1154,
+"total_collisions": 0
+}
+}
