@@ -77,7 +77,7 @@ def main(scene_config_path: str,
     visualizer.visualize_goal(config["goal"])
     
     statistics = Statistics(simulator,
-                            config_path)
+                            "")
 
     # Loop
     simulator.step()
