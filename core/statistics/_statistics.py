@@ -3,14 +3,16 @@ from pyminisim.core import Simulation
 class Statistics():
     def __init__(self,
                  simulator: Simulation,
-                 config_path: str) -> None:
+                 scene_config_path: str,
+                 controller_config_path: str) -> None:
         self._simulator = simulator
         self._simulation_ticks = 0
         self._total_collisions = 0
         self._previous_step_collision_indices = simulator._get_world_state().robot_to_pedestrians_collisions
         self._current_step_collision_indices = simulator._get_world_state().robot_to_pedestrians_collisions
         self._failure = False
-        self._config_path = config_path
+        self._scene_config_path = scene_config_path
+        self._controller_config_path = controller_config_path
 
     def set_failure_flag(self):
         self._failure = True
@@ -37,4 +39,10 @@ class Statistics():
     def total_collisions(self) -> int:
         return self._total_collisions
 
+    @property
+    def scene_config_path(self) -> str:
+        return self._scene_config_path
     
+    @property
+    def controller_config_path(self) -> str:
+        return self._controller_config_path

@@ -1,0 +1,39 @@
+init_state: [-4, 0, 0]                     
+goal: [4, 0, 0]                           
+dt: 0.1                                   
+horizon: 24                               
+model_type: "unicycle"                                             
+ped_predictor: "neural"                   
+Q: 1000                                   
+R: [[1, 0],   
+    [0, 1]]                               
+W: 0.5                                    
+r_rob: 0.35                               
+r_ped: 0.3                                
+lb: [-0.5, -2]                            
+ub: [2, 2]                                
+min_safe_dist: 1                                                                    
+state_dummy_ped: [10000, 10000, 0, 0]                     
+tollerance_error: 0.1                     
+is_store_robot_predicted_trajectory: True 
+max_ghost_tracking_time: 20               
+solver: "MA57"                            
+waypoint_tracker: "fixed"                 
+pedestrians_init_states: [                
+  [ 4.0,  0.0,  0.0],                      
+  [ 0, -4,  0],
+  [ 0,  4,  0],
+  [ 2.82,  2.82, 0],
+  [-2.82, -2.82, 0],
+  [ 2.82, -2.82, 0],
+  [-2.82,  2.82, 0]
+]
+pedestrians_goals: [                       
+  [[-4.0,  0.0]],                          
+  [[ 0,  4]],
+  [[ 0, -4]],
+  [[-2.82, -2.82]],
+  [[ 2.82,  2.82]],
+  [[-2.82,  2.82]],
+  [[ 2.82, -2.82]]
+]

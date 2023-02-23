@@ -87,7 +87,7 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
         renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(controller.goal[:2] - state[:2])
-            if error >= config["tollerence_error"]:
+            if error >= config["tollerance_error"]:
                 state = simulator.current_state.world.robot.state
                 visualizer.append_ground_truth_robot_state(state)
                 if config["total_peds"] > 0:
