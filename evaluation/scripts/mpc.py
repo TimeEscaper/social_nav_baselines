@@ -8,12 +8,19 @@ import fire
 import yaml
 import pygame
 
-def main(config_path: str,
+def main(scene_config_path: str,
+         controller_config_path: str,
          result_path: str = "") -> Statistics:
 
     # Initialization
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
+    with open(scene_config_path) as f:
+        scene_config = yaml.safe_load(f)
+
+    with open(scene_config_path) as f:
+        controller_config = yaml.safe_load(f)
+
+    config = {}
+    config.update(scene_config).update(controller)
 
     simulator, renderer = create_sim(np.array(config["init_state"]),
                                      config["model_type"],
