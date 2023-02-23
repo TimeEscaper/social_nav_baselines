@@ -204,11 +204,11 @@ class DoMPCController(AbstractController):
         [[a1, a2
           b1, b2]]  -->  [a1, a2, b1, b2]
         """
-        unfolded_predicted_pedestrians_covariances = pred_covs_inv.reshape((self._horizon + 1, self._total_peds, 4))
+        unfolded_predicted_pedestrians_inverse_covariances = pred_covs_inv.reshape((self._horizon + 1, self._total_peds, 4))
 
         for step in range(len(self._mpc_tvp_fun['_tvp', :, 'p_peds'])):
             self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_pedestrians_trajectories[step].T
-            self._mpc_tvp_fun['_tvp', step, 'cov_peds'] = unfolded_predicted_pedestrians_covariances[step].T
+            self._mpc_tvp_fun['_tvp', step, 'cov_peds'] = unfolded_predicted_pedestrians_inverse_covariances[step].T
         return predicted_pedestrians_trajectories, predicted_pedestrians_covariances
 
     def get_predicted_robot_trajectory(self) -> List[float]:
