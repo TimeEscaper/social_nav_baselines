@@ -1,14 +1,24 @@
 # Robot Model, [model_type]: 
-#       1. Unicycle Model with State Vector: [x, y, phi], Control Vector: [v, w]
-#       2. Unicycle Double Integration Model with State Vector: [x, y, phi, v, w], Control Vector: [u_a, u_alpha]
-
-# Pedestrian Model for the controller, [ped_predictor]: 
-#       1. Constant Velocity Propagation with State Vector: [x, y, vx, vy]
-#       2. Neural Predictor (work in progress)
+#       1. ["unicycle"] : Unicycle Model with State Vector: [x, y, phi], Control Vector: [v, w]
+#       2. ["unicycle_double_integrator"] : Unicycle Double Integration Model with State Vector: [x, y, phi, v, w], Control Vector: [u_a, u_alpha]
 
 # Pedestrian pyminisim model:
-#       1. Headed Social Force Model (HSFM)
-#       2. Optimal Reciprocal Collision Avoidance (ORCA)
+#       1. ["HSFM"] : Headed Social Force Model
+#       2. ["ORCA"] : Optimal Reciprocal Collision Avoidance
+
+# Pedestrian Model for the controller, [ped_predictor]: 
+#       1. ["constant_velocity"] : Constant Velocity Propagation with State Vector: [x, y, vx, vy]
+#       2. ["neural"] : Neural Predictor (work in progress)
+
+# Cost functions avalaible for MPC
+#       1. ["GO-MPC"] : Cost from the paper about GO-MPC, link: https://arxiv.org/pdf/2102.13073.pdf
+#       2. ["MD-GO-MPC"] : GO-MPC cost + Mahalanobis Distance
+#       3. ["ED-GO-MPC"] : cost + Euclidean Distance
+
+# Constraints on MPC Solution
+#       1. ["None"] : No constraints
+#       2. ["ED"] : Euclidean distance constraint
+#       3. ["MD"] : Mahalanobis distance constraint
 
 init_state: [-4, 0, 0]                     # Initial robot state vector: [x, y, phi] [m, m, rad] for "unicycle" model_type and  [x, y, phi, v, w] [m, m, rad, m/s, rad/s] for "unicycle_double_integrator" model_type
 goal: [4, 0, 0]                            # Reference robot position: [x,  y,  phi], [m, m, rad]
@@ -17,6 +27,9 @@ horizon: 24                                # MPC planning horizon, [steps]
 model_type: "unicycle"                     # Robot model, ["unicycle", "unicycle_double_integrator"]
 ped_model: "HSFM"                          # Pedestrian pyminisim model, ["HSFM", "ORCA"]
 ped_predictor: "neural"                    # Pedestrian predictor, ["constant_velocity", "neural"]
+cost_function: "GO-MPC"                    # Choose cost function for MPC, ["GO-MPC", "MD-GO-MPC", "ED-GO-MPC"]
+constraint_type: "MD"                      # Choose constraint type for MPC, ["None", "ED", "MD"]
+constraint_value: 0.5                      # Minimum safe distance to pedestrians and other objects, [m] for "ED" constraint and Collision probability [0, 1] for "MD"
 Q: 1000                                    # Terminal cost weight
 R: [[1, 0],   
     [0, 1]]                                # Control input weighted matrix
@@ -25,7 +38,6 @@ r_rob: 0.35                                # Robot radius, [m]
 r_ped: 0.3                                 # Pedestrian radius, [m]
 lb: [-0.5, -2]                             # Lower bounds for NLP: [v, w], [m/s, rad/s]
 ub: [2, 2]                                 # Upper bounds for NLP: [v, w], [m/s, rad/s]
-min_safe_dist: 1                           # Minimum safe distance to pedestrians and other objects, [m]
 total_peds: 7                              # Amount of pedestrians
 ped_detc_range: 3                          # Pedestrian detector max range, [m]
 ped_detc_fov: 120                          # Pedestrian detector max fov, [deg] 

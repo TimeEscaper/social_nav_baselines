@@ -22,12 +22,14 @@ class DoMPCController(AbstractController):
                  ub: List[float],
                  r_rob: float,
                  r_ped: float,
-                 min_safe_dist: float,
                  predictor: AbstractPredictor,
                  is_store_robot_predicted_trajectory: bool,
                  max_ghost_tracking_time: int,
                  state_dummy_ped: List[float],
-                 solver: str) -> None:
+                 solver: str,
+                 cost_function: str,
+                 constraint_type: str,
+                 constraint_value: float) -> None:
         """Initiazition of the class instance
 
         Args:
@@ -43,7 +45,7 @@ class DoMPCController(AbstractController):
             ub (List[float]): Upper boundaries for system states or/and controls
             r_rob (float): Robot radius, [m]
             r_ped (float): Pedestrian radius, [m]
-            min_safe_dist (float): Minimal safe distance between robot and pedestrian, [m]
+            constraint_value (float): Minimal safe distance between robot and pedestrian, [m]
             predictor (AbstractPredictor): Predictor, [Constant Velocity Predictor, Neural Predictor]
             # TODO
 
@@ -60,6 +62,9 @@ class DoMPCController(AbstractController):
         self._predictor = predictor
         self._is_store_robot_predicted_trajectory = is_store_robot_predicted_trajectory
         self._ghost_tracking_times : List[int]= [0] * total_peds
+
+        if cost_function == "MD-GO-MPC":
+            assert isinstance(predictor, NeuralPredictor), f"You should specify neural predictor for MD-GO-MPC type of cost"
 
         # Architecture requires at least one dummy pedestrian in the system
         if total_peds == 0:
@@ -96,6 +101,9 @@ class DoMPCController(AbstractController):
         # covariances
         self._covariances_peds = self._model.set_variable(
             "_tvp", "cov_peds", shape=(4, total_peds)) # Each covariance matrix is represented a row [a1, a2, b1, b2]
+        # invariant covariances
+        self._inverse_covariances_peds = self._model.set_variable(
+            "_tvp", "inv_cov_peds", shape=(4, total_peds)) # Each covariance matrix is represented a row [a1, a2, b1, b2]
         # goal
         current_goal = self._model.set_variable(
             "_tvp", "current_goal", shape=(len(goal)))
@@ -121,20 +129,28 @@ class DoMPCController(AbstractController):
         # horizontally concatenated array of robot current position for all the pedestrians
         p_rob_hcat = casadi.hcat([self._model._x.cat[:2] for _ in range(total_peds)])
         p_peds = self._state_peds[:2, :]
-        
-        def _get_prob_collision_cost(p_rob, peds, cov):
-            S = 0
-            delta = (p_rob - peds) 
-            for ped_ind in range(self._total_peds):
-                S += 1 / (delta[:, ped_ind].T @ casadi.reshape(cov[:, ped_ind], 2, 2) @ delta[:, ped_ind])
-            return S
 
         # stage cost
         u = self._model._u.cat
-        if isinstance(predictor, NeuralPredictor):
-            stage_cost = u.T @ R @ u + W * _get_prob_collision_cost(p_rob_hcat, p_peds, self._covariances_peds)
-        elif isinstance(predictor, ConstantVelocityPredictor):
+        if cost_function == "GO-MPC":
             stage_cost = u.T @ R @ u
+        elif cost_function == "MD-GO-MPC":
+            def _get_MD_cost(p_rob, peds, inv_cov):
+                S = 0
+                delta = (p_rob - peds) 
+                for ped_ind in range(self._total_peds):
+                    S += 1 / (delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind])
+                return S
+            stage_cost = u.T @ R @ u + W * _get_MD_cost(p_rob_hcat, p_peds, self._inverse_covariances_peds)
+        elif cost_function == "ED-GO-MPC": 
+            def _get_ED_cost(p_rob, peds):
+                S = 0
+                delta = (p_rob - peds) 
+                for ped_ind in range(self._total_peds):
+                    S += 1 / (delta[:, ped_ind].T @ delta[:, ped_ind])
+                return S
+            stage_cost = u.T @ R @ u + W * _get_ED_cost(p_rob_hcat, p_peds)
+
         # terminal cost
         p_rob_N = self._model._x.cat[:3]
         delta_p = casadi.norm_2(p_rob_N - current_goal) / casadi.norm_2(p_rob_0 - current_goal)
@@ -167,14 +183,43 @@ class DoMPCController(AbstractController):
             self._mpc.bounds["upper", "_x", "w"] = ub[1]
             self._mpc.bounds["upper", "_u", "u_a"] = 3
             self._mpc.bounds["upper", "_u", "u_alpha"] = 3
-        # distance to pedestrians
-        lb_dist_square = (r_rob + r_ped + min_safe_dist) ** 2
-        lb_dists_square = np.array([lb_dist_square for _ in range(total_peds)])
-        # inequality constrain for pedestrians
-        dx_dy_square = (p_rob_hcat - p_peds) ** 2
-        pedestrians_distances_squared = dx_dy_square[0, :] + dx_dy_square[1, :]
-        self._mpc.set_nl_cons("dist_to_peds", -pedestrians_distances_squared,
-                              ub=-lb_dists_square)
+
+        # set constraint type
+        if constraint_type == "ED":
+            # distance to pedestrians
+            lb_dist_square = (r_rob + r_ped + constraint_value) ** 2
+            lb_dists_square = np.array([lb_dist_square for _ in range(total_peds)])
+            # inequality constrain for pedestrians
+            dx_dy_square = (p_rob_hcat - p_peds) ** 2
+            pedestrians_distances_squared = dx_dy_square[0, :] + dx_dy_square[1, :]
+            self._mpc.set_nl_cons("euclidean_dist_to_peds", -pedestrians_distances_squared,
+                                  ub=-lb_dists_square)
+        elif constraint_type == "MD":
+            def _get_MD(p_rob, peds, inv_cov):
+                S = 0
+                delta = (p_rob - peds)
+                array_mahalanobis_distances = casadi.SX(1, total_peds)
+                for ped_ind in range(self._total_peds):
+                    array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind]
+                return array_mahalanobis_distances
+
+            pedestrians_mahalanobis_distances = _get_MD(p_rob_hcat, p_peds, self._inverse_covariances_peds)
+            
+            def _get_determinant(matrix):
+                det = (matrix[0, 0] * matrix[1, 1]) - (matrix[1, 0] * matrix[0, 1])
+                return det
+
+            def _get_MB_bounds(cov):
+                array_mahalanobis_bounds = casadi.SX(1, total_peds)
+                V_s = np.pi * (r_rob + r_ped) ** 2
+                for ped_ind in range(self._total_peds):
+                    array_mahalanobis_bounds[ped_ind] = -2 * casadi.log(casadi.sqrt(_get_determinant(2 * np.pi * casadi.reshape(cov[:, ped_ind], 2, 2))) * (constraint_value / V_s))
+                return array_mahalanobis_bounds
+            mahalanobis_bounds = _get_MB_bounds(self._covariances_peds)
+            self._mpc.set_nl_cons("mahalanobis_dist_to_peds", -pedestrians_mahalanobis_distances-mahalanobis_bounds,
+                                  ub=np.zeros(total_peds))
+        elif constraint_type == "None":
+            pass
 
         # time-variable-parameter function for pedestrian
         self._mpc_tvp_fun = self._mpc.get_tvp_template()
@@ -199,16 +244,18 @@ class DoMPCController(AbstractController):
             ground_truth_pedestrians_state (np.ndarray): Current state of the pedestrians, [2-d numpy array]
         """
         predicted_pedestrians_trajectories, predicted_pedestrians_covariances = self._predictor.predict(ground_truth_pedestrians_state)
-        pred_covs_inv = np.linalg.inv(predicted_pedestrians_covariances)
+        predicted_pedestrians_inverse_covariances = np.linalg.inv(predicted_pedestrians_covariances)
         """ Unfold covarince into a row for MPC
         [[a1, a2
           b1, b2]]  -->  [a1, a2, b1, b2]
         """
-        unfolded_predicted_pedestrians_inverse_covariances = pred_covs_inv.reshape((self._horizon + 1, self._total_peds, 4))
+        unfolded_predicted_pedestrians_covariances = predicted_pedestrians_covariances.reshape((self._horizon + 1, self._total_peds, 4))
+        unfolded_predicted_pedestrians_inverse_covariances = predicted_pedestrians_inverse_covariances.reshape((self._horizon + 1, self._total_peds, 4))
 
         for step in range(len(self._mpc_tvp_fun['_tvp', :, 'p_peds'])):
             self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_pedestrians_trajectories[step].T
-            self._mpc_tvp_fun['_tvp', step, 'cov_peds'] = unfolded_predicted_pedestrians_inverse_covariances[step].T
+            self._mpc_tvp_fun['_tvp', step, 'cov_peds'] = unfolded_predicted_pedestrians_covariances[step].T
+            self._mpc_tvp_fun['_tvp', step, 'inv_cov_peds'] = unfolded_predicted_pedestrians_inverse_covariances[step].T
         return predicted_pedestrians_trajectories, predicted_pedestrians_covariances
 
     def get_predicted_robot_trajectory(self) -> List[float]:

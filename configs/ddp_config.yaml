@@ -26,7 +26,7 @@ q_b: 0.0
 q_m: 0.001
 r_rob: 0.35                                # Robot radius, [m]
 r_ped: 0.3                                 # Pedestrian radius, [m]
-min_safe_dist: 0.05                           # Minimum safe distance to pedestrians and other objects, [m]
+constraint_value: 0.05                           # Minimum safe distance to pedestrians and other objects, [m]
 n_iterations: 100
 alpha: 0.001
 

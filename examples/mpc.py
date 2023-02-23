@@ -65,17 +65,21 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
                                  config["ub"],
                                  config["r_rob"],
                                  config["r_ped"],
-                                 config["min_safe_dist"],
                                  predictor,
                                  config["is_store_robot_predicted_trajectory"],
                                  config["max_ghost_tracking_time"],
                                  config["state_dummy_ped"],
-                                 config["solver"])
+                                 config["solver"],
+                                 config["cost_function"],
+                                 config["constraint_type"],
+                                 config["constraint_value"])
     visualizer = Visualizer(config["total_peds"],
                             renderer)
     visualizer.visualize_goal(config["goal"])
     
-    statistics = Statistics(simulator)
+    statistics = Statistics(simulator,
+                            config_path,
+                            config_path)
 
     # Loop
     simulator.step()
