@@ -104,11 +104,12 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                 control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = controller.make_step(state,
                                                                                                                       pedestrians_ghosts_states)
                 visualizer.append_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
-                visualizer.visualize_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
-                #visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)
+                #visualizer.visualize_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
+                visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)
                 predicted_robot_trajectory = controller.get_predicted_robot_trajectory()      
                 visualizer.append_predicted_robot_trajectory(predicted_robot_trajectory)
-                visualizer.visualize_predicted_robot_trajectory(predicted_robot_trajectory)                      
+                visualizer.visualize_predicted_robot_trajectory(predicted_robot_trajectory)          
+                visualizer.append_predicted_pedestrians_covariances(predicted_pedestrians_covariances)          
                 hold_time = 0.
             else:
                 simulator.step(np.array([0, 0]))
@@ -130,8 +131,8 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                     pygame.quit()
     pygame.quit()
 
-    visualizer.make_animation("Model Predictive Control",
-                              DEFAULT_RESULT_PATH,
+    visualizer.make_animation(f"MPC", 
+                              DEFAULT_RESULT_PATH, 
                               config)
 
 if __name__ == "__main__":

@@ -13,34 +13,32 @@
 init_state: [-4, 0, 0]                     # Initial robot state vector: [x, y, phi] [m, m, rad] for "unicycle" model_type and  [x, y, phi, v, w] [m, m, rad, m/s, rad/s] for "unicycle_double_integrator" model_type
 goal: [4, 0, 0]                            # Reference robot position: [x,  y,  phi], [m, m, rad]
 dt: 0.1                                    # Time interval, [s]
-horizon: 25                                # MPC planning horizon, [steps]
+horizon: 24                                # MPC planning horizon, [steps]
 model_type: "unicycle"                     # Robot model, ["unicycle", "unicycle_double_integrator"]
 ped_model: "HSFM"                          # Pedestrian pyminisim model, ["HSFM", "ORCA"]
 ped_predictor: "neural"                    # Pedestrian predictor, ["constant_velocity", "neural"]
-Q: [[10000, 0, 0],   
-    [0, 10000, 0],   
-    [0,   0,   1]]                         # State weighted matrix: [dx, dy, dphi]
+Q: 1000                                    # Terminal cost weight
 R: [[1, 0],   
     [0, 1]]                                # Control input weighted matrix
-W: 0.3                                     # Mahalanobis distance weight
+W: 0.5                                       # Mahalanobis distance weight
 r_rob: 0.35                                # Robot radius, [m]
 r_ped: 0.3                                 # Pedestrian radius, [m]
-lb: [0, -2]                                # Lower bounds for NLP: [v, w], [m/s, rad/s]
+lb: [-0.5, -2]                                # Lower bounds for NLP: [v, w], [m/s, rad/s]
 ub: [2, 2]                                 # Upper bounds for NLP: [v, w], [m/s, rad/s]
 min_safe_dist: 1                           # Minimum safe distance to pedestrians and other objects, [m]
 total_peds: 7                              # Amount of pedestrians
-ped_detc_range: 4                          # Pedestrian detector max range, [m]
-ped_detc_fov: 120                          # Pedestrian detector max fov, [deg] 
+ped_detc_range: 3                          # Pedestrian detector max range, [m]
+ped_detc_fov: 120                           # Pedestrian detector max fov, [deg] 
 misdetection_prob: 0                       # Probability of pedestrian misdetection
 state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
-is_robot_visible: True                     # Boolean flag of robot visibility for pedestrians
+is_robot_visible: False                    # Boolean flag of robot visibility for pedestrians
 tollerence_error: 0.1                      # Tollernce error for the Euclidean distance to the goal, [m]
 is_store_robot_predicted_trajectory: True  # Flag to store robot predicted trajectory, [True, False]
 max_ghost_tracking_time: 20                # Amount of steps to track ghost pedestrian, [step]
 solver: "MA57"                             # NLP Solver for Casadi, ["MUMPS", "MA27", "MA57", "MA77", "MA86", "MA97"]
 waypoint_tracker: "fixed"                  # Choose a waypoint tracker for pedestrians: ["random", "fixed"]
 pedestrians_init_states: [                 # Only for "fixed" waypoint_tracker
-  [ 4,  0,  0],                            # Provide initial states of the pedestrians according to the amount specified in total_peds, [x, y, phi], [m, m, rad]
+  [ 4.0,  0.0,  0.0],                      # Provide initial states of the pedestrians according to the amount specified in total_peds, [x, y, phi], [m, m, rad]
   [ 0, -4,  0],
   [ 0,  4,  0],
   [ 2.82,  2.82, 0],
@@ -49,11 +47,11 @@ pedestrians_init_states: [                 # Only for "fixed" waypoint_tracker
   [-2.82,  2.82, 0]
 ]
 pedestrians_goals: [                       # Only for "fixed" waypoint_tracker
-  [[-4,  0]],                              # Provide goals for the pedestrians according to the amount specified in total_peds, [x, y], [m, m]
+  [[-4.0,  0.0]],                          # Provide goals for the pedestrians according to the amount specified in total_peds, [x, y], [m, m]
   [[ 0,  4]],
   [[ 0, -4]],
   [[-2.82, -2.82]],
   [[ 2.82,  2.82]],
   [[-2.82,  2.82]],
-  [[ 2.82, -2.82]],
+  [[ 2.82, -2.82]]
 ]

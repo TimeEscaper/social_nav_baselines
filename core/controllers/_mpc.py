@@ -99,6 +99,9 @@ class DoMPCController(AbstractController):
         # goal
         current_goal = self._model.set_variable(
             "_tvp", "current_goal", shape=(len(goal)))
+        # initial position on the prediction step
+        p_rob_0 = self._model.set_variable(
+            "_tvp", "p_rob_0", shape=(len(goal)))
         # setup
         self._model.setup()
 
@@ -119,11 +122,11 @@ class DoMPCController(AbstractController):
         p_rob_hcat = casadi.hcat([self._model._x.cat[:2] for _ in range(total_peds)])
         p_peds = self._state_peds[:2, :]
         
-        def _get_inversed_sum_of_mahalanobis_distances(p_rob_hcat, p_peds, covariances):
+        def _get_inversed_sum_of_mahalanobis_distances(p_rob, peds, cov):
             S = 0
-            delta = (p_rob_hcat - p_peds) 
+            delta = (p_rob - peds) 
             for ped_ind in range(self._total_peds):
-                S += 1 / (delta[:, ped_ind].T @ casadi.reshape(covariances[:, ped_ind], 2, 2) @ delta[:, ped_ind])
+                S += 1 / (delta[:, ped_ind].T @ casadi.reshape(cov[:, ped_ind], 2, 2) @ delta[:, ped_ind])
             return S
 
         # stage cost
@@ -134,7 +137,9 @@ class DoMPCController(AbstractController):
             stage_cost = u.T @ R @ u
         # terminal cost
         p_rob_N = self._model._x.cat[:3]
-        terminal_cost = (p_rob_N - current_goal).T @ Q @ (p_rob_N - current_goal)
+        delta_p = casadi.norm_2(p_rob_N - current_goal) / casadi.norm_2(p_rob_0 - current_goal)
+        #terminal_cost = delta_p.T @ Q @ delta_p
+        terminal_cost = Q * delta_p ** 2 # GO-MPC Cost-function
 
         # set cost
         self._mpc.set_objective(lterm=stage_cost,
@@ -170,6 +175,7 @@ class DoMPCController(AbstractController):
         pedestrians_distances_squared = dx_dy_square[0, :] + dx_dy_square[1, :]
         self._mpc.set_nl_cons("dist_to_peds", -pedestrians_distances_squared,
                               ub=-lb_dists_square)
+
         # time-variable-parameter function for pedestrian
         self._mpc_tvp_fun = self._mpc.get_tvp_template()
 
