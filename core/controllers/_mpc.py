@@ -122,7 +122,7 @@ class DoMPCController(AbstractController):
         p_rob_hcat = casadi.hcat([self._model._x.cat[:2] for _ in range(total_peds)])
         p_peds = self._state_peds[:2, :]
         
-        def _get_inversed_sum_of_mahalanobis_distances(p_rob, peds, cov):
+        def _get_prob_collision_cost(p_rob, peds, cov):
             S = 0
             delta = (p_rob - peds) 
             for ped_ind in range(self._total_peds):
@@ -132,7 +132,7 @@ class DoMPCController(AbstractController):
         # stage cost
         u = self._model._u.cat
         if isinstance(predictor, NeuralPredictor):
-            stage_cost = u.T @ R @ u + W * _get_inversed_sum_of_mahalanobis_distances(p_rob_hcat, p_peds, self._covariances_peds)
+            stage_cost = u.T @ R @ u + W * _get_prob_collision_cost(p_rob_hcat, p_peds, self._covariances_peds)
         elif isinstance(predictor, ConstantVelocityPredictor):
             stage_cost = u.T @ R @ u
         # terminal cost
@@ -199,12 +199,12 @@ class DoMPCController(AbstractController):
             ground_truth_pedestrians_state (np.ndarray): Current state of the pedestrians, [2-d numpy array]
         """
         predicted_pedestrians_trajectories, predicted_pedestrians_covariances = self._predictor.predict(ground_truth_pedestrians_state)
-        
+        pred_covs_inv = np.linalg.inv(predicted_pedestrians_covariances)
         """ Unfold covarince into a row for MPC
         [[a1, a2
           b1, b2]]  -->  [a1, a2, b1, b2]
         """
-        unfolded_predicted_pedestrians_covariances = predicted_pedestrians_covariances.reshape((self._horizon + 1, self._total_peds, 4))
+        unfolded_predicted_pedestrians_covariances = pred_covs_inv.reshape((self._horizon + 1, self._total_peds, 4))
 
         for step in range(len(self._mpc_tvp_fun['_tvp', :, 'p_peds'])):
             self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_pedestrians_trajectories[step].T
