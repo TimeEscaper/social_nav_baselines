@@ -23,7 +23,7 @@ class DDPController(AbstractController):
                  q_m: float,
                  r_rob: float,
                  r_ped: float,
-                 min_safe_dist: float,
+                 constraint_value: float,
                  n_iterations: int,
                  predictor: AbstractPredictor,
                  is_store_robot_predicted_trajectory: bool,
@@ -45,7 +45,7 @@ class DDPController(AbstractController):
             ub (List[float]): Upper boundaries for system states or/and controls
             r_rob (float): Robot radius, [m]
             r_ped (float): Pedestrian radius, [m]
-            min_safe_dist (float): Minimal safe distance between robot and pedestrian, [m]
+            constraint_value (float): Minimal safe distance between robot and pedestrian, [m]
             predictor (AbstractPredictor): Predictor, [Constant Velocity Predictor, Neural Predictor]
             # TODO
 
@@ -75,7 +75,7 @@ class DDPController(AbstractController):
         self._R = R.copy()
         self._q_b = q_b
         self._q_m = q_m
-        self._barrier_dist = min_safe_dist + r_ped + r_rob
+        self._barrier_dist = constraint_value + r_ped + r_rob
         self._n_iterations = n_iterations
         self._alpha = alpha
 

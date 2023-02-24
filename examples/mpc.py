@@ -2,6 +2,7 @@ from core.controllers import DoMPCController
 from core.predictors import ConstantVelocityPredictor, NeuralPredictor
 from core.utils import create_sim
 from core.visualizer import Visualizer
+from core.statistics import Statistics
 import numpy as np
 import fire
 import yaml
@@ -10,14 +11,24 @@ import pathlib
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_CONFIG_PATH = r"configs/mpc_config.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/perpendicular_traffic/7_pedestrians.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/mpc.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.gif"
 
-def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
+def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
+         controller_config_path: str = DEFAULT_CONTROLLER_CONFIG_PATH,
+         result_path: str = DEFAULT_RESULT_PATH) -> Statistics:
 
     # Initialization
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
+    with open(scene_config_path) as f:
+        scene_config = yaml.safe_load(f)
+
+    with open(controller_config_path) as f:
+        controller_config = yaml.safe_load(f)
+
+    config = {}
+    config.update(scene_config)
+    config.update(controller_config)
 
     simulator, renderer = create_sim(np.array(config["init_state"]),
                                      config["model_type"],
@@ -61,16 +72,22 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                                  config["ub"],
                                  config["r_rob"],
                                  config["r_ped"],
-                                 config["min_safe_dist"],
                                  predictor,
                                  config["is_store_robot_predicted_trajectory"],
                                  config["max_ghost_tracking_time"],
                                  config["state_dummy_ped"],
-                                 config["solver"])
+                                 config["solver"],
+                                 config["cost_function"],
+                                 config["constraint_type"],
+                                 config["constraint_value"])
     visualizer = Visualizer(config["total_peds"],
                             renderer)
     visualizer.visualize_goal(config["goal"])
     
+    statistics = Statistics(simulator,
+                            scene_config,
+                            controller_config)
+
     # Loop
     simulator.step()
     hold_time = simulator.sim_dt
@@ -81,7 +98,7 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
         renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(controller.goal[:2] - state[:2])
-            if error >= config["tollerence_error"]:
+            if error >= config["tollerance_error"]:
                 state = simulator.current_state.world.robot.state
                 visualizer.append_ground_truth_robot_state(state)
                 if config["total_peds"] > 0:
@@ -120,6 +137,8 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                 controller.set_new_goal(state,
                                         new_goal)
         simulator.step(control)
+        statistics.track_collisions()
+        statistics.track_simulation_ticks()
         hold_time += simulator.sim_dt
         # Terminate the simulation anytime by pressing ESC
         events = pygame.event.get()
@@ -129,9 +148,10 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                     pygame.quit()
     pygame.quit()
 
+    
     visualizer.make_animation(f"MPC", 
-                              DEFAULT_RESULT_PATH, 
+                              result_path, 
                               config)
-
+    
 if __name__ == "__main__":
     fire.Fire(main)

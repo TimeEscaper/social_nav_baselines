@@ -149,3 +149,6 @@ solvers/
 test.ipynb
 test.py
 *.npy
+
+# Scenario configs
+evaluation/scenes

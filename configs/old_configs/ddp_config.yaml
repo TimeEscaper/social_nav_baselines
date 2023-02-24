@@ -26,7 +26,7 @@ q_b: 0.0
 q_m: 0.001
 r_rob: 0.35                                # Robot radius, [m]
 r_ped: 0.3                                 # Pedestrian radius, [m]
-min_safe_dist: 0.05                           # Minimum safe distance to pedestrians and other objects, [m]
+constraint_value: 0.05                           # Minimum safe distance to pedestrians and other objects, [m]
 n_iterations: 100
 alpha: 0.001
 
@@ -35,7 +35,7 @@ ped_detc_range: 8                          # Pedestrian detector max range, [m]
 ped_detc_fov: 120                          # Pedestrian detector max fov, [deg]
 misdetection_prob: 0                       # Probability of pedestrian misdetection
 is_robot_visible: False                     # Boolean flag of robot visibility for pedestrians
-tollerence_error: 0.1                      # Tollernce error for the Euclidean distance to the goal, [m]
+tollerance_error: 0.1                      # Tollernce error for the Euclidean distance to the goal, [m]
 is_store_robot_predicted_trajectory: True  # Flag to store robot predicted trajectory, [True, False]
 max_ghost_tracking_time: 20                # Amount of steps to track ghost pedestrian, [step]
 waypoint_tracker: "fixed"                  # Choose a waypoint tracker for pedestrians: ["random", "fixed"]

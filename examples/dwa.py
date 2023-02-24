@@ -2,6 +2,7 @@ from core.controllers import DWAController
 from core.predictors import ConstantVelocityPredictor, NeuralPredictor
 from core.utils import create_sim
 from core.visualizer import Visualizer
+from core.statistics import Statistics
 import numpy as np
 import fire
 import yaml
@@ -10,14 +11,24 @@ import pathlib
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_CONFIG_PATH = r"configs/dwa_config.yaml"
-DEFAULT_RESULT_PATH = r"results/dwa.gif"
+DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/parallel_traffic/1_pedestrian.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/dwa.yaml"
+DEFAULT_RESULT_PATH = r"results/mpc.gif"
 
-def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
-    
+def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
+         controller_config_path: str = DEFAULT_CONTROLLER_CONFIG_PATH,
+         result_path: str = DEFAULT_RESULT_PATH) -> Statistics:
+
     # Initialization
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
+    with open(scene_config_path) as f:
+        scene_config = yaml.safe_load(f)
+
+    with open(controller_config_path) as f:
+        controller_config = yaml.safe_load(f)
+    
+    config = {}
+    config.update(scene_config)
+    config.update(controller_config)
 
     simulator, renderer = create_sim(np.array(config["init_state"]),
                                      "unicycle",
@@ -68,6 +79,8 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                             renderer)
     visualizer.visualize_goal(config["goal"])
 
+    statistics = Statistics(simulator)
+
     # Loop
     simulator.step()
     hold_time = simulator.sim_dt
@@ -78,7 +91,7 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
         renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(controller.goal[:2] - state[:2])
-            if error >= config["tollerence_error"]:
+            if error >= config["tollerance_error"]:
                 state = simulator.current_state.world.robot.state
                 visualizer.append_ground_truth_robot_state(state)
                 if config["total_peds"] > 0:
@@ -115,6 +128,8 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                 controller.set_new_goal(state,
                                         new_goal)
         simulator.step(control)
+        statistics.track_collisions()
+        statistics.track_simulation_ticks()
         hold_time += simulator.sim_dt
         # Terminate the simulation anytime by pressing ESC
         events = pygame.event.get()
@@ -124,9 +139,12 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                     pygame.quit()
     pygame.quit()
 
-    visualizer.make_animation("Dynamic Window Approach",
-                              DEFAULT_RESULT_PATH,
-                              config)
+    print(f"Collisions: {statistics.total_collisions}")
+    print(f"Simulation ticks: {statistics.simulation_ticks}")
+
+    #visualizer.make_animation("Dynamic Window Approach",
+    #                          DEFAULT_RESULT_PATH,
+    #                          config)
 
 if __name__ == "__main__":
     fire.Fire(main)

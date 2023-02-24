@@ -1,13 +1,13 @@
 # Robot Model, [model_type]: 
-#       1. Unicycle Model with State Vector: [x, y, phi], Control Vector: [v, w]
-
-# Pedestrian Model for the controller, [ped_predictor]: 
-#       1. Constant Velocity Propagation with State Vector: [x, y, vx, vy]
-#       2. Neural Predictor (work in progress)
+#       1. ["unicycle"] : Unicycle Model with State Vector: [x, y, phi], Control Vector: [v, w]
 
 # Pedestrian pyminisim model:
-#       1. Headed Social Force Model (HSFM)
-#       2. Optimal Reciprocal Collision Avoidance (ORCA)
+#       1. ["HSFM"] : Headed Social Force Model
+#       2. ["ORCA"] : Optimal Reciprocal Collision Avoidance
+
+# Pedestrian Model for the controller, [ped_predictor]: 
+#       1. ["constant_velocity"] : Constant Velocity Propagation with State Vector: [x, y, vx, vy]
+#       2. ["neural"] : Neural Predictor (work in progress)
 
 init_state: [-4,  0,  0]                   # Initial robot state vector: [x, y, phi] [m, m, rad] for "unicycle" model_type and  [x, y, phi, v, w] [m, m, rad, m/s, rad/s] for "unicycle_double_integrator" model_type
 goal: [4, 0, 0]                            # Reference robot position: [x,  y,  phi], [m, m, rad]
@@ -28,8 +28,8 @@ ped_detc_range: 4                          # Pedestrian detector max range, [m]
 ped_detc_fov: 180                          # Pedestrian detector max fov, [deg] 
 misdetection_prob: 0                       # Probability of pedestrian misdetection
 state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
-is_robot_visible: True                     # Boolean flag of robot visibility for pedestrians
-tollerence_error: 0.1                      # Tollernce error for the Euclidean distance to the goal, [m]
+is_robot_visible: False                    # Boolean flag of robot visibility for pedestrians
+tollerance_error: 0.1                      # Tollernce error for the Euclidean distance to the goal, [m]
 max_ghost_tracking_time: 10                # Amount of steps to track ghost pedestrian, [step]
 waypoint_tracker: "fixed"                  # Choose a waypoint tracker for pedestrians: ["random", "fixed"]
 pedestrians_init_states: [                 # Only for "fixed" waypoint_tracker

@@ -1,0 +1,20 @@
+# Scenario 0: Mahalanobis distance in cost function, no-constraints
+horizon: 24                               
+model_type: "unicycle"                                             
+ped_predictor: "neural"
+cost_function: "GO-MPC"                    
+constraint_type: "None"                                     
+Q: 1000                                   
+R: [[1, 0],   
+    [0, 1]]                               
+W: 1000                                    
+r_rob: 0.35                               
+r_ped: 0.3                                
+lb: [-0.5, -2]                            
+ub: [2, 2]                                
+constraint_value: 1                                                                    
+state_dummy_ped: [10000, 10000, 0, 0]                     
+tollerance_error: 0.1                     
+is_store_robot_predicted_trajectory: False 
+max_ghost_tracking_time: 20               
+solver: "MA57"                            
