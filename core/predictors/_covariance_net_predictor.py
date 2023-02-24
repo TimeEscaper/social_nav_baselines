@@ -20,8 +20,11 @@ class NeuralPredictor(AbstractPredictor):
                  device: str = "cpu") -> None:
         super().__init__(dt=NeuralPredictor._DT,
                          total_peds=total_peds,
-                         horizon=horizon)
-
+                         horizon=horizon,
+                         history_length=NeuralPredictor._HISTORY_LENGTH)
+        assert horizon <= NeuralPredictor._MODEL_HORIZON, \
+            f"Horizon can not be larger than horizon that the model was trained with " \
+            f"({NeuralPredictor._MODEL_HORIZON} steps)"
         self._model = CovarianceNet(input_size=2,
                                     hidden_size=64,
                                     prediction_steps=NeuralPredictor._MODEL_HORIZON)
@@ -30,29 +33,30 @@ class NeuralPredictor(AbstractPredictor):
         _ = self._model.to(device)
         self._model = self._model.eval()
         self._device = device
+        self._horizon = horizon
 
     def predict(self, joint_history: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         # joint_history: (history, n_neighbours, state_dim)
         n_agents = joint_history.shape[1]
         if n_agents == 1:
             ego_agent = joint_history[:, 0, :2]
-            ego_vel = joint_history[-1, 0, :]
+            ego_vel = joint_history[-1, 0, 2:]
             neighbours_stub = np.ones((joint_history.shape[0], 1, 2)) * 1000.
             pred, cov = self._predict_ego_agent(ego_agent, ego_vel, neighbours_stub)
-            return pred[np.newaxis], cov[np.newaxis]
+            return pred[:self._horizon, np.newaxis, :], cov[:self._horizon, np.newaxis, :, :]
 
         preds = []
         covs = []
         for i in range(n_agents):
             ego_agent = joint_history[:, i, :2]
-            ego_vel = joint_history[-1, i, :]
+            ego_vel = joint_history[-1, i, 2:]
             neighbours = joint_history[:, [j for j in range(n_agents) if j != i], :2]
             pred, cov = self._predict_ego_agent(ego_agent, ego_vel, neighbours)
             preds.append(pred)
             covs.append(pred)
         preds = np.array(preds)
         covs = np.array(covs)
-        return preds, covs
+        return preds[:self._horizon], covs[self._horizon]
 
         # for i in range(joint_history.shape[1]):
         #     ego_history =
