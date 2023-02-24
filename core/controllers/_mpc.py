@@ -213,9 +213,27 @@ class DoMPCController(AbstractController):
                 array_mahalanobis_bounds = casadi.SX(1, total_peds)
                 V_s = np.pi * (r_rob + r_ped) ** 2
                 for ped_ind in range(self._total_peds):
-                    array_mahalanobis_bounds[ped_ind] = -2 * casadi.log(casadi.sqrt(_get_determinant(2 * np.pi * casadi.reshape(cov[:, ped_ind], 2, 2))) * (constraint_value / V_s))
+                    array_mahalanobis_bounds[ped_ind] = 2 * casadi.log(
+                        casadi.sqrt(
+                        _get_determinant(2 * np.pi *  \
+                                         casadi.reshape(cov[:, ped_ind], 2, 2))) * \
+                                         (constraint_value / V_s))
                 return array_mahalanobis_bounds
             mahalanobis_bounds = _get_MB_bounds(self._covariances_peds)
+            
+            """
+            ### TEST
+            test = casadi.Function("test",
+                        {"p_rob_hcat":p_rob_hcat, "p_peds":p_peds,"cov": self._covariances_peds, "inv_cov": self._inverse_covariances_peds,"MD": pedestrians_mahalanobis_distances, "Bounds": mahalanobis_bounds},
+                        ["cov", "inv_cov", "p_rob_hcat", "p_peds"], ["MD", "Bounds"])
+            covariances_peds = np.array([ 1.23342298e-01,  -1.77052733e-03,  -1.77052733e-03, 8.85994434e-02])
+            inverse_covariances_peds = np.array([8.11, 0.162, 0.162, 11.29])
+            rob = np.array([0, 0])
+            ped = np.array([0.5, 0.5])
+            print(test(cov=covariances_peds, inv_cov=inverse_covariances_peds, p_rob_hcat=rob, p_peds=ped))
+            ### TEST
+            """
+
             self._mpc.set_nl_cons("mahalanobis_dist_to_peds", -pedestrians_mahalanobis_distances-mahalanobis_bounds,
                                   ub=np.zeros(total_peds))
         elif constraint_type == "None":
