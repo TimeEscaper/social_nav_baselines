@@ -11,15 +11,24 @@ import pathlib
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_CONFIG_PATH = r"configs/mpc_config.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/perpendicular_traffic/7_pedestrians.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/mpc.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.gif"
 
-def main(config_path: str = DEFAULT_CONFIG_PATH,
-         result_path: str = DEFAULT_RESULT_PATH) -> None:
+def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
+         controller_config_path: str = DEFAULT_CONTROLLER_CONFIG_PATH,
+         result_path: str = DEFAULT_RESULT_PATH) -> Statistics:
 
     # Initialization
-    with open(config_path) as f:
-        config = yaml.safe_load(f)
+    with open(scene_config_path) as f:
+        scene_config = yaml.safe_load(f)
+
+    with open(controller_config_path) as f:
+        controller_config = yaml.safe_load(f)
+
+    config = {}
+    config.update(scene_config)
+    config.update(controller_config)
 
     simulator, renderer = create_sim(np.array(config["init_state"]),
                                      config["model_type"],
@@ -78,8 +87,8 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
     visualizer.visualize_goal(config["goal"])
     
     statistics = Statistics(simulator,
-                            config_path,
-                            config_path)
+                            scene_config,
+                            controller_config)
 
     # Loop
     simulator.step()
@@ -141,12 +150,10 @@ def main(config_path: str = DEFAULT_CONFIG_PATH,
                     pygame.quit()
     pygame.quit()
 
-    print(f"Collisions: {statistics.total_collisions}")
-    print(f"Simulation ticks: {statistics.simulation_ticks}")
-    """
+    
     visualizer.make_animation(f"MPC", 
                               result_path, 
                               config)
-    """
+    
 if __name__ == "__main__":
     fire.Fire(main)

@@ -1,0 +1,29 @@
+dt: 0.1                                   
+goal:                                 
+- -4.115611081105455                  
+- 0.6131383674219516                  
+- -0.0
+init_state:                         
+- 4.115611081105455
+- -0.6131383674219516
+- 0.0
+is_robot_visible: false
+misdetection_prob: 0
+ped_detc_fov: 120
+ped_detc_range: 3
+ped_model: HSFM
+pedestrians_goals:
+- - - -4.152047093053303
+    - -0.213143259080908
+- - - 4.118011792837781
+    - 0.7994049285331043
+pedestrians_init_states:
+- - 4.152047093053303
+  - 0.213143259080908
+  - 0.0
+- - -4.118011792837781
+  - -0.7994049285331043
+  - 0.0
+tollerance_error: 0.1
+total_peds: 2
+waypoint_tracker: fixed

@@ -16,7 +16,7 @@ def main(scene_config_path: str,
     with open(scene_config_path) as f:
         scene_config = yaml.safe_load(f)
 
-    with open(scene_config_path) as f:
+    with open(controller_config_path) as f:
         controller_config = yaml.safe_load(f)
 
     config = {}

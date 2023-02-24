@@ -27,13 +27,13 @@ horizon: 24                                # MPC planning horizon, [steps]
 model_type: "unicycle"                     # Robot model, ["unicycle", "unicycle_double_integrator"]
 ped_model: "HSFM"                          # Pedestrian pyminisim model, ["HSFM", "ORCA"]
 ped_predictor: "neural"                    # Pedestrian predictor, ["constant_velocity", "neural"]
-cost_function: "GO-MPC"                    # Choose cost function for MPC, ["GO-MPC", "MD-GO-MPC", "ED-GO-MPC"]
-constraint_type: "MD"                      # Choose constraint type for MPC, ["None", "ED", "MD"]
+cost_function: "ED-GO-MPC"                 # Choose cost function for MPC, ["GO-MPC", "MD-GO-MPC", "ED-GO-MPC"]
+constraint_type: "ED"                      # Choose constraint type for MPC, ["None", "ED", "MD"]
 constraint_value: 0.2                      # Minimum safe distance to pedestrians and other objects, [m] for "ED" constraint and Collision probability [0, 1] for "MD"
 Q: 1000                                    # Terminal cost weight
 R: [[1, 0],   
     [0, 1]]                                # Control input weighted matrix
-W: 0.5                                     # Mahalanobis distance weight
+W: 100                                     # Mahalanobis distance weight
 r_rob: 0.35                                # Robot radius, [m]
 r_ped: 0.3                                 # Pedestrian radius, [m]
 lb: [-0.5, -2]                             # Lower bounds for NLP: [v, w], [m/s, rad/s]
@@ -44,7 +44,7 @@ ped_detc_fov: 120                          # Pedestrian detector max fov, [deg]
 misdetection_prob: 0                       # Probability of pedestrian misdetection
 state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
 is_robot_visible: False                    # Boolean flag of robot visibility for pedestrians
-tollerance_error: 0.1                     # Tollernce error for the Euclidean distance to the goal, [m]
+tollerance_error: 0.1                      # Tollerance error for the Euclidean distance to the goal, [m]
 is_store_robot_predicted_trajectory: True  # Flag to store robot predicted trajectory, [True, False]
 max_ghost_tracking_time: 20                # Amount of steps to track ghost pedestrian, [step]
 solver: "MA57"                             # NLP Solver for Casadi, ["MUMPS", "MA27", "MA57", "MA77", "MA86", "MA97"]
