@@ -11,7 +11,7 @@ import pathlib
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/circular_crossing/4_pedestrians.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/random/1_pedestrian.yaml"
 DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/mpc.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.gif"
 
