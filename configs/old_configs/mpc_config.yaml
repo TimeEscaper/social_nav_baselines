@@ -33,7 +33,7 @@ constraint_value: 0.2                      # Minimum safe distance to pedestrian
 Q: 1000                                    # Terminal cost weight
 R: [[1, 0],   
     [0, 1]]                                # Control input weighted matrix
-W: 100                                     # Mahalanobis distance weight
+W: 100                                     # Mahalanobis/Euclidean distance weight in cost function
 r_rob: 0.35                                # Robot radius, [m]
 r_ped: 0.3                                 # Pedestrian radius, [m]
 lb: [-0.5, -2]                             # Lower bounds for NLP: [v, w], [m/s, rad/s]
@@ -44,7 +44,7 @@ ped_detc_fov: 120                          # Pedestrian detector max fov, [deg]
 misdetection_prob: 0                       # Probability of pedestrian misdetection
 state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
 is_robot_visible: False                    # Boolean flag of robot visibility for pedestrians
-tollerance_error: 0.1                      # Tollerance error for the Euclidean distance to the goal, [m]
+tolerance_error: 0.1                      # Tollerance error for the Euclidean distance to the goal, [m]
 is_store_robot_predicted_trajectory: True  # Flag to store robot predicted trajectory, [True, False]
 max_ghost_tracking_time: 20                # Amount of steps to track ghost pedestrian, [step]
 solver: "MA57"                             # NLP Solver for Casadi, ["MUMPS", "MA27", "MA57", "MA77", "MA86", "MA97"]

@@ -24,6 +24,6 @@ pedestrians_init_states:
 - - 0.7002454720713698
   - -2.1507831501914216
   - 0.0
-tollerance_error: 0.1
+tolerance_error: 0.1
 total_peds: 2
 waypoint_tracker: fixed

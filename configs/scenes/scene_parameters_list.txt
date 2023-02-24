@@ -16,7 +16,7 @@ Scene parameter list:
                            Provide goals for the pedestrians according to the amount specified in total_peds, [x, y], [m, m]
 pedestrians_init_states:   Only for "fixed" waypoint_tracker
                            Provide initial states of the pedestrians according to the amount specified in total_peds, [x, y, phi], [m, m, rad]
-       tollerance_error:   Tollerance error for the Euclidean distance to the goal, [m]
+       tolerance_error:   Tollerance error for the Euclidean distance to the goal, [m]
              total_peds:   Amount of pedestrians
        waypoint_tracker:   Choose a waypoint tracker for pedestrians: ["random", "fixed"]
                                     

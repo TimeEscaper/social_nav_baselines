@@ -11,7 +11,7 @@ import pathlib
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/parallel_traffic/1_pedestrian.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/perpendicular_traffic/7_pedestrians.yaml"
 DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/dwa.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.gif"
 
@@ -79,7 +79,9 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                             renderer)
     visualizer.visualize_goal(config["goal"])
 
-    statistics = Statistics(simulator)
+    statistics = Statistics(simulator,
+                            scene_config_path,
+                            controller_config_path)
 
     # Loop
     simulator.step()
@@ -91,7 +93,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
         renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(controller.goal[:2] - state[:2])
-            if error >= config["tollerance_error"]:
+            if error >= config["tolerance_error"]:
                 state = simulator.current_state.world.robot.state
                 visualizer.append_ground_truth_robot_state(state)
                 if config["total_peds"] > 0:
@@ -139,12 +141,9 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                     pygame.quit()
     pygame.quit()
 
-    print(f"Collisions: {statistics.total_collisions}")
-    print(f"Simulation ticks: {statistics.simulation_ticks}")
-
-    #visualizer.make_animation("Dynamic Window Approach",
-    #                          DEFAULT_RESULT_PATH,
-    #                          config)
+    visualizer.make_animation("Dynamic Window Approach",
+                              DEFAULT_RESULT_PATH,
+                              config)
 
 if __name__ == "__main__":
     fire.Fire(main)

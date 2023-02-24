@@ -1,0 +1,30 @@
+sceneName -> controllerName_configNumber -> amount_ped -> scenario_number
+Таблички формуруем по сценариям, то есть всего 4 таблички. В каждой из них описываются методы
+{
+"circular_crossing": {
+    "dwa_0": {
+            "1": {
+                "0" : {
+                    "failure_status": false,
+                    "simulation_ticks": 1154,
+                    "total_collisions": 0,
+                    "scene_config": "",
+                    "controller_config": ""
+                },
+                "1" : {
+                    "failure_status": false,
+                    "simulation_ticks": 1154,
+                    "total_collisions": 0,
+                    "scene_config": "",
+                    "controller_config": ""
+                }
+        }
+    }
+
+}
+"evaluation/methods/mpc/configs/mpc_circular_crossing_1.yaml": {
+"failure_status": false,
+"simulation_ticks": 1154,
+"total_collisions": 0
+}
+}

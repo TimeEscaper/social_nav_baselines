@@ -78,8 +78,8 @@ def main(scene_config_path: str,
     visualizer.visualize_goal(config["goal"])
     
     statistics = Statistics(simulator,
-                            scene_config,
-                            controller_config)
+                            scene_config_path,
+                            controller_config_path)
 
     # Loop
     simulator.step()
@@ -97,7 +97,7 @@ def main(scene_config_path: str,
         renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(controller.goal[:2] - state[:2])
-            if error >= config["tollerance_error"]:
+            if error >= config["tolerance_error"]:
                 state = simulator.current_state.world.robot.state
                 visualizer.append_ground_truth_robot_state(state)
                 if config["total_peds"] > 0:
@@ -116,26 +116,10 @@ def main(scene_config_path: str,
                 elif config["total_peds"] == 0:
                     pedestrians_ghosts_states = np.array([config["state_dummy_ped"]])
                 control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = controller.make_step(state,
-                                                                                                                      pedestrians_ghosts_states)
-                visualizer.append_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
-                #visualizer.visualize_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
-                #visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)
-                predicted_robot_trajectory = controller.get_predicted_robot_trajectory()      
-                visualizer.append_predicted_robot_trajectory(predicted_robot_trajectory)
-                #visualizer.visualize_predicted_robot_trajectory(predicted_robot_trajectory)          
-                visualizer.append_predicted_pedestrians_covariances(predicted_pedestrians_covariances)          
+                                                                                                                      pedestrians_ghosts_states)        
                 hold_time = 0.
             else:
                 break
-                simulator.step(np.array([0, 0]))
-                print("The goal", *["{0:0.2f}".format(i) for i in controller.goal], "was reached!")
-                input_value = input("Enter new goal in format '0 0 0' or type 'exit' to exit: ")
-                if input_value == "exit":
-                    break
-                new_goal = np.array(list(map(int, input_value.split())))
-                visualizer.visualize_goal(new_goal)
-                controller.set_new_goal(state,
-                                        new_goal)
         simulator.step(control)
         statistics.track_collisions()
         statistics.track_simulation_ticks()
@@ -147,14 +131,6 @@ def main(scene_config_path: str,
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
     pygame.quit()
-
-    #print(f"Collisions: {statistics.total_collisions}")
-    #print(f"Simulation ticks: {statistics.simulation_ticks}")
-    """
-    visualizer.make_animation(f"MPC", 
-                              result_path, 
-                              config)
-    """
     return statistics
 
 if __name__ == "__main__":

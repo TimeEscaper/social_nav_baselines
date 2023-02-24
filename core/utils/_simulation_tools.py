@@ -21,7 +21,8 @@ def create_sim(init_state: np.ndarray,
                waypoint_tracker: str,
                pedestrians_init_states: List[List[float]],
                pedestrians_goals: List[List[List[float]]],
-               pedestrian_model: str) -> Tuple[Simulation, Renderer]:
+               pedestrian_model: str,
+               create_renderer: bool = True) -> Tuple[Simulation, Renderer]:
     """Function sets up simulation parameters
 
     Args:
@@ -79,7 +80,10 @@ def create_sim(init_state: np.ndarray,
                      robot_model=robot_model,
                      pedestrians_model=pedestrians_model,
                      sensors=sensors)
-    renderer = Renderer(simulation=sim,
-                        resolution=80.0,
-                        screen_size=(700, 700))
-    return sim, renderer
+    if create_renderer:
+        renderer = Renderer(simulation=sim,
+                            resolution=80.0,
+                            screen_size=(700, 700))
+        return sim, renderer
+    else:
+        return sim, None
