@@ -28,12 +28,12 @@ class NeuralPredictor(AbstractPredictor):
         self._model = CovarianceNet(input_size=2,
                                     hidden_size=64,
                                     prediction_steps=NeuralPredictor._MODEL_HORIZON)
-        self._model.load_state_dict(torch.load("/home/sibirsky/model_6_2023-02-14_12-08-44.pth",
+        self._model.load_state_dict(torch.load("nn_weights/covariance_net_dt_01_horizon_25.pth",
                                                map_location=device))
         _ = self._model.to(device)
         self._model = self._model.eval()
         self._device = device
-        self._horizon = horizon
+        self._horizon = horizon + 1
 
     def predict(self, joint_history: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         # joint_history: (history, n_neighbours, state_dim)
@@ -42,6 +42,7 @@ class NeuralPredictor(AbstractPredictor):
             ego_agent = joint_history[:, 0, :2]
             ego_vel = joint_history[-1, 0, 2:]
             neighbours_stub = np.ones((joint_history.shape[0], 1, 2)) * 1000.
+            neighbours_stub = neighbours_stub.transpose((1, 0, 2))
             pred, cov = self._predict_ego_agent(ego_agent, ego_vel, neighbours_stub)
             return pred[:self._horizon, np.newaxis, :], cov[:self._horizon, np.newaxis, :, :]
 
@@ -50,13 +51,13 @@ class NeuralPredictor(AbstractPredictor):
         for i in range(n_agents):
             ego_agent = joint_history[:, i, :2]
             ego_vel = joint_history[-1, i, 2:]
-            neighbours = joint_history[:, [j for j in range(n_agents) if j != i], :2]
+            neighbours = joint_history[:, [j for j in range(n_agents) if j != i], :2].transpose((1, 0, 2))
             pred, cov = self._predict_ego_agent(ego_agent, ego_vel, neighbours)
             preds.append(pred)
-            covs.append(pred)
-        preds = np.array(preds)
-        covs = np.array(covs)
-        return preds[:self._horizon], covs[self._horizon]
+            covs.append(cov)
+        preds = np.array(preds).transpose((1, 0, 2))
+        covs = np.array(covs).transpose((1, 0, 2, 3))
+        return preds[:self._horizon], covs[:self._horizon]
 
         # for i in range(joint_history.shape[1]):
         #     ego_history =
@@ -83,6 +84,9 @@ class NeuralPredictor(AbstractPredictor):
                                     torch.Tensor(neighbours_history).unsqueeze(0).to(self._device))
             pred = pred.clone().detach().cpu().numpy()[0]
             cov = cov.clone().detach().cpu().numpy()[0]
-        pred = np.matmul(pred[:, :2], np.linalg.inv(rt_matrix[:2, :2].T)) - rt_matrix[:2, 2]
+
+        inv_rotation = np.linalg.inv(rt_matrix[:2, :2].T)
+        pred = np.matmul(pred[:, :2], inv_rotation) - rt_matrix[:2, 2]
+        cov = np.matmul(inv_rotation, np.matmul(cov, inv_rotation.T))
 
         return pred, cov

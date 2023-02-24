@@ -33,4 +33,4 @@ ub: [2, 2]                                 # Upper bounds for NLP: [v, w], [m/s,
 state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
 is_store_robot_predicted_trajectory: True  # Flag to store robot predicted trajectory, [True, False]
 max_ghost_tracking_time: 20                # Amount of steps to track ghost pedestrian, [step]
-solver: "MA57"                             # NLP Solver for Casadi, ["MUMPS", "MA27", "MA57", "MA77", "MA86", "MA97"]
+solver: "MUMPS"                             # NLP Solver for Casadi, ["MUMPS", "MA27", "MA57", "MA77", "MA86", "MA97"]

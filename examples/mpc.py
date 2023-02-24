@@ -1,5 +1,5 @@
 from core.controllers import DoMPCController
-from core.predictors import ConstantVelocityPredictor, NeuralPredictor
+from core.predictors import ConstantVelocityPredictor, NeuralPredictor, PedestrianTracker
 from core.utils import create_sim
 from core.visualizer import Visualizer
 from core.statistics import Statistics
@@ -11,7 +11,7 @@ import pathlib
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/perpendicular_traffic/7_pedestrians.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/circular_crossing/4_pedestrians.yaml"
 DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/mpc.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.gif"
 
@@ -72,7 +72,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                  config["ub"],
                                  config["r_rob"],
                                  config["r_ped"],
-                                 predictor,
+                                 PedestrianTracker(predictor, config["max_ghost_tracking_time"], False),
                                  config["is_store_robot_predicted_trajectory"],
                                  config["max_ghost_tracking_time"],
                                  config["state_dummy_ped"],
@@ -100,26 +100,39 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
             error = np.linalg.norm(controller.goal[:2] - state[:2])
             if error >= config["tollerance_error"]:
                 state = simulator.current_state.world.robot.state
+
+                detected_peds_keys = simulator.current_state.sensors["pedestrian_detector"].reading.pedestrians.keys()
+                ground_truth_pedestrians_state = np.concatenate([simulator.current_state.world.pedestrians.poses[:, :2],
+                                                                 simulator.current_state.world.pedestrians.velocities[:, :2]], axis=1)
+                observation = {k: ground_truth_pedestrians_state[k, :] for k in detected_peds_keys}
+
                 visualizer.append_ground_truth_robot_state(state)
-                if config["total_peds"] > 0:
-                    detected_pedestrian_indices = simulator.current_state.sensors['pedestrian_detector'].reading.pedestrians.keys()
-                    undetected_pedestrian_indices = list(set(range(config["total_peds"])) - set(detected_pedestrian_indices))
-                    ground_truth_pedestrians_state = np.concatenate([simulator.current_state.world.pedestrians.poses[:, :2],
-                                                                     simulator.current_state.world.pedestrians.velocities[:, :2]], axis=1)
-                    ground_truth_pedestrians_state[undetected_pedestrian_indices] = config["state_dummy_ped"]
-                    controller.previously_detected_pedestrians |= set(detected_pedestrian_indices)
-                    pedestrians_ghosts_states = ground_truth_pedestrians_state
-                    if undetected_pedestrian_indices:
-                        pedestrians_ghosts_states = controller.get_pedestrains_ghosts_states(ground_truth_pedestrians_state,
-                                                                                             undetected_pedestrian_indices)
-                    
-                    visualizer.append_ground_truth_pedestrians_pose(simulator.current_state.world.pedestrians.poses[:, :2])
-                elif config["total_peds"] == 0:
-                    pedestrians_ghosts_states = np.array([config["state_dummy_ped"]])
+                visualizer.append_ground_truth_pedestrians_pose(simulator.current_state.world.pedestrians.poses[:, :2])
+
                 control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = controller.make_step(state,
-                                                                                                                      pedestrians_ghosts_states)
+                                                                                                                      observation)
+
+                # visualizer.append_ground_truth_robot_state(state)
+                # if config["total_peds"] > 0:
+                #     detected_pedestrian_indices = simulator.current_state.sensors['pedestrian_detector'].reading.pedestrians.keys()
+                #     undetected_pedestrian_indices = list(set(range(config["total_peds"])) - set(detected_pedestrian_indices))
+                #     ground_truth_pedestrians_state = np.concatenate([simulator.current_state.world.pedestrians.poses[:, :2],
+                #                                                      simulator.current_state.world.pedestrians.velocities[:, :2]], axis=1)
+                #     ground_truth_pedestrians_state[undetected_pedestrian_indices] = config["state_dummy_ped"]
+                #     controller.previously_detected_pedestrians |= set(detected_pedestrian_indices)
+                #     pedestrians_ghosts_states = ground_truth_pedestrians_state
+                #     if undetected_pedestrian_indices:
+                #         pedestrians_ghosts_states = controller.get_pedestrains_ghosts_states(ground_truth_pedestrians_state,
+                #                                                                              undetected_pedestrian_indices)
+                #
+                #     visualizer.append_ground_truth_pedestrians_pose(simulator.current_state.world.pedestrians.poses[:, :2])
+                # elif config["total_peds"] == 0:
+                #     pedestrians_ghosts_states = np.array([config["state_dummy_ped"]])
+                # control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = controller.make_step(state,
+                #                                                                                                       pedestrians_ghosts_states)
                 visualizer.append_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
                 #visualizer.visualize_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
+
                 visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)
                 predicted_robot_trajectory = controller.get_predicted_robot_trajectory()      
                 visualizer.append_predicted_robot_trajectory(predicted_robot_trajectory)

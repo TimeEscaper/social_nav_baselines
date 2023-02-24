@@ -1,9 +1,10 @@
 from ._controller import AbstractController
 from core.predictors import AbstractPredictor, NeuralPredictor, ConstantVelocityPredictor
+from core.predictors import PedestrianTracker
 import numpy as np
 import do_mpc
 import casadi
-from typing import List
+from typing import List, Dict
 
 
 class DoMPCController(AbstractController):
@@ -22,7 +23,7 @@ class DoMPCController(AbstractController):
                  ub: List[float],
                  r_rob: float,
                  r_ped: float,
-                 predictor: AbstractPredictor,
+                 pedestrian_tracker: PedestrianTracker,
                  is_store_robot_predicted_trajectory: bool,
                  max_ghost_tracking_time: int,
                  state_dummy_ped: List[float],
@@ -59,12 +60,12 @@ class DoMPCController(AbstractController):
                          dt,
                          state_dummy_ped,
                          max_ghost_tracking_time)
-        self._predictor = predictor
+        self._ped_tracker = pedestrian_tracker
         self._is_store_robot_predicted_trajectory = is_store_robot_predicted_trajectory
         self._ghost_tracking_times : List[int]= [0] * total_peds
 
-        if cost_function == "MD-GO-MPC":
-            assert isinstance(predictor, NeuralPredictor), f"You should specify neural predictor for MD-GO-MPC type of cost"
+        # if cost_function == "MD-GO-MPC":
+        #     assert isinstance(predictor, NeuralPredictor), f"You should specify neural predictor for MD-GO-MPC type of cost"
 
         # Architecture requires at least one dummy pedestrian in the system
         if total_peds == 0:
@@ -255,26 +256,38 @@ class DoMPCController(AbstractController):
                           goal)
 
     def predict(self,
-                ground_truth_pedestrians_state: np.ndarray) -> np.ndarray:
+                observation: Dict[int, np.ndarray]) -> np.ndarray:
         """Method predicts pedestrian trajectories with specified predictor
         
         Args:
             ground_truth_pedestrians_state (np.ndarray): Current state of the pedestrians, [2-d numpy array]
         """
-        predicted_pedestrians_trajectories, predicted_pedestrians_covariances = self._predictor.predict(ground_truth_pedestrians_state)
-        predicted_pedestrians_inverse_covariances = np.linalg.inv(predicted_pedestrians_covariances)
-        """ Unfold covarince into a row for MPC
-        [[a1, a2
-          b1, b2]]  -->  [a1, a2, b1, b2]
-        """
-        unfolded_predicted_pedestrians_covariances = predicted_pedestrians_covariances.reshape((self._horizon + 1, self._total_peds, 4))
-        unfolded_predicted_pedestrians_inverse_covariances = predicted_pedestrians_inverse_covariances.reshape((self._horizon + 1, self._total_peds, 4))
+        self._ped_tracker.update(observation)
+        tracked_predictions = self._ped_tracker.get_predictions()
+        predicted_trajectories = np.tile(np.array([1000., 1000., 0., 0.]), (self._horizon + 1, self._total_peds, 1))
+        predicted_covs = np.tile(np.array([[0.01, 0.0], [0., 0.01]]), (self._horizon + 1, self._total_peds, 1, 1))
+        for k in tracked_predictions.keys():
+            predicted_trajectories[:, k, :2] = tracked_predictions[k][0]
+            predicted_covs[:, k, :] = tracked_predictions[k][1]
+
+        # predicted_pedestrians_trajectories, predicted_pedestrians_covariances = self._predictor.predict(ground_truth_pedestrians_state)
+        # predicted_pedestrians_inverse_covariances = np.linalg.inv(predicted_pedestrians_covariances)
+        # """ Unfold covarince into a row for MPC
+        # [[a1, a2
+        #   b1, b2]]  -->  [a1, a2, b1, b2]
+        # """
+        # unfolded_predicted_pedestrians_covariances = predicted_pedestrians_covariances.reshape((self._horizon + 1, self._total_peds, 4))
+        # unfolded_predicted_pedestrians_inverse_covariances = predicted_pedestrians_inverse_covariances.reshape((self._horizon + 1, self._total_peds, 4))
+
+        predicted_covs_inv = np.linalg.inv(predicted_covs)
+        predicted_covs_flatten = predicted_covs.reshape((self._horizon + 1, self._total_peds, 4))
+        predicted_covs_inv_flatten = predicted_covs_inv.reshape((self._horizon + 1, self._total_peds, 4))
 
         for step in range(len(self._mpc_tvp_fun['_tvp', :, 'p_peds'])):
-            self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_pedestrians_trajectories[step].T
-            self._mpc_tvp_fun['_tvp', step, 'cov_peds'] = unfolded_predicted_pedestrians_covariances[step].T
-            self._mpc_tvp_fun['_tvp', step, 'inv_cov_peds'] = unfolded_predicted_pedestrians_inverse_covariances[step].T
-        return predicted_pedestrians_trajectories, predicted_pedestrians_covariances
+            self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_trajectories[step].T
+            self._mpc_tvp_fun['_tvp', step, 'cov_peds'] = predicted_covs_flatten[step].T
+            self._mpc_tvp_fun['_tvp', step, 'inv_cov_peds'] = predicted_covs_inv_flatten[step].T
+        return predicted_trajectories, predicted_covs
 
     def get_predicted_robot_trajectory(self) -> List[float]:
         rob_x_pred = self._mpc.data.prediction(('_x', 'x'))[0]
@@ -284,8 +297,8 @@ class DoMPCController(AbstractController):
 
     def make_step(self, 
                   state: np.ndarray,
-                  ground_truth_pedestrians_state: np.ndarray) -> np.ndarray:
-        self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances = self.predict(ground_truth_pedestrians_state)
+                  observation: Dict[int, np.ndarray]) -> np.ndarray:
+        self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances = self.predict(observation)
         control = self._mpc.make_step(state).T[0]
         return control, self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances
     

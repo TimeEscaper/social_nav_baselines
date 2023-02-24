@@ -28,7 +28,7 @@ class _CyclicBuffer:
 
     @all.setter
     def all(self, value: np.ndarray):
-        assert value.shape == self._size + self._dims
+        assert value.shape == (self._size,) + self._dims
         self._buffer = value
 
     @property
@@ -183,6 +183,11 @@ class PedestrianTracker:
         self._do_predictions_for_tracks()
         self._update_ghosts()
 
+    def get_predictions(self) -> Dict[int, Tuple[np.ndarray, np.ndarray]]:
+        preds = {}
+        preds.update({k: (v.predicted_poses.copy(), v.predicted_covs.copy()) for k, v in self._tracks.items()})
+        preds.update({k: (v.predicted_poses.copy(), v.predicted_covs.copy()) for k, v in self._ghosts.items()})
+        return preds
 
     @property
     def joint_track(self) -> Optional[np.ndarray]:
@@ -201,7 +206,7 @@ class PedestrianTracker:
         if len(self._tracks) == 0:
             return {}
 
-        joint_history = np.concatenate([v.history[:, np.newaxis, :2] for v in self._tracks.values()], axis=1)
+        joint_history = np.concatenate([v.history[:, np.newaxis, :] for v in self._tracks.values()], axis=1)
         pred_poses, pred_covs = self._predictor.predict(joint_history)
         ped_ids = list(self._tracks.keys())
         for i in range(len(self._tracks)):
