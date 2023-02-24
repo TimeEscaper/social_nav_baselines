@@ -1,74 +1,84 @@
 import numpy as np
+import torch
+
+from typing import Optional, Tuple
+
 from ._predictor import AbstractPredictor
+from ._covariance_net._model import CovarianceNet
+from ._covariance_net._model_utils import get_rotation_translation_matrix
 
 
 class NeuralPredictor(AbstractPredictor):
+    # Network was trained with those parameters
+    _MODEL_HORIZON = 25
+    _DT = 0.1
+    _HISTORY_LENGTH = 8
 
     def __init__(self,
-                 dt: float,
                  total_peds: int,
-                 horizon: int) -> None:
-        super().__init__(dt,
-                         total_peds,
-                         horizon)
+                 horizon: int = 25,
+                 device: str = "cpu") -> None:
+        super().__init__(dt=NeuralPredictor._DT,
+                         total_peds=total_peds,
+                         horizon=horizon)
 
-    def predict_one_step(self,
-                         state_peds_k: np.ndarray) -> np.ndarray:
-        """Method returns next state for the specified pedestrians
+        self._model = CovarianceNet(input_size=2,
+                                    hidden_size=64,
+                                    prediction_steps=NeuralPredictor._MODEL_HORIZON)
+        self._model.load_state_dict(torch.load("/home/sibirsky/model_6_2023-02-14_12-08-44.pth",
+                                               map_location=device))
+        _ = self._model.to(device)
+        self._model = self._model.eval()
+        self._device = device
 
-        Propagation model with constant_velocity
+    def predict(self, joint_history: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+        # joint_history: (history, n_neighbours, state_dim)
+        n_agents = joint_history.shape[1]
+        if n_agents == 1:
+            ego_agent = joint_history[:, 0, :2]
+            ego_vel = joint_history[-1, 0, :]
+            neighbours_stub = np.ones((joint_history.shape[0], 1, 2)) * 1000.
+            pred, cov = self._predict_ego_agent(ego_agent, ego_vel, neighbours_stub)
+            return pred[np.newaxis], cov[np.newaxis]
 
-        Args:
-            state_peds_k (np.ndarray): state vector of all pedestrians: [x_init,  y_init, vx, vy], [m, m, m/s, m/s]
+        preds = []
+        covs = []
+        for i in range(n_agents):
+            ego_agent = joint_history[:, i, :2]
+            ego_vel = joint_history[-1, i, :]
+            neighbours = joint_history[:, [j for j in range(n_agents) if j != i], :2]
+            pred, cov = self._predict_ego_agent(ego_agent, ego_vel, neighbours)
+            preds.append(pred)
+            covs.append(pred)
+        preds = np.array(preds)
+        covs = np.array(covs)
+        return preds, covs
 
-        Return:
-            state_peds_k+1 (np.ndarray): state vector at k + 1
-        """
-        state_peds_k_1 = state_peds_k[:]
-        x = state_peds_k_1[0, :]
-        y = state_peds_k_1[1, :]
-        vx = state_peds_k_1[2, :]
-        vy = state_peds_k_1[3, :]
-        state_peds_k_1[0, :] = x + vx * self._dt
-        state_peds_k_1[1, :] = y + vy * self._dt
-        return state_peds_k_1
+        # for i in range(joint_history.shape[1]):
+        #     ego_history =
 
-    def predict(self,
-                state_peds_k: np.ndarray) -> np.ndarray:
-        """Methods predicts trajectories for all pedestrians across all prediction horizon
+    def predict_one_step(self) -> np.ndarray:
+        return None
 
-        Args:
-            state_peds_k (np.ndarray): Current pedestrian states, [tota_peds, state_dim]
-            dt (float): Time delta, [s]
-            horizon (int): Horizon, [steps]
+    def _predict_ego_agent(self,
+                           ego_history: np.ndarray,
+                           ego_vel: np.ndarray,
+                           neighbours_history: Optional[np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
+        # ego_history: (history, pose_dim)
+        # ego_vel: (velocity_dim,)
+        # neighbours_history: (history, n_neighbours, pose_dim)
+        rt_matrix = get_rotation_translation_matrix(ego_history[7, 0], ego_history[7, 1],
+                                                    ego_vel[0], ego_vel[1])
 
-        Returns:
-            states_peds (np.ndarray): Coordinates of the pedestrians trajectories, [horizon_dim, tota_peds, state_dim]
-            covariance_peds (np.ndarray): Covariances ov the pedestrian trajectories, [horizon_dim, total_peds, covariance.shape]
-        """
-        states_peds = np.zeros([self._horizon + 1, *np.shape(state_peds_k)])
-        states_peds[0, :, :] = state_peds_k
-        # copy velocities
-        states_peds[1:, :, 2:] = states_peds[0, :, 2:]
-        # propagate coordinates
-        for step in range(1, self._horizon + 1):
-            states_peds[step, :, :2] = states_peds[step-1, :, :2] + states_peds[step-1, :, 2:] * self._dt
+        ego_history = np.matmul(ego_history + rt_matrix[:2, 2], rt_matrix[:2, :2].T)
+        neighbours_history = np.matmul(neighbours_history + rt_matrix[:2, 2], rt_matrix[:2, :2].T)
 
-        # covariance
-        """
-        Code below should be changed for proper neural network,
-        this is just a test
-        """
-        init_covariance = np.array(((2, 0), (0, 0.07)))
-        init_covariance_peds = np.tile(init_covariance, (np.shape(state_peds_k)[0], 1, 1))
+        with torch.no_grad():
+            pred, cov = self._model(torch.Tensor(ego_history).unsqueeze(0).to(self._device),
+                                    ego_vel[np.newaxis],
+                                    torch.Tensor(neighbours_history).unsqueeze(0).to(self._device))
+            pred = pred.clone().detach().cpu().numpy()[0]
+            cov = cov.clone().detach().cpu().numpy()[0]
+        pred = np.matmul(pred[:, :2], np.linalg.inv(rt_matrix[:2, :2].T)) - rt_matrix[:2, 2]
 
-        covariance_peds = np.zeros([self._horizon + 1, np.shape(state_peds_k)[0], 2, 2])
-        covariance_peds[0, :, :, :] = init_covariance_peds
-        # covariance propagation
-        for step in range(1, self._horizon + 1):
-            covariance_peds[step, :, :, :] = covariance_peds[step - 1, :, :, :] * 1.03
-
-        data = np.load("/home/aleksandr/Research/social_nav_baselines/cov.npy")
-        data = data[:, np.newaxis, :, :]
-        data = np.repeat(data, self.total_peds, axis=1)
-        return states_peds, data # covariance_peds
+        return pred, cov

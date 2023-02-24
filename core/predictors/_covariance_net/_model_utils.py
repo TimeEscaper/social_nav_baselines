@@ -1,4 +1,24 @@
 import torch
+import numpy as np
+
+
+def get_rotation_matrix(vel_x, vel_y):
+    vel = np.array([vel_x, vel_y])
+    if np.linalg.norm(vel) == 0:
+        return np.array([[1, 0], [0, 1]])
+    vel = vel / np.linalg.norm(vel)
+
+    return np.array([[vel[0], vel[1]], [-vel[1], vel[0]]])
+
+
+def get_translation_matrix(pos_x, pos_y):
+    return np.array([-pos_x, -pos_y])
+
+
+def get_rotation_translation_matrix(pos_x, pos_y, vel_x, vel_y):
+    # return 3x3 matrix
+    return np.block(
+        [[get_rotation_matrix(vel_x, vel_y), get_translation_matrix(pos_x, pos_y).reshape(-1, 1)], [0, 0, 1]])
 
 
 def get_cov_mat(a, b, c, coordinates):

@@ -1,3 +1,3 @@
 from ._predictor import AbstractPredictor
 from ._constant_velocity_predictor import ConstantVelocityPredictor
-from ._neural_predictor import NeuralPredictor
+from ._covariance_net_predictor import NeuralPredictor

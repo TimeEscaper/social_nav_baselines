@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 from typing import Optional
 from ._model_utils import nll_loss, rollout_gru, get_cov_mat
 from ._cons_vel_model import batched_constant_velocity_model
@@ -40,8 +41,7 @@ class CovarianceNet(nn.Module):
         self.criterion = nll_loss
         self.prediction_steps = prediction_steps
 
-    def forward(self, agent_hist: torch.Tensor, neighbor_hist: torch.Tensor,
-                agent_future_gt: Optional[torch.Tensor] = None):
+    def forward(self, agent_hist: torch.Tensor, agent_vel: np.ndarray, neighbor_hist: torch.Tensor):
         # agent_hist: (batch_size, seq_len, input_size)
         # neighbor_hist: (batch_size, num_neighbors, seq_len, input_size)
         # agent_future: (batch_size, seq_len, input_size)
@@ -76,7 +76,8 @@ class CovarianceNet(nn.Module):
         # scene = torch.cat((agent_hist[:,-1], neighbor_hist[:,-1]), dim=-1)
         scene = agent_hist_encoded[:, -1] + neighbor_hist[:, -1]
         # decoder_input: (seq_len, batch_size, output_size)
-        predictions_xy = batched_constant_velocity_model(agent_hist.cpu().detach().numpy(), self.prediction_steps)
+        predictions_xy = batched_constant_velocity_model(agent_hist.cpu().detach().numpy(), agent_vel,
+                                                         self.prediction_steps)
         predictions_xy = torch.from_numpy(predictions_xy).to(agent_hist_encoded.device).float()
         predictions = self.predictions_to_hidden(predictions_xy)
 

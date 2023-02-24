@@ -43,13 +43,11 @@ def main(config_path: str = DEFAULT_CONFIG_PATH) -> None:
                                                   config["horizon"])
     elif config["ped_predictor"] == "neural":
         if config["total_peds"] > 0:
-            predictor = NeuralPredictor(config["dt"],
-                                        config["total_peds"],
-                                        config["horizon"])
+            predictor = NeuralPredictor(total_peds=config["total_peds"],
+                                        horizon=config["horizon"])
         elif config["total_peds"] == 0:
-            predictor = NeuralPredictor(config["dt"],
-                                        1,
-                                        config["horizon"])
+            predictor = NeuralPredictor(total_peds=1,
+                                        horizon=config["horizon"])
     controller = DoMPCController(np.array(config["init_state"]),
                                  np.array(config["goal"]),
                                  config["horizon"],
