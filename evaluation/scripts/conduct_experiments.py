@@ -41,7 +41,7 @@ with controller {controller_config_path}
                     print(error_msg)
                     log += error_msg
 
-with open(fr'evaluation/statistics/stats.json', 'w') as outfile:
+with open(fr'evaluation/statistics/stats_{"_".join(controllers)}.json', 'w') as outfile:
         json.dump(statistics, outfile, indent=4)
 
 
