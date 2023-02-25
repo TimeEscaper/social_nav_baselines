@@ -8,7 +8,7 @@ exp = 0
 
 total_peds_list = [1, 2, 4, 7]
 scenes_list = ["circular_crossing", "parallel_traffic", "perpendicular_traffic", "random"]
-controllers = ["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC"]
+controllers = ["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC"] # Тут можно выбрать какие контроллеры запускать
 total_scenarios_for_scene = 30
 statistics = {}
 log = ""
