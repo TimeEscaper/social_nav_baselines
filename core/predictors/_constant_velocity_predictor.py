@@ -9,7 +9,8 @@ class ConstantVelocityPredictor(AbstractPredictor):
                  horizon: int) -> None:
         super().__init__(dt,
                          total_peds,
-                         horizon)
+                         horizon,
+                         history_length=1)
 
     def predict_one_step(self,
                          state_peds_k: np.ndarray) -> np.ndarray:

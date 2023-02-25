@@ -128,7 +128,7 @@ class Visualizer():
             for pedestrian in range(len(predicted_pedestrians_trajectories[0])):
                 pos = predicted_pedestrians_trajectories[step][pedestrian]
                 self._renderer.draw(f"ped_{step}_{pedestrian}", CircleDrawing(pos, 0.05, self._palette_rgb[pedestrian], 0))
-                self._renderer.draw(f"cov_{step}_{pedestrian}", Covariance2dDrawing(pos, predicted_pedestrians_covariances[step, pedestrian, :, :], self._palette_rgb[pedestrian], 0.1))
+                self._renderer.draw(f"cov_{step}_{pedestrian}", Covariance2dDrawing(pos, predicted_pedestrians_covariances[step, pedestrian, :, :], self._palette_rgb[pedestrian], 0.05))
 
     @staticmethod
     def hex_to_rgb(value: str) -> List[int]:
@@ -172,7 +172,7 @@ class Visualizer():
         #mpl.rcParams['axes.grid'] = True
 
         # set figure
-        fig, ax = plt.subplots(1, 3, figsize=[48, 16], constrained_layout=True, facecolor='white')
+        fig, ax = plt.subplots(1, 2, figsize=[32, 16], constrained_layout=True, facecolor='white')
         #fig, ax = plt.subplots(figsize=[16, 16], facecolor='white')
         ax[0].set_aspect('equal', adjustable='box')
         fig.suptitle(title, fontsize=35)
@@ -365,7 +365,7 @@ class Visualizer():
             ax[2].get_yaxis().set_visible(False)
             ax[2].set_title("Configuration", fontsize=27)
 
-        plot_config_data()
+        #plot_config_data()
 
         print("make_animation: Start")
         frames = len(x_rob_plt)-2

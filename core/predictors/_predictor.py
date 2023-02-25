@@ -6,14 +6,15 @@ class AbstractPredictor(ABC):
     def __init__(self,
                  dt: float,
                  total_peds: int,
-                 horizon: int) -> None:
+                 horizon: int,
+                 history_length: int) -> None:
         assert dt > 0, f"Time delta should be > 0, given {dt}"
         assert total_peds > 0, f"Amount of pedestrians should be positive, given {total_peds}"
         assert horizon > 0, f"Prediction horizon should be positive, given {horizon}"
         self._dt = dt
         self._total_peds = total_peds
         self._horizon = horizon
-    
+        self._history_length = history_length
 
     @abstractmethod
     def predict_one_step(self)-> np.ndarray:
@@ -30,3 +31,12 @@ class AbstractPredictor(ABC):
     @property
     def total_peds(self) -> float:
         return self._total_peds
+
+    @property
+    def history_length(self) -> int:
+        return self._history_length
+
+    @property
+    def horizon(self) -> int:
+        return self._horizon
+

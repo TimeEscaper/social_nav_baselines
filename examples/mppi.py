@@ -1,4 +1,4 @@
-from core.controllers import DoMPCController
+from core.controllers import MPPIController
 from core.predictors import ConstantVelocityPredictor, NeuralPredictor, PedestrianTracker
 from core.utils import create_sim
 from core.visualizer import Visualizer
@@ -12,13 +12,13 @@ import pathlib
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
 DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/random/1_pedestrian.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/mpc.yaml"
-DEFAULT_RESULT_PATH = r"results/mpc.gif"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/mppi.yaml"
+DEFAULT_RESULT_PATH = r"results/mppi.gif"
+
 
 def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
          controller_config_path: str = DEFAULT_CONTROLLER_CONFIG_PATH,
          result_path: str = DEFAULT_RESULT_PATH) -> Statistics:
-
     # Initialization
     with open(scene_config_path) as f:
         scene_config = yaml.safe_load(f)
@@ -55,62 +55,67 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
     elif config["ped_predictor"] == "neural":
         if config["total_peds"] > 0:
             predictor = NeuralPredictor(total_peds=config["total_peds"],
-                                        horizon=config["horizon"])
+                                        horizon=config["horizon"],
+                                        device=config["device"])
         elif config["total_peds"] == 0:
             predictor = NeuralPredictor(total_peds=1,
-                                        horizon=config["horizon"])
-    controller = DoMPCController(np.array(config["init_state"]),
-                                 np.array(config["goal"]),
-                                 config["horizon"],
-                                 config["dt"],
-                                 config["model_type"],
-                                 config["total_peds"],
-                                 np.array(config["Q"]),
-                                 np.array(config["R"]),
-                                 config["W"],
-                                 config["lb"],
-                                 config["ub"],
-                                 config["r_rob"],
-                                 config["r_ped"],
-                                 PedestrianTracker(predictor, config["max_ghost_tracking_time"], False),
-                                 config["is_store_robot_predicted_trajectory"],
-                                 config["max_ghost_tracking_time"],
-                                 config["state_dummy_ped"],
-                                 config["solver"],
-                                 config["cost_function"],
-                                 config["constraint_type"],
-                                 config["constraint_value"])
+                                        horizon=config["horizon"],
+                                        device=config["device"])
+
+    controller = MPPIController(init_state=np.array(config["init_state"]),
+                                goal=np.array(config["goal"]),
+                                horizon=config["horizon"],
+                                dt=config["dt"],
+                                model_type=config["model_type"],
+                                total_peds=config["total_peds"],
+                                Q=config["Q"],
+                                R=np.array(config["R"]),
+                                W=config["W"],
+                                noise_sigma=np.array(config["noise_sigma"]),
+                                lb=config["lb"],
+                                ub=config["ub"],
+                                r_rob=config["r_rob"],
+                                r_ped=config["r_ped"],
+                                pedestrian_tracker=PedestrianTracker(predictor, config["max_ghost_tracking_time"], False),
+                                max_ghost_tracking_time=config["max_ghost_tracking_time"],
+                                cost_function=config["cost_function"],
+                                num_samples=config["num_samples"],
+                                lambda_=config["lambda_"],
+                                device=config["device"]
+                                )
     visualizer = Visualizer(config["total_peds"],
                             renderer)
     visualizer.visualize_goal(config["goal"])
-    
+
     statistics = Statistics(simulator,
-                            scene_config_path,
-                            controller_config_path)
+                            scene_config,
+                            controller_config)
 
     # Loop
     simulator.step()
     hold_time = simulator.sim_dt
     state = config["init_state"]
-    control = np.array([0, 0]) 
+    control = np.array([0, 0])
 
     while True:
         renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(controller.goal[:2] - state[:2])
-            if error >= config["tolerance_error"]:
+            if error >= config["tollerance_error"]:
                 state = simulator.current_state.world.robot.state
 
                 detected_peds_keys = simulator.current_state.sensors["pedestrian_detector"].reading.pedestrians.keys()
                 ground_truth_pedestrians_state = np.concatenate([simulator.current_state.world.pedestrians.poses[:, :2],
-                                                                 simulator.current_state.world.pedestrians.velocities[:, :2]], axis=1)
+                                                                 simulator.current_state.world.pedestrians.velocities[:,
+                                                                 :2]], axis=1)
                 observation = {k: ground_truth_pedestrians_state[k, :] for k in detected_peds_keys}
 
                 visualizer.append_ground_truth_robot_state(state)
                 visualizer.append_ground_truth_pedestrians_pose(simulator.current_state.world.pedestrians.poses[:, :2])
 
-                control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = controller.make_step(state,
-                                                                                                                      observation)
+                control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = controller.make_step(
+                    state,
+                    observation)
 
                 # visualizer.append_ground_truth_robot_state(state)
                 # if config["total_peds"] > 0:
@@ -131,13 +136,14 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                 # control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = controller.make_step(state,
                 #                                                                                                       pedestrians_ghosts_states)
                 visualizer.append_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
-                #visualizer.visualize_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
+                # visualizer.visualize_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
 
-                visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)
-                predicted_robot_trajectory = controller.get_predicted_robot_trajectory()      
+                visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(
+                    predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)
+                predicted_robot_trajectory = controller.get_predicted_robot_trajectory()
                 visualizer.append_predicted_robot_trajectory(predicted_robot_trajectory)
-                visualizer.visualize_predicted_robot_trajectory(predicted_robot_trajectory)          
-                visualizer.append_predicted_pedestrians_covariances(predicted_pedestrians_covariances)          
+                visualizer.visualize_predicted_robot_trajectory(predicted_robot_trajectory)
+                visualizer.append_predicted_pedestrians_covariances(predicted_pedestrians_covariances)
                 hold_time = 0.
             else:
                 simulator.step(np.array([0, 0]))
@@ -161,10 +167,10 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                     pygame.quit()
     pygame.quit()
 
-    
-    visualizer.make_animation(f"Model Predictive Control", 
-                              result_path, 
+    visualizer.make_animation(f"MPC",
+                              result_path,
                               config)
-    
+
+
 if __name__ == "__main__":
     fire.Fire(main)
