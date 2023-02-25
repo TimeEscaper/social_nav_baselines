@@ -1,12 +1,10 @@
 from core.controllers import DWAController
 from core.predictors import ConstantVelocityPredictor, NeuralPredictor
 from core.utils import create_sim
-from core.visualizer import Visualizer
 from core.statistics import Statistics
 import numpy as np
 import fire
 import yaml
-import pygame
 import pathlib
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
@@ -26,7 +24,7 @@ def main(scene_config_path: str,
     config.update(scene_config)
     config.update(controller_config)
 
-    simulator, renderer = create_sim(np.array(config["init_state"]),
+    simulator, _ = create_sim(np.array(config["init_state"]),
                                      "unicycle",
                                      config["total_peds"],
                                      config["is_robot_visible"],
@@ -38,7 +36,7 @@ def main(scene_config_path: str,
                                      config["pedestrians_init_states"],
                                      config["pedestrians_goals"],
                                      config["ped_model"],
-                                     create_renderer=True)
+                                     create_renderer=False)
     #renderer.initialize()
     if config["ped_predictor"] == "constant_velocity":
         if config["total_peds"] > 0:
@@ -72,9 +70,6 @@ def main(scene_config_path: str,
                                config["total_peds"],
                                config["state_dummy_ped"],
                                config["max_ghost_tracking_time"])
-    #visualizer = Visualizer(config["total_peds"],
-    #                        renderer)
-    #visualizer.visualize_goal(config["goal"])
 
     statistics = Statistics(simulator,
                             scene_config_path,
@@ -87,12 +82,10 @@ def main(scene_config_path: str,
     control = np.array([0, 0]) 
     
     while True:
-        #renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(controller.goal[:2] - state[:2])
             if error >= config["tolerance_error"]:
                 state = simulator.current_state.world.robot.state
-                #visualizer.append_ground_truth_robot_state(state)
                 if config["total_peds"] > 0:
                     detected_pedestrian_indices = simulator.current_state.sensors['pedestrian_detector'].reading.pedestrians.keys()
                     undetected_pedestrian_indices = list(set(range(config["total_peds"])) - set(detected_pedestrian_indices))
@@ -104,12 +97,10 @@ def main(scene_config_path: str,
                     if undetected_pedestrian_indices:
                         pedestrians_ghosts_states = controller.get_pedestrains_ghosts_states(ground_truth_pedestrians_state,
                                                                                              undetected_pedestrian_indices)
-                    
-                    #visualizer.append_ground_truth_pedestrians_pose(simulator.current_state.world.pedestrians.poses[:, :2])
                 elif config["total_peds"] == 0:
                     pedestrians_ghosts_states = np.array([config["state_dummy_ped"]])
-                control, predicted_pedestrians_trajectories = controller.make_step(state,
-                                                                                   pedestrians_ghosts_states)             
+                control, _ = controller.make_step(state,
+                                                  pedestrians_ghosts_states)             
                 hold_time = 0.
             else:
                 break
@@ -117,13 +108,6 @@ def main(scene_config_path: str,
         statistics.track_collisions()
         statistics.track_simulation_ticks()
         hold_time += simulator.sim_dt
-        # Terminate the simulation anytime by pressing ESC
-        events = pygame.event.get()
-        for event in events:
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    pygame.quit()
-    pygame.quit()
     return statistics
 
 if __name__ == "__main__":

@@ -9,33 +9,6 @@
                     "scene_config": "evaluation/scenes/circular_crossing/1/0.yaml",
                     "controller_config": "evaluation/controllers/dwa/0.yaml"
                 }
-            },
-            "2": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 593,
-                    "total_collisions": 0,
-                    "scene_config": "evaluation/scenes/circular_crossing/2/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
-            },
-            "4": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 626,
-                    "total_collisions": 1,
-                    "scene_config": "evaluation/scenes/circular_crossing/4/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
-            },
-            "7": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 736,
-                    "total_collisions": 4,
-                    "scene_config": "evaluation/scenes/circular_crossing/7/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
             }
         }
     },
@@ -47,33 +20,6 @@
                     "simulation_ticks": 373,
                     "total_collisions": 0,
                     "scene_config": "evaluation/scenes/parallel_traffic/1/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
-            },
-            "2": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 395,
-                    "total_collisions": 0,
-                    "scene_config": "evaluation/scenes/parallel_traffic/2/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
-            },
-            "4": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 494,
-                    "total_collisions": 0,
-                    "scene_config": "evaluation/scenes/parallel_traffic/4/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
-            },
-            "7": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 549,
-                    "total_collisions": 1,
-                    "scene_config": "evaluation/scenes/parallel_traffic/7/0.yaml",
                     "controller_config": "evaluation/controllers/dwa/0.yaml"
                 }
             }
@@ -89,33 +35,6 @@
                     "scene_config": "evaluation/scenes/perpendicular_traffic/1/0.yaml",
                     "controller_config": "evaluation/controllers/dwa/0.yaml"
                 }
-            },
-            "2": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 604,
-                    "total_collisions": 0,
-                    "scene_config": "evaluation/scenes/perpendicular_traffic/2/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
-            },
-            "4": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 692,
-                    "total_collisions": 0,
-                    "scene_config": "evaluation/scenes/perpendicular_traffic/4/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
-            },
-            "7": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 923,
-                    "total_collisions": 1,
-                    "scene_config": "evaluation/scenes/perpendicular_traffic/7/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
             }
         }
     },
@@ -127,33 +46,6 @@
                     "simulation_ticks": 604,
                     "total_collisions": 0,
                     "scene_config": "evaluation/scenes/random/1/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
-            },
-            "2": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 615,
-                    "total_collisions": 0,
-                    "scene_config": "evaluation/scenes/random/2/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
-            },
-            "4": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 626,
-                    "total_collisions": 0,
-                    "scene_config": "evaluation/scenes/random/4/0.yaml",
-                    "controller_config": "evaluation/controllers/dwa/0.yaml"
-                }
-            },
-            "7": {
-                "0": {
-                    "failure_status": false,
-                    "simulation_ticks": 725,
-                    "total_collisions": 0,
-                    "scene_config": "evaluation/scenes/random/7/0.yaml",
                     "controller_config": "evaluation/controllers/dwa/0.yaml"
                 }
             }

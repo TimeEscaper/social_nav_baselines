@@ -31,6 +31,8 @@ statistics = {
             }
         }
 }
+log = ""
+total_experiments = len(total_peds_list) * len(scenes_list) * total_scenarios_for_scene
 
 # dwa controller config
 controller_config_path = r"evaluation/controllers/dwa/0.yaml"
@@ -48,9 +50,14 @@ for scene in scenes_list:
                                                                        "scene_config": scenario_statistics._scene_config_path,
                                                                        "controller_config": scenario_statistics._controller_config_path}
                 exp += 1
+                print(f"Experiment: {exp}/{total_experiments}")
             except:
-                print(f"Error in scene config: evaluation/scenes/{scene}/{total_peds}/{scenario_id}.yaml")
-                print(f"with controller evaluation/controllers/dwa/0.yaml")
+                error_msg = f"""
+Error in scene config: evaluation/scenes/{scene}/{total_peds}/{scenario_id}.yaml
+with controller evaluation/controllers/dwa/0.yaml
+                """
+                print(error_msg)
+                log += error_msg
 
 with open(fr'evaluation/statistics/stats.json', 'w') as outfile:
         json.dump(statistics, outfile, indent=4)
@@ -58,6 +65,13 @@ with open(fr'evaluation/statistics/stats.json', 'w') as outfile:
 
 end_time = time.time()
 
-print("Время выполнения эксперимента: ", end_time - start_time)
-print("Всего проведено эксперементов: ", exp)
-print("Среднее время выполнения одного эксперемента: ", (end_time - start_time) / exp)
+conclusion_msg = f"""
+Total time: {round(end_time - start_time, 3)}s
+Experiments conducted: {exp}/{total_experiments}
+Mean time for one experiment: {round((end_time - start_time) / exp, 3)}s
+"""
+print(conclusion_msg)
+log += conclusion_msg
+
+with open(fr"evaluation/logs/log_file_{round(time.time())}.txt", "w") as outlogfile:
+     outlogfile.write(log)
