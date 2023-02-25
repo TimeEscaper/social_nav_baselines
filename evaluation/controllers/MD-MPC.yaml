@@ -1,4 +1,4 @@
-# Scenario 0: Mahalanobis distance in cost function, no-constraints
+# Scenario: Mahalanobis distance in cost function, no-constraints
 
 # Robot Model, [model_type]: 
 #       1. ["unicycle"] : Unicycle Model with State Vector: [x, y, phi], Control Vector: [v, w]
