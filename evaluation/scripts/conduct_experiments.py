@@ -12,7 +12,7 @@ def main(controller: str):
     total_peds_list = [1, 2, 4, 7]
     scenes_list = ["circular_crossing", "parallel_traffic", "perpendicular_traffic", "random"]
     controllers = [controller] #["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC"] # Тут можно выбрать какие контроллеры запускать
-    total_scenarios_for_scene = 1 #30
+    total_scenarios_for_scene = 30
     statistics = {scene:dict() for scene in scenes_list}
     log = ""
     total_experiments = len(total_peds_list) * len(scenes_list) * total_scenarios_for_scene * len(controllers)
