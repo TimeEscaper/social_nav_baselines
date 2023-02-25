@@ -4,6 +4,8 @@ import json
 import numpy as np
 import pandas as pd
 
+
+
 scenes_list = ["circular_crossing", "parallel_traffic", "perpendicular_traffic", "random"]
 #controllers = ["dwa_0"]#["dwa_0", "mpc_0", "mpc_1", "mpc_2", "mpc_3", "mpc_4"]
 controllers = ["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC"]
@@ -13,8 +15,12 @@ metrics = ["failure_status", "simulation_ticks", "total_collisions"]
 
 tables_data = np.empty([len(scenes_list), len(controllers), len(metrics)*len(total_peds_list)], dtype='<U10')
 
-with open(fr'evaluation/statistics/stats_dwa.json') as file:
-        statistics = json.load(file)
+statistics = {}
+
+for controller in controllers:
+    with open(fr'evaluation/statistics/stats_{controller}.json') as file:
+            sub_statistics = json.load(file)
+    statistics.update(sub_statistics)
 
 for scene_id, scene in enumerate(scenes_list):
     for controller_id, controller in enumerate(controllers):
