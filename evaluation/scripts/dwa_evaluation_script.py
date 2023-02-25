@@ -81,7 +81,13 @@ def main(scene_config_path: str,
     state = config["init_state"]
     control = np.array([0, 0]) 
     
-    while True:
+    while statistics.simulation_ticks <= 3000:
+
+        # if simulation time exceeded
+        if statistics.simulation_ticks == 3000:
+            statistics.set_failure_flag()
+            break
+        
         if hold_time >= controller.dt:
             error = np.linalg.norm(controller.goal[:2] - state[:2])
             if error >= config["tolerance_error"]:

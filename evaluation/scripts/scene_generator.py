@@ -28,7 +28,7 @@ def generate_circular_scenarios():
             robot_initial_position = np.array([circle_rad * np.cos(phis[-1]), circle_rad * np.sin(phis[-1]), phis[-1] + 3.14])
             robot_goal_position = robot_initial_position * (-1)
             
-            config["ped_model"] = "HSFM"
+            
             config["init_state"] = robot_initial_position.tolist()
             config["goal"] = robot_goal_position.tolist()
             config["total_peds"] = total_peds
@@ -46,7 +46,7 @@ def generate_random_scenarios():
             pedestrians_initial_positions[:, :2] = RandomWaypointTracker(world_size=(10.0, 15.0)).sample_independent_points(total_peds)
             pedestrians_goal_positions = RandomWaypointTracker(world_size=(10.0, 15.0)).sample_independent_points(total_peds)
 
-            config["ped_model"] = "HSFM"
+            
             config["init_state"] = [-4, 0, 0]
             config["goal"] = [4, 0, 0]
             config["total_peds"] = total_peds
@@ -87,7 +87,7 @@ def generate_parallel_scenarios():
             pedestrians_goal_positions = pedestrians_initial_positions.copy()
             pedestrians_goal_positions[:, 1] = (pedestrians_initial_positions * (-1))[:, 1].copy()
 
-            config["ped_model"] = "HSFM"
+            
             config["init_state"] = robot_initial_position.tolist()
             config["goal"] = robot_goal_position.tolist()
             config["total_peds"] = total_peds
@@ -120,7 +120,7 @@ def generate_perpendicular_scenarios():
             pedestrians_goal_positions = pedestrians_initial_positions.copy()
             pedestrians_goal_positions[:, 1] = (pedestrians_initial_positions * (-1))[:, 1].copy()
 
-            config["ped_model"] = "HSFM"
+            
             config["init_state"] = robot_initial_position.tolist()
             config["goal"] = robot_goal_position.tolist()
             config["total_peds"] = total_peds

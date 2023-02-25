@@ -6,26 +6,27 @@ import time
 start_time = time.time()
 exp = 0
 
-total_peds_list = [1, 2, 4, 7]
+total_peds_list = [1] #[1, 2, 4, 7]
 scenes_list = ["circular_crossing", "parallel_traffic", "perpendicular_traffic", "random"]
 controllers = ["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC"] # Тут можно выбрать какие контроллеры запускать
-total_scenarios_for_scene = 30
-statistics = {}
+total_scenarios_for_scene = 1 #30
+statistics = {scene:dict() for scene in scenes_list}
 log = ""
-total_experiments = len(total_peds_list) * len(scenes_list) * total_scenarios_for_scene
+total_experiments = len(total_peds_list) * len(scenes_list) * total_scenarios_for_scene * len(controllers)
 
 for controller in controllers:
     controller_config_path = fr"evaluation/controllers/{controller}.yaml"
     for scene in scenes_list:
-        statistics[scene] = {}
         statistics[scene][controller] = {}
         for total_peds in total_peds_list:
             statistics[scene][controller][total_peds] = {}
             for scenario_id in range(total_scenarios_for_scene):
                 try:
                     scene_config_path = fr'evaluation/scenes/{scene}/{total_peds}/{scenario_id}.yaml'
-                    scenario_statistics = dwa_evaluation_script.main(scene_config_path, controller_config_path)
-
+                    if controller == "ED-DWA":
+                        scenario_statistics = dwa_evaluation_script.main(scene_config_path, controller_config_path)
+                    else:
+                        scenario_statistics = mpc_evaluation_script.main(scene_config_path, controller_config_path)
                     statistics[scene][controller][total_peds][scenario_id] = {"failure_status": scenario_statistics.failure, 
                                                                               "simulation_ticks": scenario_statistics.simulation_ticks, 
                                                                               "total_collisions": scenario_statistics.total_collisions,

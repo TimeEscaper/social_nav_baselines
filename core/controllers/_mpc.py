@@ -266,7 +266,7 @@ class DoMPCController(AbstractController):
         """
         self._ped_tracker.update(observation)
         tracked_predictions = self._ped_tracker.get_predictions()
-        predicted_trajectories = np.tile(np.array([1000., 1000., 0., 0.]), (self._horizon + 1, self._total_peds, 1))
+        predicted_trajectories = np.tile(np.array([10000., 10000., 0., 0.]), (self._horizon + 1, self._total_peds, 1))
         predicted_covs = np.tile(np.array([[0.01, 0.0], [0., 0.01]]), (self._horizon + 1, self._total_peds, 1, 1))
         for k in tracked_predictions.keys():
             predicted_trajectories[:, k, :2] = tracked_predictions[k][0]

@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # Result folders
-results/
+results/archive
 
 # VS Code
 .vscode/
@@ -151,4 +151,4 @@ test.py
 *.npy
 
 # Scenario configs
-evaluation/scenes
+#evaluation/scenes

@@ -1,0 +1,230 @@
+{
+    "circular_crossing": {
+        "ED-DWA": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 538,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/circular_crossing/1/0.yaml",
+                    "controller_config": "evaluation/controllers/ED-DWA.yaml"
+                }
+            }
+        },
+        "MD-MPC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 714,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/circular_crossing/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml"
+                }
+            }
+        },
+        "ED-MPC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 725,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/circular_crossing/1/0.yaml",
+                    "controller_config": "evaluation/controllers/ED-MPC.yaml"
+                }
+            }
+        },
+        "MPC-MDC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 989,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/circular_crossing/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MPC-MDC.yaml"
+                }
+            }
+        },
+        "MPC-EDC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 989,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/circular_crossing/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MPC-EDC.yaml"
+                }
+            }
+        }
+    },
+    "parallel_traffic": {
+        "ED-DWA": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 307,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/parallel_traffic/1/0.yaml",
+                    "controller_config": "evaluation/controllers/ED-DWA.yaml"
+                }
+            }
+        },
+        "MD-MPC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 747,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/parallel_traffic/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml"
+                }
+            }
+        },
+        "ED-MPC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 747,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/parallel_traffic/1/0.yaml",
+                    "controller_config": "evaluation/controllers/ED-MPC.yaml"
+                }
+            }
+        },
+        "MPC-MDC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 747,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/parallel_traffic/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MPC-MDC.yaml"
+                }
+            }
+        },
+        "MPC-EDC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 747,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/parallel_traffic/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MPC-EDC.yaml"
+                }
+            }
+        }
+    },
+    "perpendicular_traffic": {
+        "ED-DWA": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 538,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/perpendicular_traffic/1/0.yaml",
+                    "controller_config": "evaluation/controllers/ED-DWA.yaml"
+                }
+            }
+        },
+        "MD-MPC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 978,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/perpendicular_traffic/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml"
+                }
+            }
+        },
+        "ED-MPC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 978,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/perpendicular_traffic/1/0.yaml",
+                    "controller_config": "evaluation/controllers/ED-MPC.yaml"
+                }
+            }
+        },
+        "MPC-MDC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 978,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/perpendicular_traffic/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MPC-MDC.yaml"
+                }
+            }
+        },
+        "MPC-EDC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 978,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/perpendicular_traffic/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MPC-EDC.yaml"
+                }
+            }
+        }
+    },
+    "random": {
+        "ED-DWA": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 538,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/random/1/0.yaml",
+                    "controller_config": "evaluation/controllers/ED-DWA.yaml"
+                }
+            }
+        },
+        "MD-MPC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 978,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/random/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml"
+                }
+            }
+        },
+        "ED-MPC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 978,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/random/1/0.yaml",
+                    "controller_config": "evaluation/controllers/ED-MPC.yaml"
+                }
+            }
+        },
+        "MPC-MDC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 978,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/random/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MPC-MDC.yaml"
+                }
+            }
+        },
+        "MPC-EDC": {
+            "1": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 978,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/random/1/0.yaml",
+                    "controller_config": "evaluation/controllers/MPC-EDC.yaml"
+                }
+            }
+        }
+    }
+}
