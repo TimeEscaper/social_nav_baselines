@@ -26,29 +26,26 @@ class _FullTrajectoryCost:
     def __init__(self, Q: float, stage_weight: float, r_robot: float,
                  r_ped: float, device: str):
         self._Q = Q
-        self._stage_weight: stage_weight
+        self._stage_weight = stage_weight
         self._r_robot = r_robot
         self._r_ped = r_ped
         self._device = device
         self._goal = None
         self._initial_state = None
-        self._peds_traj = None
-        self._peds_covs = None
+        self._ped_samples = None
 
     def update(self, goal: np.ndarray, initial_state: np.ndarray,
-               ped_traj: Optional[torch.Tensor], ped_covs: Optional[torch.Tensor]):
+               ped_samples: Optional[torch.Tensor]):
         self._goal = torch.tensor(goal).float().to(self._device)
         self._initial_state = torch.tensor(initial_state).float().to(self._device)
-        if ped_traj is not None and ped_covs is not None:
-            self._peds_traj = torch.tensor(ped_traj).float().to(self._device)
-            self._peds_covs = torch.tensor(ped_covs).float().to(self._device)
+        if ped_samples is not None:
+            self._ped_samples = torch.tensor(ped_samples).float().to(self._device)
         else:
-            self._peds_traj = None
-            self._peds_covs = None
+            self._ped_samples = None
 
     def __call__(self, states: torch.Tensor, actions: torch.Tensor) -> torch.Tensor:
         cost = self._calculate_goal_cost(states)
-        cost = cost + self._calculate_social_cost(states)
+        cost = cost + self._stage_weight * self._calculate_social_cost(states)
         return cost
 
     def _calculate_goal_cost(self, states: torch.Tensor) -> torch.Tensor:
@@ -59,7 +56,25 @@ class _FullTrajectoryCost:
         return cost
 
     def _calculate_social_cost(self, states: torch.Tensor) -> torch.Tensor:
-        return 0.
+        if self._ped_samples is None:
+            return 0.
+        robot_samples = states[0][:, :, :2]
+        peds_poses = self._ped_samples.permute(0, 2, 1, 3)
+
+        n_ped_samples = peds_poses.shape[0]
+        n_peds = peds_poses.shape[1]
+        distances = torch.zeros((n_ped_samples, n_peds, robot_samples.shape[0], robot_samples.shape[1], robot_samples.shape[2]))
+        for i in range(n_ped_samples):
+            for j in range(n_peds):
+                distances[i, j, :, :, :] = robot_samples - peds_poses[i, j, :, :]
+        distances = torch.linalg.norm(distances, dim=-1)
+
+        costs = 1 / distances
+        costs = torch.mean(costs, dim=0)
+        costs = torch.sum(costs, dim=0)
+        costs = torch.sum(costs, dim=1)
+        costs = costs.unsqueeze(0)
+        return costs
 
 
 class _UnicycleDynamics:
@@ -109,6 +124,7 @@ class MPPIController(AbstractController):
                  cost_function: str,
                  num_samples: int = 50,
                  lambda_: float = 1.,
+                 cost_n_samples: int = 20,
                  device: str = "cpu") -> None:
         """Initiazition of the class instance
 
@@ -141,6 +157,8 @@ class MPPIController(AbstractController):
                          max_ghost_tracking_time)
         self._ped_tracker = pedestrian_tracker
         self._total_peds = total_peds
+        self._device = device
+        self._cost_n_samples = cost_n_samples
         self._full_traj_cost = _FullTrajectoryCost(Q=Q,
                                                    stage_weight=W,
                                                    r_robot=r_rob,
@@ -197,18 +215,24 @@ class MPPIController(AbstractController):
 
         # For MPPI, number of pedestrians is not a problem unlike for Casadi, so we handle them separately
         if len(tracked_predictions) == 0:
-            return None, None
+            return None
         tracked_trajs = np.stack([v[0] for v in tracked_predictions.values()], axis=1)
         tracked_covs = np.stack([v[1] for v in tracked_predictions.values()], axis=1)
 
+        tracked_trajs = torch.tensor(tracked_trajs).float().to(self._device)
+        tracked_covs = torch.tensor(tracked_covs).float().to(self._device)
 
-        return tracked_trajs, tracked_covs
+        distribution = torch.distributions.MultivariateNormal(loc=tracked_trajs,
+                                                              covariance_matrix=tracked_covs)
+        ped_samples = distribution.sample((self._cost_n_samples,))
+
+        return ped_samples
 
     def make_step(self,
                   state: np.ndarray,
                   observation: Dict[int, np.ndarray]) -> np.ndarray:
-        peds_traj, peds_cov = self.predict(observation)
-        self._full_traj_cost.update(self._goal, state, peds_traj, peds_cov)
+        ped_samples = self.predict(observation)
+        self._full_traj_cost.update(self._goal, state, ped_samples)
         controls = self._mppi.command(state).clone().detach().cpu().numpy()
         self._planned_traj = self._dynamics.rollout_dynamics(state, controls)[:, :2]
         control = controls[0]

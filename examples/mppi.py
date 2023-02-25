@@ -8,10 +8,20 @@ import fire
 import yaml
 import pygame
 import pathlib
+import torch
+import random
+
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed(SEED)
+
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/random/1_pedestrian.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/random/4_pedestrians.yaml"
 DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/mppi.yaml"
 DEFAULT_RESULT_PATH = r"results/mppi.gif"
 
@@ -81,7 +91,8 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                 cost_function=config["cost_function"],
                                 num_samples=config["num_samples"],
                                 lambda_=config["lambda_"],
-                                device=config["device"]
+                                device=config["device"],
+                                cost_n_samples=config["cost_n_samples"]
                                 )
     visualizer = Visualizer(config["total_peds"],
                             renderer)
