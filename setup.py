@@ -18,7 +18,10 @@ setup(
         'numba',
         'scipy',
         'do_mpc',
-        'casadi'
+        'casadi',
+        'pytorch_mppi',
+        'fire',
+        'pyyaml'
     ],
     extras_require={
         'test': [

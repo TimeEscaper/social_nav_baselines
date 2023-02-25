@@ -2,6 +2,7 @@ import mpc_evaluation_script
 import dwa_evaluation_script
 import json
 import time
+import traceback
 
 start_time = time.time()
 exp = 0
@@ -34,10 +35,11 @@ for controller in controllers:
                                                                               "controller_config": scenario_statistics._controller_config_path}
                     exp += 1
                     print(f"Experiment: {exp}/{total_experiments}")
-                except:
+                except Exception:
                     error_msg = f"""
 Error in scene config: evaluation/scenes/{scene}/{total_peds}/{scenario_id}.yaml
 with controller {controller_config_path}
+Exception: {traceback.print_exc()}
                     """
                     print(error_msg)
                     log += error_msg
