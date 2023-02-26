@@ -11,8 +11,8 @@ import pathlib
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/random/1_pedestrian.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/mpc.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/scenes/circular_crossing/7/0.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/controllers/MD-MPC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.gif"
 
 def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -110,8 +110,8 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                 visualizer.append_ground_truth_pedestrians_pose(simulator.current_state.world.pedestrians.poses[:, :2])
 
                 control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = controller.make_step(state,
-                                                                                                                      observation)
-
+                                                                                                                     observation)
+                #print(control) 
                 # visualizer.append_ground_truth_robot_state(state)
                 # if config["total_peds"] > 0:
                 #     detected_pedestrian_indices = simulator.current_state.sensors['pedestrian_detector'].reading.pedestrians.keys()

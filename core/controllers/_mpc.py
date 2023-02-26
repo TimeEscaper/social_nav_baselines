@@ -154,17 +154,20 @@ class DoMPCController(AbstractController):
 
         # terminal cost
         p_rob_N = self._model._x.cat[:3]
-        delta_p = casadi.norm_2(p_rob_N - current_goal) / casadi.norm_2(p_rob_0 - current_goal)
+        delta_p = casadi.norm_2(p_rob_N[:2] - current_goal[:2]) / casadi.norm_2(p_rob_0[:2] - current_goal[:2])
+        #delta_p = (p_rob_N - current_goal)
         #terminal_cost = delta_p.T @ Q @ delta_p
         terminal_cost = Q * delta_p ** 2 # GO-MPC Cost-function
 
         # set cost
-        self._mpc.set_objective(lterm=stage_cost,
+        self._mpc.set_objective(lterm=stage_cost + terminal_cost,
                                 mterm=terminal_cost)
+        """
         if model_type == "unicycle":
             self._mpc.set_rterm(v=1e-2, w=1e-2)
         elif model_type == "unicycle_double_integrator":                      
             self._mpc.set_rterm(u_a=1e-2, u_alpha=1e-2)
+        """
         # bounds
         if model_type == "unicycle":
             # lb
@@ -212,7 +215,7 @@ class DoMPCController(AbstractController):
 
             def _get_MB_bounds(cov):
                 array_mahalanobis_bounds = casadi.SX(1, total_peds)
-                V_s = np.pi * (r_rob + r_ped) ** 2
+                V_s = np.pi * (r_rob + r_ped + 1) ** 2
                 for ped_ind in range(self._total_peds):
                     deter = 2 * np.pi * _get_determinant(casadi.reshape(cov[:, ped_ind], 2, 2))
                     deter = casadi.sqrt(deter)

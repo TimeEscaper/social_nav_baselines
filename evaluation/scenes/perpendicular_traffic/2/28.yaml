@@ -9,21 +9,21 @@ init_state:
 - 0
 is_robot_visible: false
 misdetection_prob: 0
-ped_detc_fov: 120
-ped_detc_range: 3
+ped_detc_fov: 140
+ped_detc_range: 5
 ped_model: ORCA
 pedestrians_goals:
-- - - -3.1102073393528102
-    - -3.4727655260855577
-- - - 1.1190398127986878
-    - -2.713795699018236
+- - - -0.3368470421834915
+    - 1.9209168466270545
+- - - 1.4391763741811978
+    - 3.8226405086776127
 pedestrians_init_states:
-- - -3.1102073393528102
-  - 3.4727655260855577
+- - -0.3368470421834915
+  - -1.9209168466270545
   - 0.0
-- - 1.1190398127986878
-  - 2.713795699018236
+- - 1.4391763741811978
+  - -3.8226405086776127
   - 0.0
-tolerance_error: 0.2
+tolerance_error: 0.8
 total_peds: 2
 waypoint_tracker: fixed

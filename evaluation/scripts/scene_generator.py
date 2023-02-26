@@ -1,7 +1,12 @@
 import yaml
 import numpy as np
+import random
 import matplotlib.pyplot as plt
 from pyminisim.pedestrians import RandomWaypointTracker
+
+SEED = 42
+np.random.seed(42)
+random.seed(42)
 
 with open(r"evaluation/template_config.yaml") as f:
     config = yaml.safe_load(f)
@@ -27,7 +32,6 @@ def generate_circular_scenarios():
             circle_rad = np.random.uniform(min_circle_rad, max_circle_rad)
             robot_initial_position = np.array([circle_rad * np.cos(phis[-1]), circle_rad * np.sin(phis[-1]), phis[-1] + 3.14])
             robot_goal_position = robot_initial_position * (-1)
-            
             
             config["init_state"] = robot_initial_position.tolist()
             config["goal"] = robot_goal_position.tolist()
