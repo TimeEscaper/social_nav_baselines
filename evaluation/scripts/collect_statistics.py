@@ -13,8 +13,14 @@ metrics = ["failure_status", "simulation_ticks", "total_collisions"]
 
 tables_data = np.empty([len(scenes_list), len(controllers), len(metrics)*len(total_peds_list)], dtype='<U10')
 
-with open(fr'evaluation/statistics/stats_dwa.json') as file:
-        statistics = json.load(file)
+statistics = {}
+
+for controller in controllers:
+    with open(fr'evaluation/statistics/stats_{controller}.json') as file:
+            sub_statistics = json.load(file)
+    for scene in scenes_list:
+        statistics[scene] = statistics.setdefault(scene, dict())
+        statistics[scene].update(sub_statistics[scene])
 
 for scene_id, scene in enumerate(scenes_list):
     for controller_id, controller in enumerate(controllers):
