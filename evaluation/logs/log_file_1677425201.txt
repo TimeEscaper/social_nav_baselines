@@ -1,0 +1,5 @@
+
+    Total time: 6603.608s
+    Experiments conducted: 480/480
+    Mean time for one experiment: 13.758s
+    
