@@ -111,7 +111,13 @@ class Visualizer():
         assert self._renderer, f"You should provide renderer instance of the pyminisim to use this method!"
         for i in range(len(predicted_robot_trajectory)):
             self._renderer.draw(f"{1000+i}", CircleDrawing(predicted_robot_trajectory[i], 0.03, (255, 100, 0), 0))
-    
+
+    def visualize_subgoal(self, subgoal: np.ndarray) -> None:
+        if subgoal is not None:
+            self._renderer.draw("subgoal", CircleDrawing(subgoal[:2], 0.1, (0, 255, 0), 0))
+        else:
+            self._renderer.clear_drawings(["subgoal"])
+
     def visualize_predicted_pedestrians_trajectories(self,
                                                      predicted_pedestrians_trajectories: List[List[float]]) -> None:
         assert self._renderer, f"You should provide renderer instance of the pyminisim to use this method!"

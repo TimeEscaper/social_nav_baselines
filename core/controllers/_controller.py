@@ -119,3 +119,4 @@ class AbstractController(ABC):
         new_goal = self.get_ref_direction(current_state,
                                           new_goal)
         self.goal = new_goal
+
