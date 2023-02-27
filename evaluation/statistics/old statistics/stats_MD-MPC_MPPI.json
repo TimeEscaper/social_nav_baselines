@@ -1,0 +1,315 @@
+{
+    "circular_crossing": {
+        "MD-MPC": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/circular_crossing/4/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 1,
+                    "scene_config": "evaluation/scenes/circular_crossing/7/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0
+                    ]
+                }
+            }
+        },
+        "MPPI": {
+            "4": {},
+            "7": {}
+        }
+    },
+    "parallel_traffic": {
+        "MD-MPC": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/parallel_traffic/4/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/parallel_traffic/7/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            }
+        },
+        "MPPI": {
+            "4": {},
+            "7": {}
+        }
+    },
+    "perpendicular_traffic": {
+        "MD-MPC": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 1,
+                    "scene_config": "evaluation/scenes/perpendicular_traffic/4/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0
+                    ]
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 571,
+                    "total_collisions": 2,
+                    "scene_config": "evaluation/scenes/perpendicular_traffic/7/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        1,
+                        0,
+                        2,
+                        0,
+                        2,
+                        0,
+                        2,
+                        0
+                    ]
+                }
+            }
+        },
+        "MPPI": {
+            "4": {},
+            "7": {}
+        }
+    },
+    "random": {
+        "MD-MPC": {
+            "4": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 560,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/random/4/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 3,
+                    "scene_config": "evaluation/scenes/random/7/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        2
+                    ]
+                }
+            }
+        },
+        "MPPI": {
+            "4": {},
+            "7": {}
+        }
+    }
+}

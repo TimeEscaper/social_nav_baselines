@@ -1,0 +1,1303 @@
+{
+    "circular_crossing": {
+        "MPPI": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": {
+                        "dt": 0.1,
+                        "goal": [
+                            -3.679087417136764,
+                            1.3188562614001695,
+                            -9.078981525687
+                        ],
+                        "init_state": [
+                            3.679087417136764,
+                            -1.3188562614001695,
+                            9.078981525687
+                        ],
+                        "is_robot_visible": false,
+                        "misdetection_prob": 0,
+                        "ped_detc_fov": 140,
+                        "ped_detc_range": 5,
+                        "ped_model": "ORCA",
+                        "pedestrians_goals": [
+                            [
+                                [
+                                    -4.1815067714080705,
+                                    -0.2719511117704379
+                                ]
+                            ],
+                            [
+                                [
+                                    1.387219180307184,
+                                    -3.758700117403415
+                                ]
+                            ],
+                            [
+                                [
+                                    3.9240610476234714,
+                                    0.20055102495852178
+                                ]
+                            ],
+                            [
+                                [
+                                    0.5806009004233934,
+                                    4.076940028994849
+                                ]
+                            ]
+                        ],
+                        "pedestrians_init_states": [
+                            [
+                                4.1815067714080705,
+                                0.2719511117704379,
+                                0.0
+                            ],
+                            [
+                                -1.387219180307184,
+                                3.758700117403415,
+                                0.0
+                            ],
+                            [
+                                -3.9240610476234714,
+                                -0.20055102495852178,
+                                0.0
+                            ],
+                            [
+                                -0.5806009004233934,
+                                -4.076940028994849,
+                                0.0
+                            ]
+                        ],
+                        "tolerance_error": 0.8,
+                        "total_peds": 4,
+                        "waypoint_tracker": "fixed"
+                    },
+                    "controller_config": {
+                        "horizon": 24,
+                        "model_type": "unicycle",
+                        "ped_predictor": "neural",
+                        "cost_function": "GO-MPC",
+                        "Q": 1000,
+                        "R": [
+                            [
+                                1,
+                                0
+                            ],
+                            [
+                                0,
+                                1
+                            ]
+                        ],
+                        "W": 100,
+                        "r_rob": 0.35,
+                        "r_ped": 0.3,
+                        "lb": [
+                            -0.2,
+                            -2
+                        ],
+                        "ub": [
+                            2,
+                            2
+                        ],
+                        "state_dummy_ped": [
+                            10000,
+                            10000,
+                            0,
+                            0
+                        ],
+                        "max_ghost_tracking_time": 20,
+                        "noise_sigma": [
+                            0.5,
+                            0.5
+                        ],
+                        "num_samples": 50,
+                        "lambda_": 1.0,
+                        "cost_n_samples": 100,
+                        "device": "cpu"
+                    },
+                    "collisions_per_subgoal": []
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": {
+                        "dt": 0.1,
+                        "goal": [
+                            -3.659465790299752,
+                            1.9958565037928757,
+                            -8.92388402363034
+                        ],
+                        "init_state": [
+                            3.659465790299752,
+                            -1.9958565037928757,
+                            8.92388402363034
+                        ],
+                        "is_robot_visible": false,
+                        "misdetection_prob": 0,
+                        "ped_detc_fov": 140,
+                        "ped_detc_range": 5,
+                        "ped_model": "ORCA",
+                        "pedestrians_goals": [
+                            [
+                                [
+                                    -3.96619786745782,
+                                    -0.5293501783762797
+                                ]
+                            ],
+                            [
+                                [
+                                    -2.1879236670130404,
+                                    -3.4391937295623793
+                                ]
+                            ],
+                            [
+                                [
+                                    0.5287690689118439,
+                                    -3.7789098226834237
+                                ]
+                            ],
+                            [
+                                [
+                                    3.108829855081381,
+                                    -2.7032635207429556
+                                ]
+                            ],
+                            [
+                                [
+                                    4.032990060922903,
+                                    0.38326202056698266
+                                ]
+                            ],
+                            [
+                                [
+                                    1.5750757203154544,
+                                    3.4941026685954943
+                                ]
+                            ],
+                            [
+                                [
+                                    -0.6694931534597456,
+                                    4.095065356347141
+                                ]
+                            ]
+                        ],
+                        "pedestrians_init_states": [
+                            [
+                                3.96619786745782,
+                                0.5293501783762797,
+                                0.0
+                            ],
+                            [
+                                2.1879236670130404,
+                                3.4391937295623793,
+                                0.0
+                            ],
+                            [
+                                -0.5287690689118439,
+                                3.7789098226834237,
+                                0.0
+                            ],
+                            [
+                                -3.108829855081381,
+                                2.7032635207429556,
+                                0.0
+                            ],
+                            [
+                                -4.032990060922903,
+                                -0.38326202056698266,
+                                0.0
+                            ],
+                            [
+                                -1.5750757203154544,
+                                -3.4941026685954943,
+                                0.0
+                            ],
+                            [
+                                0.6694931534597456,
+                                -4.095065356347141,
+                                0.0
+                            ]
+                        ],
+                        "tolerance_error": 0.8,
+                        "total_peds": 7,
+                        "waypoint_tracker": "fixed"
+                    },
+                    "controller_config": {
+                        "horizon": 24,
+                        "model_type": "unicycle",
+                        "ped_predictor": "neural",
+                        "cost_function": "GO-MPC",
+                        "Q": 1000,
+                        "R": [
+                            [
+                                1,
+                                0
+                            ],
+                            [
+                                0,
+                                1
+                            ]
+                        ],
+                        "W": 100,
+                        "r_rob": 0.35,
+                        "r_ped": 0.3,
+                        "lb": [
+                            -0.2,
+                            -2
+                        ],
+                        "ub": [
+                            2,
+                            2
+                        ],
+                        "state_dummy_ped": [
+                            10000,
+                            10000,
+                            0,
+                            0
+                        ],
+                        "max_ghost_tracking_time": 20,
+                        "noise_sigma": [
+                            0.5,
+                            0.5
+                        ],
+                        "num_samples": 50,
+                        "lambda_": 1.0,
+                        "cost_n_samples": 100,
+                        "device": "cpu"
+                    },
+                    "collisions_per_subgoal": []
+                }
+            }
+        },
+        "MD-MPC-EDC": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/circular_crossing/4/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/circular_crossing/7/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    "parallel_traffic": {
+        "MPPI": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": {
+                        "dt": 0.1,
+                        "goal": [
+                            1.743126383175516,
+                            3.455108699444012,
+                            0.0
+                        ],
+                        "init_state": [
+                            1.743126383175516,
+                            -3.455108699444012,
+                            0.0
+                        ],
+                        "is_robot_visible": false,
+                        "misdetection_prob": 0,
+                        "ped_detc_fov": 140,
+                        "ped_detc_range": 5,
+                        "ped_model": "ORCA",
+                        "pedestrians_goals": [
+                            [
+                                [
+                                    -3.304954689589424,
+                                    -2.9130647406878065
+                                ]
+                            ],
+                            [
+                                [
+                                    -1.2424834914399983,
+                                    3.102602907584296
+                                ]
+                            ],
+                            [
+                                [
+                                    -0.7855133414714063,
+                                    1.2741744589953292
+                                ]
+                            ],
+                            [
+                                [
+                                    3.3812666958198068,
+                                    1.7838305478203011
+                                ]
+                            ]
+                        ],
+                        "pedestrians_init_states": [
+                            [
+                                -3.304954689589424,
+                                2.9130647406878065,
+                                0.0
+                            ],
+                            [
+                                -1.2424834914399983,
+                                -3.102602907584296,
+                                0.0
+                            ],
+                            [
+                                -0.7855133414714063,
+                                -1.2741744589953292,
+                                0.0
+                            ],
+                            [
+                                3.3812666958198068,
+                                -1.7838305478203011,
+                                1.57
+                            ]
+                        ],
+                        "tolerance_error": 0.8,
+                        "total_peds": 4,
+                        "waypoint_tracker": "fixed"
+                    },
+                    "controller_config": {
+                        "horizon": 24,
+                        "model_type": "unicycle",
+                        "ped_predictor": "neural",
+                        "cost_function": "GO-MPC",
+                        "Q": 1000,
+                        "R": [
+                            [
+                                1,
+                                0
+                            ],
+                            [
+                                0,
+                                1
+                            ]
+                        ],
+                        "W": 100,
+                        "r_rob": 0.35,
+                        "r_ped": 0.3,
+                        "lb": [
+                            -0.2,
+                            -2
+                        ],
+                        "ub": [
+                            2,
+                            2
+                        ],
+                        "state_dummy_ped": [
+                            10000,
+                            10000,
+                            0,
+                            0
+                        ],
+                        "max_ghost_tracking_time": 20,
+                        "noise_sigma": [
+                            0.5,
+                            0.5
+                        ],
+                        "num_samples": 50,
+                        "lambda_": 1.0,
+                        "cost_n_samples": 100,
+                        "device": "cpu"
+                    },
+                    "collisions_per_subgoal": []
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": {
+                        "dt": 0.1,
+                        "goal": [
+                            -1.4059172194302876,
+                            2.504727099753845,
+                            0
+                        ],
+                        "init_state": [
+                            -1.4059172194302876,
+                            -2.504727099753845,
+                            0
+                        ],
+                        "is_robot_visible": false,
+                        "misdetection_prob": 0,
+                        "ped_detc_fov": 140,
+                        "ped_detc_range": 5,
+                        "ped_model": "ORCA",
+                        "pedestrians_goals": [
+                            [
+                                [
+                                    -3.25943527674049,
+                                    -1.7388580564315947
+                                ]
+                            ],
+                            [
+                                [
+                                    -2.9050915587326536,
+                                    2.977136230396697
+                                ]
+                            ],
+                            [
+                                [
+                                    3.6163144922328962,
+                                    3.9099219840118216
+                                ]
+                            ],
+                            [
+                                [
+                                    -0.29735979414177116,
+                                    -3.6582803059396243
+                                ]
+                            ],
+                            [
+                                [
+                                    0.06652760821085524,
+                                    2.126323329003738
+                                ]
+                            ],
+                            [
+                                [
+                                    1.2307946539265318,
+                                    1.8595586467813687
+                                ]
+                            ],
+                            [
+                                [
+                                    2.9156722322616497,
+                                    1.3756616785504943
+                                ]
+                            ]
+                        ],
+                        "pedestrians_init_states": [
+                            [
+                                -3.25943527674049,
+                                1.7388580564315947,
+                                0.0
+                            ],
+                            [
+                                -2.9050915587326536,
+                                -2.977136230396697,
+                                0.0
+                            ],
+                            [
+                                3.6163144922328962,
+                                -3.9099219840118216,
+                                1.57
+                            ],
+                            [
+                                -0.29735979414177116,
+                                3.6582803059396243,
+                                0.0
+                            ],
+                            [
+                                0.06652760821085524,
+                                -2.126323329003738,
+                                0.0
+                            ],
+                            [
+                                1.2307946539265318,
+                                -1.8595586467813687,
+                                0.0
+                            ],
+                            [
+                                2.9156722322616497,
+                                -1.3756616785504943,
+                                0.0
+                            ]
+                        ],
+                        "tolerance_error": 0.8,
+                        "total_peds": 7,
+                        "waypoint_tracker": "fixed"
+                    },
+                    "controller_config": {
+                        "horizon": 24,
+                        "model_type": "unicycle",
+                        "ped_predictor": "neural",
+                        "cost_function": "GO-MPC",
+                        "Q": 1000,
+                        "R": [
+                            [
+                                1,
+                                0
+                            ],
+                            [
+                                0,
+                                1
+                            ]
+                        ],
+                        "W": 100,
+                        "r_rob": 0.35,
+                        "r_ped": 0.3,
+                        "lb": [
+                            -0.2,
+                            -2
+                        ],
+                        "ub": [
+                            2,
+                            2
+                        ],
+                        "state_dummy_ped": [
+                            10000,
+                            10000,
+                            0,
+                            0
+                        ],
+                        "max_ghost_tracking_time": 20,
+                        "noise_sigma": [
+                            0.5,
+                            0.5
+                        ],
+                        "num_samples": 50,
+                        "lambda_": 1.0,
+                        "cost_n_samples": 100,
+                        "device": "cpu"
+                    },
+                    "collisions_per_subgoal": []
+                }
+            }
+        },
+        "MD-MPC-EDC": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/parallel_traffic/4/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 1,
+                    "scene_config": "evaluation/scenes/parallel_traffic/7/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        1,
+                        0,
+                        1,
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    "perpendicular_traffic": {
+        "MPPI": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": {
+                        "dt": 0.1,
+                        "goal": [
+                            4,
+                            0,
+                            0
+                        ],
+                        "init_state": [
+                            -4,
+                            0,
+                            0
+                        ],
+                        "is_robot_visible": false,
+                        "misdetection_prob": 0,
+                        "ped_detc_fov": 140,
+                        "ped_detc_range": 5,
+                        "ped_model": "ORCA",
+                        "pedestrians_goals": [
+                            [
+                                [
+                                    -2.3966314136173903,
+                                    -1.0314809234198332
+                                ]
+                            ],
+                            [
+                                [
+                                    -1.0609626693087326,
+                                    2.443833853657711
+                                ]
+                            ],
+                            [
+                                [
+                                    0.8453120675779167,
+                                    -3.3577758286267403
+                                ]
+                            ],
+                            [
+                                [
+                                    3.9912756671896163,
+                                    1.0661984460468725
+                                ]
+                            ]
+                        ],
+                        "pedestrians_init_states": [
+                            [
+                                -2.3966314136173903,
+                                1.0314809234198332,
+                                0.0
+                            ],
+                            [
+                                -1.0609626693087326,
+                                -2.443833853657711,
+                                0.0
+                            ],
+                            [
+                                0.8453120675779167,
+                                3.3577758286267403,
+                                0.0
+                            ],
+                            [
+                                3.9912756671896163,
+                                -1.0661984460468725,
+                                0.0
+                            ]
+                        ],
+                        "tolerance_error": 0.8,
+                        "total_peds": 4,
+                        "waypoint_tracker": "fixed"
+                    },
+                    "controller_config": {
+                        "horizon": 24,
+                        "model_type": "unicycle",
+                        "ped_predictor": "neural",
+                        "cost_function": "GO-MPC",
+                        "Q": 1000,
+                        "R": [
+                            [
+                                1,
+                                0
+                            ],
+                            [
+                                0,
+                                1
+                            ]
+                        ],
+                        "W": 100,
+                        "r_rob": 0.35,
+                        "r_ped": 0.3,
+                        "lb": [
+                            -0.2,
+                            -2
+                        ],
+                        "ub": [
+                            2,
+                            2
+                        ],
+                        "state_dummy_ped": [
+                            10000,
+                            10000,
+                            0,
+                            0
+                        ],
+                        "max_ghost_tracking_time": 20,
+                        "noise_sigma": [
+                            0.5,
+                            0.5
+                        ],
+                        "num_samples": 50,
+                        "lambda_": 1.0,
+                        "cost_n_samples": 100,
+                        "device": "cpu"
+                    },
+                    "collisions_per_subgoal": []
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 1,
+                    "scene_config": {
+                        "dt": 0.1,
+                        "goal": [
+                            4,
+                            0,
+                            0
+                        ],
+                        "init_state": [
+                            -4,
+                            0,
+                            0
+                        ],
+                        "is_robot_visible": false,
+                        "misdetection_prob": 0,
+                        "ped_detc_fov": 140,
+                        "ped_detc_range": 5,
+                        "ped_model": "ORCA",
+                        "pedestrians_goals": [
+                            [
+                                [
+                                    -3.376087390504,
+                                    -3.5599876496763634
+                                ]
+                            ],
+                            [
+                                [
+                                    -1.7986226264178915,
+                                    1.9948505473235019
+                                ]
+                            ],
+                            [
+                                [
+                                    -0.7184968602893105,
+                                    3.008070952722245
+                                ]
+                            ],
+                            [
+                                [
+                                    0.3258098939882935,
+                                    2.531711226185511
+                                ]
+                            ],
+                            [
+                                [
+                                    0.8842268087752807,
+                                    -1.9181414986863143
+                                ]
+                            ],
+                            [
+                                [
+                                    2.7563641470698186,
+                                    -3.4071880916608976
+                                ]
+                            ],
+                            [
+                                [
+                                    2.968580219958714,
+                                    1.015418882756681
+                                ]
+                            ]
+                        ],
+                        "pedestrians_init_states": [
+                            [
+                                -3.376087390504,
+                                3.5599876496763634,
+                                0.0
+                            ],
+                            [
+                                -1.7986226264178915,
+                                -1.9948505473235019,
+                                0.0
+                            ],
+                            [
+                                -0.7184968602893105,
+                                -3.008070952722245,
+                                0.0
+                            ],
+                            [
+                                0.3258098939882935,
+                                -2.531711226185511,
+                                0.0
+                            ],
+                            [
+                                0.8842268087752807,
+                                1.9181414986863143,
+                                0.0
+                            ],
+                            [
+                                2.7563641470698186,
+                                3.4071880916608976,
+                                0.0
+                            ],
+                            [
+                                2.968580219958714,
+                                -1.015418882756681,
+                                0.0
+                            ]
+                        ],
+                        "tolerance_error": 0.8,
+                        "total_peds": 7,
+                        "waypoint_tracker": "fixed"
+                    },
+                    "controller_config": {
+                        "horizon": 24,
+                        "model_type": "unicycle",
+                        "ped_predictor": "neural",
+                        "cost_function": "GO-MPC",
+                        "Q": 1000,
+                        "R": [
+                            [
+                                1,
+                                0
+                            ],
+                            [
+                                0,
+                                1
+                            ]
+                        ],
+                        "W": 100,
+                        "r_rob": 0.35,
+                        "r_ped": 0.3,
+                        "lb": [
+                            -0.2,
+                            -2
+                        ],
+                        "ub": [
+                            2,
+                            2
+                        ],
+                        "state_dummy_ped": [
+                            10000,
+                            10000,
+                            0,
+                            0
+                        ],
+                        "max_ghost_tracking_time": 20,
+                        "noise_sigma": [
+                            0.5,
+                            0.5
+                        ],
+                        "num_samples": 50,
+                        "lambda_": 1.0,
+                        "cost_n_samples": 100,
+                        "device": "cpu"
+                    },
+                    "collisions_per_subgoal": []
+                }
+            }
+        },
+        "MD-MPC-EDC": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/perpendicular_traffic/4/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": []
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 681,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/perpendicular_traffic/7/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    "random": {
+        "MPPI": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": {
+                        "dt": 0.1,
+                        "goal": [
+                            4,
+                            0,
+                            0
+                        ],
+                        "init_state": [
+                            -4,
+                            0,
+                            0
+                        ],
+                        "is_robot_visible": false,
+                        "misdetection_prob": 0,
+                        "ped_detc_fov": 140,
+                        "ped_detc_range": 5,
+                        "ped_model": "ORCA",
+                        "pedestrians_goals": [
+                            [
+                                [
+                                    4.446142194740233,
+                                    1.8324802828964586
+                                ]
+                            ],
+                            [
+                                [
+                                    -0.02825235991572672,
+                                    1.1784724020121384
+                                ]
+                            ],
+                            [
+                                [
+                                    3.6890498447871813,
+                                    0.7060974663882966
+                                ]
+                            ],
+                            [
+                                [
+                                    -4.696129403031631,
+                                    4.309486955069778
+                                ]
+                            ]
+                        ],
+                        "pedestrians_init_states": [
+                            [
+                                4.699120461072704,
+                                -4.060992842105816,
+                                0.0
+                            ],
+                            [
+                                1.7260211822512623,
+                                -0.5624978069542887,
+                                0.0
+                            ],
+                            [
+                                3.681422543775053,
+                                -3.228502105526141,
+                                0.0
+                            ],
+                            [
+                                1.9262595222616454,
+                                3.381152896481103,
+                                0.0
+                            ]
+                        ],
+                        "tolerance_error": 0.8,
+                        "total_peds": 4,
+                        "waypoint_tracker": "fixed"
+                    },
+                    "controller_config": {
+                        "horizon": 24,
+                        "model_type": "unicycle",
+                        "ped_predictor": "neural",
+                        "cost_function": "GO-MPC",
+                        "Q": 1000,
+                        "R": [
+                            [
+                                1,
+                                0
+                            ],
+                            [
+                                0,
+                                1
+                            ]
+                        ],
+                        "W": 100,
+                        "r_rob": 0.35,
+                        "r_ped": 0.3,
+                        "lb": [
+                            -0.2,
+                            -2
+                        ],
+                        "ub": [
+                            2,
+                            2
+                        ],
+                        "state_dummy_ped": [
+                            10000,
+                            10000,
+                            0,
+                            0
+                        ],
+                        "max_ghost_tracking_time": 20,
+                        "noise_sigma": [
+                            0.5,
+                            0.5
+                        ],
+                        "num_samples": 50,
+                        "lambda_": 1.0,
+                        "cost_n_samples": 100,
+                        "device": "cpu"
+                    },
+                    "collisions_per_subgoal": []
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": {
+                        "dt": 0.1,
+                        "goal": [
+                            4,
+                            0,
+                            0
+                        ],
+                        "init_state": [
+                            -4,
+                            0,
+                            0
+                        ],
+                        "is_robot_visible": false,
+                        "misdetection_prob": 0,
+                        "ped_detc_fov": 140,
+                        "ped_detc_range": 5,
+                        "ped_model": "ORCA",
+                        "pedestrians_goals": [
+                            [
+                                [
+                                    1.7646793722636218,
+                                    3.049889996807698
+                                ]
+                            ],
+                            [
+                                [
+                                    -2.3017927987178566,
+                                    3.250494101800621
+                                ]
+                            ],
+                            [
+                                [
+                                    -0.017443177365463747,
+                                    -4.229417208656688
+                                ]
+                            ],
+                            [
+                                [
+                                    -4.4144907075602084,
+                                    -1.6576168130393922
+                                ]
+                            ],
+                            [
+                                [
+                                    2.8489697711146755,
+                                    2.0768093474091573
+                                ]
+                            ],
+                            [
+                                [
+                                    2.886149646724064,
+                                    0.17269056441609365
+                                ]
+                            ],
+                            [
+                                [
+                                    -0.5980100204450949,
+                                    -3.5254747329371607
+                                ]
+                            ]
+                        ],
+                        "pedestrians_init_states": [
+                            [
+                                1.9561814649680684,
+                                -4.967817363957213,
+                                0.0
+                            ],
+                            [
+                                1.1958933745984073,
+                                -1.445069895586426,
+                                0.0
+                            ],
+                            [
+                                2.941973312770843,
+                                -4.070093601768678,
+                                0.0
+                            ],
+                            [
+                                0.8820226694839048,
+                                -0.19027110113876233,
+                                0.0
+                            ],
+                            [
+                                1.423255259052274,
+                                -4.351464055170316,
+                                0.0
+                            ],
+                            [
+                                0.7998378742813124,
+                                0.6148458795952374,
+                                0.0
+                            ],
+                            [
+                                0.6066009441617091,
+                                1.034876665964548,
+                                0.0
+                            ]
+                        ],
+                        "tolerance_error": 0.8,
+                        "total_peds": 7,
+                        "waypoint_tracker": "fixed"
+                    },
+                    "controller_config": {
+                        "horizon": 24,
+                        "model_type": "unicycle",
+                        "ped_predictor": "neural",
+                        "cost_function": "GO-MPC",
+                        "Q": 1000,
+                        "R": [
+                            [
+                                1,
+                                0
+                            ],
+                            [
+                                0,
+                                1
+                            ]
+                        ],
+                        "W": 100,
+                        "r_rob": 0.35,
+                        "r_ped": 0.3,
+                        "lb": [
+                            -0.2,
+                            -2
+                        ],
+                        "ub": [
+                            2,
+                            2
+                        ],
+                        "state_dummy_ped": [
+                            10000,
+                            10000,
+                            0,
+                            0
+                        ],
+                        "max_ghost_tracking_time": 20,
+                        "noise_sigma": [
+                            0.5,
+                            0.5
+                        ],
+                        "num_samples": 50,
+                        "lambda_": 1.0,
+                        "cost_n_samples": 100,
+                        "device": "cpu"
+                    },
+                    "collisions_per_subgoal": []
+                }
+            }
+        },
+        "MD-MPC-EDC": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/random/4/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/random/7/0.yaml",
+                    "controller_config": "evaluation/controllers/MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            }
+        }
+    }
+}

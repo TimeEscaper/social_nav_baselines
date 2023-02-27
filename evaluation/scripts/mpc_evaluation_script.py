@@ -9,9 +9,18 @@ import fire
 import yaml
 import pygame
 import pathlib
+import pathlib
+import torch
+import random
 
-def main(scene_config_path: str = r"evaluation/scenes/random/7/0.yaml",
-         controller_config_path: str = r"evaluation/controllers/MD-MPC-EDC.yaml",
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed(SEED)
+
+def main(scene_config_path: str,
+         controller_config_path: str,
          result_path: str = "") -> Statistics:
 
     # Initialization

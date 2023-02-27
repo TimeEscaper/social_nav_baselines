@@ -1,0 +1,37 @@
+
+Error in scene config: evaluation/scenes/circular_crossing/4/0.yaml
+with controller evaluation/controllers/MPPI.yaml
+Exception: 'tolerance_error'
+                        
+Error in scene config: evaluation/scenes/circular_crossing/7/0.yaml
+with controller evaluation/controllers/MPPI.yaml
+Exception: 'tolerance_error'
+                        
+Error in scene config: evaluation/scenes/parallel_traffic/4/0.yaml
+with controller evaluation/controllers/MPPI.yaml
+Exception: 'tolerance_error'
+                        
+Error in scene config: evaluation/scenes/parallel_traffic/7/0.yaml
+with controller evaluation/controllers/MPPI.yaml
+Exception: 'tolerance_error'
+                        
+Error in scene config: evaluation/scenes/perpendicular_traffic/4/0.yaml
+with controller evaluation/controllers/MPPI.yaml
+Exception: 'tolerance_error'
+                        
+Error in scene config: evaluation/scenes/perpendicular_traffic/7/0.yaml
+with controller evaluation/controllers/MPPI.yaml
+Exception: 'tolerance_error'
+                        
+Error in scene config: evaluation/scenes/random/4/0.yaml
+with controller evaluation/controllers/MPPI.yaml
+Exception: 'tolerance_error'
+                        
+Error in scene config: evaluation/scenes/random/7/0.yaml
+with controller evaluation/controllers/MPPI.yaml
+Exception: 'tolerance_error'
+                        
+    Total time: 175.933s
+    Experiments conducted: 8/16
+    Mean time for one experiment: 21.992s
+    

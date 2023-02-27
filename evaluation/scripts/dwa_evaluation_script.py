@@ -1,13 +1,12 @@
 from core.controllers import DWAController
 from core.predictors import ConstantVelocityPredictor, NeuralPredictor
 from core.utils import create_sim
+from core.visualizer import Visualizer
 from core.statistics import Statistics
 import numpy as np
 import fire
 import yaml
 import pathlib
-
-pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
 def main(scene_config_path: str,
          controller_config_path: str,
@@ -75,16 +74,19 @@ def main(scene_config_path: str,
                             scene_config_path,
                             controller_config_path)
 
+    visualizer = Visualizer(config["total_peds"])
+    visualizer.visualize_goal(config["goal"])
+
     # Loop
     simulator.step()
     hold_time = simulator.sim_dt
     state = config["init_state"]
     control = np.array([0, 0]) 
     
-    while statistics.simulation_ticks <= 3000:
+    while statistics.simulation_ticks <= 2000:
 
         # if simulation time exceeded
-        if statistics.simulation_ticks == 3000:
+        if statistics.simulation_ticks == 2000:
             statistics.set_failure_flag()
             break
         

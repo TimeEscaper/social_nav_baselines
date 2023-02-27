@@ -98,19 +98,22 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                 cost_n_samples=config["cost_n_samples"]
                                 )
 
+    statistics = Statistics(simulator,
+                            scene_config,
+                            controller_config)
+    
     planner = RandomPlanner(global_goal=np.array(config["goal"]),
                             controller=controller,
-                            subgoal_reach_threshold=config["tollerance_error"],
+                            subgoal_reach_threshold=config["tolerance_error"],
                             subgoal_to_goal_threshold=2.,
-                            pedestrian_tracker=ped_tracker)
+                            pedestrian_tracker=ped_tracker,
+                            statistics_module=statistics)
 
     visualizer = Visualizer(config["total_peds"],
                             renderer)
     visualizer.visualize_goal(config["goal"])
 
-    statistics = Statistics(simulator,
-                            scene_config,
-                            controller_config)
+    
 
     # Loop
     simulator.step()
@@ -122,7 +125,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
         renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(planner.global_goal[:2] - state[:2])
-            if error >= config["tollerance_error"]:
+            if error >= config["tolerance_error"]:
                 state = simulator.current_state.world.robot.state
 
                 detected_peds_keys = simulator.current_state.sensors["pedestrian_detector"].reading.pedestrians.keys()
