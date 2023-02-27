@@ -9,12 +9,22 @@ import fire
 import yaml
 import pygame
 import pathlib
+import random
+import torch
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/random/1_pedestrian.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/circular_crossing/7_pedestrians.yaml"
 DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/mpc.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.gif"
+
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed(SEED)
+
 
 def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
          controller_config_path: str = DEFAULT_CONTROLLER_CONFIG_PATH,

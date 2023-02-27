@@ -6,7 +6,7 @@ goal:
 init_state:
 - 4.010376648059447
 - -0.7368831972548735
-- 0.0
+- 3.14
 is_robot_visible: false
 misdetection_prob: 0
 ped_detc_fov: 120

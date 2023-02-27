@@ -16,9 +16,10 @@ class _StageControlCost:
         self._R = torch.tensor(R).float().to(device)
 
     def __call__(self, state: torch.Tensor, action: torch.Tensor) -> torch.Tensor:
-        cost = torch.einsum("ni,ji->nj", action, self._R)
-        cost = torch.einsum("ni,ni->n", action, cost)
-        return cost
+        return 0.
+        # cost = torch.einsum("ni,ji->nj", action, self._R)
+        # cost = torch.einsum("ni,ni->n", action, cost)
+        # return cost
 
 
 class _FullTrajectoryCost:
