@@ -5,7 +5,7 @@ from typing import Any, Tuple, Optional
 from core.planners import AbstractPlanner
 from core.controllers import AbstractController
 from core.predictors import PedestrianTracker
-
+from core.statistics import Statistics
 
 class RandomPlanner(AbstractPlanner):
 
@@ -14,11 +14,13 @@ class RandomPlanner(AbstractPlanner):
                  controller: AbstractController,
                  subgoal_reach_threshold: float,
                  subgoal_to_goal_threshold: float,
-                 pedestrian_tracker: PedestrianTracker):
+                 pedestrian_tracker: PedestrianTracker,
+                 statistics_module: Optional[Statistics] = None):
         super(RandomPlanner, self).__init__(global_goal=global_goal,
                                             controller=controller,
                                             subgoal_reach_threshold=subgoal_reach_threshold,
-                                            subgoal_to_goal_threshold=subgoal_to_goal_threshold)
+                                            subgoal_to_goal_threshold=subgoal_to_goal_threshold,
+                                            statistics_module=statistics_module)
         self._pedestrian_tracker = pedestrian_tracker
 
     def generate_subgoal(self, state: np.ndarray, observation: Any) -> np.ndarray:

@@ -112,7 +112,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
         renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(controller.goal[:2] - state[:2])
-            if error >= config["tollerance_error"]:
+            if error >= config["tolerance_error"]:
                 state = simulator.current_state.world.robot.state
 
                 detected_peds_keys = simulator.current_state.sensors["pedestrian_detector"].reading.pedestrians.keys()

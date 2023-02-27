@@ -152,3 +152,6 @@ test.py
 
 # Scenario configs
 #evaluation/scenes
+
+# datasets
+datasets/

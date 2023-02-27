@@ -12,8 +12,8 @@ import pathlib
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/scenes/circular_crossing/7/0.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/controllers/MD-MPC.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/scenes/random/7/1.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/controllers/MD-MPC-EDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.gif"
 
 def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -85,19 +85,22 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                  config["constraint_type"],
                                  config["constraint_value"])
 
+    statistics = Statistics(simulator,
+                            scene_config_path,
+                            controller_config_path)
+
     planner = RandomPlanner(global_goal=np.array(config["goal"]),
                             controller=controller,
-                            subgoal_reach_threshold=config["tollerance_error"],
+                            subgoal_reach_threshold=config["tolerance_error"],
                             subgoal_to_goal_threshold=2.,
-                            pedestrian_tracker=ped_tracker)
+                            pedestrian_tracker=ped_tracker,
+                            statistics_module=statistics)
 
     visualizer = Visualizer(config["total_peds"],
                             renderer)
     visualizer.visualize_goal(config["goal"])
     
-    statistics = Statistics(simulator,
-                            scene_config_path,
-                            controller_config_path)
+    
 
     # Loop
     simulator.step()
@@ -109,7 +112,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
         renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(planner.global_goal[:2] - state[:2])
-            if error >= config["tollerance_error"]:
+            if error >= config["tolerance_error"]:
                 state = simulator.current_state.world.robot.state
 
                 detected_peds_keys = simulator.current_state.sensors["pedestrian_detector"].reading.pedestrians.keys()
@@ -123,8 +126,8 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
 
                 control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = planner.make_step(state,
                                                                                                                       observation)
-
-                # visualizer.append_ground_truth_robot_state(state)
+                statistics.append_current_subgoal(planner.current_subgoal)
+                #visualizer.append_ground_truth_robot_state(state)
                 # if config["total_peds"] > 0:
                 #     detected_pedestrian_indices = simulator.current_state.sensors['pedestrian_detector'].reading.pedestrians.keys()
                 #     undetected_pedestrian_indices = list(set(range(config["total_peds"])) - set(detected_pedestrian_indices))
@@ -173,7 +176,12 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                     pygame.quit()
     pygame.quit()
 
-    
+    statistics._ground_truth_pedestrian_trajectories = visualizer._ground_truth_pedestrian_trajectories
+    statistics._ground_truth_robot_trajectory = visualizer._ground_truth_robot_trajectory
+    statistics._predicted_pedestrians_trajectories = visualizer._predicted_pedestrians_trajectories
+    statistics._predicted_robot_trajectory = visualizer._predicted_robot_trajectory
+    statistics._predicted_pedestrians_covariances = visualizer._predicted_pedestrians_covariances
+
     visualizer.make_animation(f"Model Predictive Control", 
                               result_path, 
                               config)

@@ -152,11 +152,12 @@ class Visualizer():
     
     def visualize_goal(self,
                        new_goal: np.ndarray) -> None:
-        self._renderer.draw("goal",
-                            CircleDrawing(new_goal[:2],
-                                          0.1,
-                                          (255, 0, 0),
-                                          0))
+        if self._renderer:
+            self._renderer.draw("goal",
+                                CircleDrawing(new_goal[:2],
+                                            0.1,
+                                            (255, 0, 0),
+                                            0))
         self._set_of_goals.append(new_goal)
 
     def make_animation(self,

@@ -3,6 +3,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 from typing import Any, Tuple, Optional
 from core.controllers import AbstractController
+from core.statistics import Statistics
 
 
 class AbstractPlanner(ABC):
@@ -11,11 +12,13 @@ class AbstractPlanner(ABC):
                  global_goal: np.ndarray,
                  controller: AbstractController,
                  subgoal_reach_threshold: float,
-                 subgoal_to_goal_threshold: float):
+                 subgoal_to_goal_threshold: float,
+                 statistics_module: Optional[Statistics] = None):
         self._global_goal = global_goal
         self._controller = controller
         self._subgoal_reach_threshold = subgoal_reach_threshold
         self._subgoal_to_goal_threshold = subgoal_to_goal_threshold
+        self._statistics_module = statistics_module
 
         self._current_subgoal = None
         self._subgoals_history = []
@@ -47,6 +50,8 @@ class AbstractPlanner(ABC):
     def update_subgoal(self, state: np.ndarray, observation: Any) -> Tuple[bool, bool]:
         position = state[:2]
         if np.linalg.norm(position - self._global_goal[:2]) <= self._subgoal_reach_threshold:
+            if self._statistics_module:
+                self._statistics_module.append_collision_per_subgoal()
             return False, True
 
         subgoal_updated = False
@@ -64,7 +69,13 @@ class AbstractPlanner(ABC):
                     self._current_subgoal = self.generate_subgoal(state, observation)
                 self._subgoals_history.append(self._current_subgoal)
                 subgoal_updated = True
+                if self._statistics_module:
+                    self._statistics_module.append_collision_per_subgoal()
 
+        # add collisions per subgoal to statistics module
+        #if self._statistics_module and subgoal_updated:
+        #    self._statistics_module.append_collision_per_subgoal()
+        
         return subgoal_updated, goal_reached
 
     def set_new_global_goal(self, goal: np.ndarray):
