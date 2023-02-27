@@ -37,7 +37,7 @@ def main(scene_config_path: str = r"evaluation/scenes/random/7/0.yaml",
                                      config["pedestrians_init_states"],
                                      config["pedestrians_goals"],
                                      config["ped_model"],
-                                     True)
+                                     False)
     if config["ped_predictor"] == "constant_velocity":
         if config["total_peds"] > 0:
             predictor = ConstantVelocityPredictor(config["dt"],
@@ -106,7 +106,7 @@ def main(scene_config_path: str = r"evaluation/scenes/random/7/0.yaml",
             statistics.set_failure_flag()
             break
         
-        renderer.render()
+        #renderer.render()
         if hold_time >= controller.dt:
             error = np.linalg.norm(planner.global_goal[:2] - state[:2])
             if error >= config["tolerance_error"]:
