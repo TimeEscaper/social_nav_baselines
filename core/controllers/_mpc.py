@@ -267,7 +267,7 @@ class DoMPCController(AbstractController):
         Args:
             ground_truth_pedestrians_state (np.ndarray): Current state of the pedestrians, [2-d numpy array]
         """
-        self._ped_tracker.update(observation)
+        # self._ped_tracker.update(observation)
         tracked_predictions = self._ped_tracker.get_predictions()
         predicted_trajectories = np.tile(np.array([10000., 10000., 0., 0.]), (self._horizon + 1, self._total_peds, 1))
         predicted_covs = np.tile(np.array([[0.01, 0.0], [0., 0.01]]), (self._horizon + 1, self._total_peds, 1, 1))

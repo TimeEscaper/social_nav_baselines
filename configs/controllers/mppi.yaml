@@ -31,7 +31,8 @@ ub: [2, 2]                                 # Upper bounds for NLP: [v, w], [m/s,
 state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
 max_ghost_tracking_time: 20                # Amount of steps to track ghost pedestrian, [step]
 
-noise_sigma: [0.5, 0.1]
+noise_sigma: [0.5, 0.5]
 num_samples: 50
 lambda_: 1.
+cost_n_samples: 100
 device: "cpu"

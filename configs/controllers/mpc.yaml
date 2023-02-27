@@ -19,8 +19,8 @@
 horizon: 24                                # MPC planning horizon, [steps]
 model_type: "unicycle"                     # Robot model, ["unicycle", "unicycle_double_integrator"]
 ped_predictor: "neural"                    # Pedestrian predictor, ["constant_velocity", "neural"]
-cost_function: "ED-GO-MPC"                 # Choose cost function for MPC, ["GO-MPC", "MD-GO-MPC", "ED-GO-MPC"]
-constraint_type: "None"                    # Choose constraint type for MPC, ["None", "ED", "MD"]
+cost_function: "GO-MPC"                    # Choose cost function for MPC, ["GO-MPC", "MD-GO-MPC", "ED-GO-MPC"]
+constraint_type: "None"                      # Choose constraint type for MPC, ["None", "ED", "MD"]
 constraint_value: 0.2                      # Minimum safe distance to pedestrians and other objects, [m] for "ED" constraint and Collision probability [0, 1] for "MD"
 Q: 1000                                    # Terminal cost weight
 R: [[1, 0],   
