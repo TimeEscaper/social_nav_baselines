@@ -1,5 +1,6 @@
 from core.controllers import MPPIController
 from core.predictors import ConstantVelocityPredictor, NeuralPredictor, PedestrianTracker
+from core.planners import RandomPlanner
 from core.utils import create_sim
 from core.visualizer import Visualizer
 from core.statistics import Statistics
@@ -72,6 +73,8 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                         horizon=config["horizon"],
                                         device=config["device"])
 
+    ped_tracker = PedestrianTracker(predictor, config["max_ghost_tracking_time"], False)
+
     controller = MPPIController(init_state=np.array(config["init_state"]),
                                 goal=np.array(config["goal"]),
                                 horizon=config["horizon"],
@@ -86,7 +89,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                 ub=config["ub"],
                                 r_rob=config["r_rob"],
                                 r_ped=config["r_ped"],
-                                pedestrian_tracker=PedestrianTracker(predictor, config["max_ghost_tracking_time"], False),
+                                pedestrian_tracker=ped_tracker,
                                 max_ghost_tracking_time=config["max_ghost_tracking_time"],
                                 cost_function=config["cost_function"],
                                 num_samples=config["num_samples"],
@@ -94,6 +97,13 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                 device=config["device"],
                                 cost_n_samples=config["cost_n_samples"]
                                 )
+
+    planner = RandomPlanner(global_goal=np.array(config["goal"]),
+                            controller=controller,
+                            subgoal_reach_threshold=config["tollerance_error"],
+                            subgoal_to_goal_threshold=2.,
+                            pedestrian_tracker=ped_tracker)
+
     visualizer = Visualizer(config["total_peds"],
                             renderer)
     visualizer.visualize_goal(config["goal"])
@@ -111,22 +121,21 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
     while True:
         renderer.render()
         if hold_time >= controller.dt:
-            error = np.linalg.norm(controller.goal[:2] - state[:2])
-            if error >= config["tolerance_error"]:
+            error = np.linalg.norm(planner.global_goal[:2] - state[:2])
+            if error >= config["tollerance_error"]:
                 state = simulator.current_state.world.robot.state
 
                 detected_peds_keys = simulator.current_state.sensors["pedestrian_detector"].reading.pedestrians.keys()
                 ground_truth_pedestrians_state = np.concatenate([simulator.current_state.world.pedestrians.poses[:, :2],
-                                                                 simulator.current_state.world.pedestrians.velocities[:,
-                                                                 :2]], axis=1)
+                                                                 simulator.current_state.world.pedestrians.velocities[:, :2]], axis=1)
                 observation = {k: ground_truth_pedestrians_state[k, :] for k in detected_peds_keys}
 
                 visualizer.append_ground_truth_robot_state(state)
                 visualizer.append_ground_truth_pedestrians_pose(simulator.current_state.world.pedestrians.poses[:, :2])
+                visualizer.visualize_subgoal(planner.current_subgoal)
 
-                control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = controller.make_step(
-                    state,
-                    observation)
+                control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = planner.make_step(state,
+                                                                                                                      observation)
 
                 # visualizer.append_ground_truth_robot_state(state)
                 # if config["total_peds"] > 0:
@@ -147,10 +156,9 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                 # control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = controller.make_step(state,
                 #                                                                                                       pedestrians_ghosts_states)
                 visualizer.append_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
-                # visualizer.visualize_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
+                #visualizer.visualize_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
 
-                visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(
-                    predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)
+                visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)
                 predicted_robot_trajectory = controller.get_predicted_robot_trajectory()
                 visualizer.append_predicted_robot_trajectory(predicted_robot_trajectory)
                 visualizer.visualize_predicted_robot_trajectory(predicted_robot_trajectory)
@@ -164,8 +172,9 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                     break
                 new_goal = np.array(list(map(int, input_value.split())))
                 visualizer.visualize_goal(new_goal)
-                controller.set_new_goal(state,
-                                        new_goal)
+                planner.set_new_global_goal(new_goal)
+
+
         simulator.step(control)
         statistics.track_collisions()
         statistics.track_simulation_ticks()
