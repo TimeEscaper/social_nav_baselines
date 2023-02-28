@@ -2,6 +2,7 @@ from examples import main as evaluation_script
 import json
 import time
 import fire
+import pathlib
 
 def main(controller: str = None):
     start_time = time.time()
@@ -52,10 +53,12 @@ Exception: {e}
                         """
                         print(error_msg)
                         log += error_msg
-
+    
+    pathlib.Path(r"evaluation/statistics").mkdir(parents=True, exist_ok=True) #TODO: Проверить создание папок
     with open(fr'evaluation/statistics/stats_{"_".join(controllers)}.json', 'w') as outfile:
             json.dump(statistics, outfile, indent=4)
-    
+
+    pathlib.Path(r"evaluation/datasets").mkdir(parents=True, exist_ok=True)
     with open(fr'evaluation/datasets/trajectory_dataset_{"_".join(controllers)}.json', 'w') as outfile:
             json.dump(trajectory_dataset, outfile)
 
@@ -69,7 +72,8 @@ Exception: {e}
     """
     print(conclusion_msg)
     log += conclusion_msg
-
+   
+    pathlib.Path(r"evaluation/logs").mkdir(parents=True, exist_ok=True)
     with open(fr"evaluation/logs/log_file_{round(time.time())}.txt", "w") as outlogfile:
         outlogfile.write(log)
 
