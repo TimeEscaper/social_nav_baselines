@@ -20,9 +20,9 @@ torch.cuda.manual_seed(SEED)
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/scenes/circular_crossing/4/0.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/scenes/circular_crossing/7/3.yaml"
 DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/controllers/ED-MPC.yaml"
-DEFAULT_RESULT_PATH = r"results/mpc.gif"
+DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
          controller_config_path: str = DEFAULT_CONTROLLER_CONFIG_PATH,
@@ -77,12 +77,14 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
     visualizer = Visualizer(config["total_peds"],
                             renderer)
     visualizer.visualize_goal(config["goal"])
-
+    
     # Loop
     simulator.step()
     hold_time = simulator.sim_dt
     state = config["init_state"]
     control = np.array([0, 0]) 
+
+    plot_start_position = True
 
     while True:
         # if simulation time exceeded
@@ -115,6 +117,12 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                     visualizer.visualize_subgoal(planner.current_subgoal)
                     visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)      
                 hold_time = 0.
+
+                if plot_start_position:
+                    visualizer.plot_final_trajectories(f"Circular Crossing Pattern", 
+                                                       r"results/circular_crossing_starting_position.png", 
+                                                       config)
+                    plot_start_position = False
             else:
                 if config["experiment_run"]:
                     break
@@ -152,8 +160,8 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
         visualizer.make_animation(f"Model Predictive Control", 
                                 result_path, 
                                 config)
-    
-    return statistics
+        
+    #return statistics
     
 if __name__ == "__main__":
     fire.Fire(main)

@@ -379,3 +379,128 @@ class Visualizer():
         anim = FuncAnimation(fig, animate, frames=frames, interval=dt, repeat=False)
         anim.save(result_path, 'pillow', frames)
         print("make_animation: Done")
+    
+
+
+
+
+
+
+
+
+    def plot_final_trajectories(self,
+                                title: str,
+                                result_path: str,
+                                config: Dict) -> None:
+        # General
+        init_state: np.ndarray = np.array(config['init_state'])
+        init_state[0], init_state[1] = init_state[1], init_state[0]
+        dt: float = config['dt']
+        r_rob: float = config['r_rob']
+        r_ped: float = config['r_ped']
+        # Graphics
+        annotation_offset: np.ndarray = np.array([0, 0.2])
+
+        # Customizing Matplotlib:
+        mpl.rcParams['font.size'] = 18
+        mpl.rcParams['lines.linewidth'] = 3
+        #mpl.rcParams['axes.grid'] = True
+
+        # set figure
+        fig, ax = plt.subplots(figsize=[16, 16], facecolor='white')
+        ax.set_aspect('equal', adjustable='box')
+        fig.suptitle(title, fontsize=35)
+        
+        # Data parsing
+        x_rob_plt = self.ground_truth_robot_trajectory[:, 1]
+        y_rob_plt = self.ground_truth_robot_trajectory[:, 0]
+        phi_rob_plt = self.ground_truth_robot_trajectory[:, 2]
+        x_peds_plt = self.ground_truth_pedestrian_trajectories[:, :, 1]
+        y_peds_plt = self.ground_truth_pedestrian_trajectories[:, :, 0]
+
+        robot_coord = (round(x_rob_plt[-1], 2), (round(y_rob_plt[-1], 2)))
+        goal: np.ndarray = self._set_of_goals[-1]
+
+        # add circle spawn area
+        circle_spawn = plt.Circle(
+                (0, 0), 4, fill=False, linewidth=110, color="red", alpha=0.15)
+        ax.add_patch(circle_spawn)
+        """
+        perms = [(4, 0), (-4, 0), (0, -4), (0, 4)]
+        for perm in perms:
+            plt.annotate('', xy=perm, xytext=(0, 0),
+                arrowprops=dict(headlength=40, headwidth=20, color='red', linewidth=10))
+        plt.annotate('', xy=(2.3, -2.3), xytext=(-2.3, 2.3),
+                arrowprops=dict(headlength=40, headwidth=20, color='goldenrod', linewidth=10))
+        """
+        
+        def plot_pedestrian(x_ped_plt, y_ped_plt, cnt, i) -> None:
+            # plot pedestrian i position
+            ax.plot(x_ped_plt[:cnt], y_ped_plt[:cnt], linewidth=3,
+                    color=self._palette_hex[i])
+            # plot pedestrian i area
+            ped1_radius_plot = plt.Circle(
+                (x_ped_plt[cnt], y_ped_plt[cnt]), r_ped, fill=False, linewidth=5, color=self._palette_hex[i])
+            ax.add_patch(ped1_radius_plot)
+            # annotate pedestrian i
+            if i == 0:
+                ped_coord = (round(x_ped_plt[cnt], 2), (round(y_ped_plt[cnt], 2)))
+                ax.annotate(f'Pedestrian', ped_coord +
+                            np.array([0, r_ped]) + annotation_offset,  ha='center')
+            # plot pedestrian prediction
+            #ax.plot(self.predicted_pedestrians_trajectories[cnt, :, i, 1], self.predicted_pedestrians_trajectories[cnt, :,
+            #        i, 0], color=self._palette_hex[i], linestyle='dashed', linewidth=3)
+ 
+        # plot robot position
+        ax.plot(x_rob_plt, y_rob_plt,
+                linewidth=3, color='blue', label='Robot')
+        ax.set_xlim([-5.1, 5.1])
+        ax.set_ylim([-5.1, 5.1])
+        # plot robot area
+        robot_radius_plot = plt.Circle(
+            (x_rob_plt[-1], y_rob_plt[-1]), r_rob, fill=False, linewidth=5, color='blue')
+        robot_fill = plt.Circle(
+            (x_rob_plt[-1], y_rob_plt[-1]), r_rob, fill=True, color='blue', alpha=0.3)
+        ax.add_patch(robot_radius_plot)
+        ax.add_patch(robot_fill)
+        # annotate robot
+        #robot_coord = (round(x_rob_plt[-1], 2), (round(y_rob_plt[-1], 2)))
+        #ax.annotate(f'Robot: {robot_coord}', robot_coord +
+        #            np.array([0, r_rob]) + annotation_offset,  ha='center')
+        ax.annotate(f'Robot', robot_coord +
+                    np.array([0, r_rob]) + annotation_offset,  ha='center')
+        # plot robot goal
+        #goal: np.ndarray = self._set_of_goals[-1]
+        ax.plot(float(goal[1]), float(goal[0]), '*', color="black", markersize=40)
+        # annotate robot goal
+        #goal_coord = (round(float(goal[1]), 2), round(
+        #    float(goal[0]), 2))
+        #ax.annotate(f'Goal: {goal_coord}', goal_coord +
+        #            np.array([0, r_rob]) + 2 * annotation_offset,  ha='center')
+        # plot robot start
+        # ax.plot(float(init_state[0]), float(
+        #    init_state[1]), 'yo', markersize=10)
+        # annotate robot start
+        #start_coord = (round(float(init_state[0]), 2), round(
+        #    float(init_state[1]), 2))
+        # ax.annotate(f'Start: {start_coord}', start_coord -
+        #            np.array([0, r_rob]) - annotation_offset,  ha='center')
+        # plot robot direction arrow
+        ax.arrow(x_rob_plt[-1], y_rob_plt[-1], np.sin(
+            phi_rob_plt[-1])*r_rob,  np.cos(phi_rob_plt[-1])*r_rob, color='b', width=r_rob/5)
+        # plot predicted robot trajectory
+        #ax.plot(self.predicted_robot_trajectory[-1, :, 1], self.predicted_robot_trajectory[-1, :, 0], linewidth=1, color='blue', linestyle='dashed')
+        # plot pedestrians
+        for ped_ind in range(self._total_peds):
+            plot_pedestrian(x_peds_plt[:, ped_ind], y_peds_plt[:, ped_ind], -1, ped_ind)
+        # legend
+        ax.set_xlabel('$y$ [m]')
+        ax.set_ylabel('$x$ [m]')
+        #ax.legend()
+        ax.grid(True)
+        #ax.set_title("Resulted Trajectories", fontsize=27)
+
+
+        
+        
+        fig.savefig(result_path)
