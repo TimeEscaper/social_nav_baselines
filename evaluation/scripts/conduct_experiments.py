@@ -1,20 +1,20 @@
-import mpc_evaluation_script
-import dwa_evaluation_script
-import mppi_evaluation_script
-
+#import mpc_evaluation_script
+#import dwa_evaluation_script
+#import mppi_evaluation_script
+from examples import main as evaluation_script
 import json
 import time
-import traceback
 import fire
 
 def main(controller: str = None):
     start_time = time.time()
     exp = 0
 
-    total_peds_list = [7] # [1, 2, 4, 7]
+    total_peds_list = [4, 5, 6, 7]
     scenes_list = ["circular_crossing", "parallel_traffic", "perpendicular_traffic", "random"]
-    controllers = ["MPPI"]#[controller] #["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC", "MD-MPC-EDC", "MPPI"] # Тут можно выбрать какие контроллеры запускать
-    total_scenarios_for_scene = 1
+    controllers = [controller] #["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC", "MD-MPC-EDC", "MPPI"] # Тут можно выбрать какие контроллеры запускать
+    total_scenarios_for_scene = 30
+    
     statistics = {scene:dict() for scene in scenes_list}
     trajectory_dataset = {scene:dict() for scene in scenes_list}
     log = ""
@@ -30,20 +30,15 @@ def main(controller: str = None):
                 trajectory_dataset[scene][controller][total_peds] = {}
                 for scenario_id in range(total_scenarios_for_scene):
                     try:
+                        exp += 1
                         scene_config_path = fr'evaluation/scenes/{scene}/{total_peds}/{scenario_id}.yaml'
-                        if controller == "ED-DWA":
-                            scenario_statistics = dwa_evaluation_script.main(scene_config_path, controller_config_path)
-                        elif controller == "MPPI":
-                            scenario_statistics = mppi_evaluation_script.main(scene_config_path, controller_config_path)
-                        else:
-                            scenario_statistics = mpc_evaluation_script.main(scene_config_path, controller_config_path)
-
+                        scenario_statistics = evaluation_script(scene_config_path, controller_config_path)
                         statistics[scene][controller][total_peds][scenario_id] = {"failure_status": scenario_statistics.failure, 
                                                                                 "simulation_ticks": scenario_statistics.simulation_ticks, 
                                                                                 "total_collisions": scenario_statistics.total_collisions,
                                                                                 "scene_config": scenario_statistics._scene_config_path,
                                                                                 "controller_config": scenario_statistics._controller_config_path,
-                                                                                "collisions_per_subgoal": scenario_statistics.collisions_per_subgoall_array}
+                                                                                "collisions_per_subgoal": scenario_statistics.collisions_per_subgoal_array}
                         if total_peds == 7:
                             trajectory_dataset[scene][controller][total_peds][scenario_id] = {"ground_truth_pedestrian_trajectories": scenario_statistics.ground_truth_pedestrian_trajectories.tolist(),
                                                                                             "ground_truth_robot_trajectory": scenario_statistics.ground_truth_robot_trajectory.tolist(),
@@ -51,7 +46,6 @@ def main(controller: str = None):
                                                                                             "predicted_robot_trajectory": scenario_statistics.predicted_robot_trajectory.tolist(),
                                                                                             "predicted_pedestrians_covariances": scenario_statistics.predicted_pedestrians_covariances.tolist(),
                                                                                             "subgoals_trajectory": scenario_statistics.subgoals_trajectory.tolist()}
-                        exp += 1
                         print(f"Experiment: {exp}/{total_experiments}")
                     except Exception as e:
                         error_msg = f"""

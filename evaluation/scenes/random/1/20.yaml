@@ -14,11 +14,11 @@ ped_detc_fov: 140
 ped_detc_range: 5
 ped_model: ORCA
 pedestrians_goals:
-- - - -1.648811457408581
-    - 2.4350825629160777
+- - - 2.8489697711146755
+    - 2.0768093474091573
 pedestrians_init_states:
-- - 3.258167505647627
-  - -3.711301325265548
+- - -4.4144907075602084
+  - -1.6576168130393922
   - 0.0
 tolerance_error: 0.8
 total_peds: 1

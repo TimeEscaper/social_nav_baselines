@@ -17,7 +17,7 @@ def generate_circular_scenarios():
     min_circle_rad = 3.8
     max_circle_rad = 4.2
 
-    for total_peds in [1, 2, 4, 7]:
+    for total_peds in [1, 2, 4, 5, 6, 7]:
         for scenario_id in range(30):
             circle_sectors = np.linspace(0, 2 * np.pi, total_peds + 2) # add sector for the robot
             phis = np.array([np.random.uniform(circle_sectors[i], circle_sectors[i+1]) for i in range(len(circle_sectors) - 1)])
@@ -44,7 +44,7 @@ def generate_circular_scenarios():
 
 def generate_random_scenarios():
     # Random traffic scenario
-    for total_peds in [1, 2, 4, 7]:
+    for total_peds in [1, 2, 4, 5, 6, 7]:
         for scenario_id in range(30):
             pedestrians_initial_positions = np.zeros([total_peds, 3])
             pedestrians_initial_positions[:, :2] = RandomWaypointTracker(world_size=(10.0, 15.0)).sample_independent_points(total_peds)
@@ -62,7 +62,7 @@ def generate_random_scenarios():
 
 def generate_parallel_scenarios():
     # Parallel traffic scenario
-    for total_peds in [1, 2, 4, 7]:
+    for total_peds in [1, 2, 4, 5, 6, 7]:
         for scenario_id in range(30):
             sectors_X_axis = np.linspace(-4, 4, total_peds + 2) # add sector for the robot
             X_coordinates = np.array([np.random.uniform(sectors_X_axis[i], sectors_X_axis[i+1]) for i in range(len(sectors_X_axis) - 1)])
@@ -103,7 +103,7 @@ def generate_parallel_scenarios():
 
 def generate_perpendicular_scenarios():
     # Parallel traffic scenario
-    for total_peds in [1, 2, 4, 7]:
+    for total_peds in [1, 2, 4, 5, 6, 7]:
         for scenario_id in range(30):
             sectors_X_axis = np.linspace(-4, 4, total_peds + 1) # add sector for the robot
             X_coordinates = np.array([np.random.uniform(sectors_X_axis[i], sectors_X_axis[i+1]) for i in range(len(sectors_X_axis) - 1)])

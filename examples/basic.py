@@ -21,7 +21,7 @@ torch.cuda.manual_seed(SEED)
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
 DEFAULT_SCENE_CONFIG_PATH = r"evaluation/scenes/circular_crossing/4/0.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/controllers/MPPI.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/controllers/ED-MPC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.gif"
 
 def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
