@@ -71,10 +71,6 @@ class AbstractPlanner(ABC):
                 subgoal_updated = True
                 if self._statistics_module:
                     self._statistics_module.append_collision_per_subgoal()
-
-        # add collisions per subgoal to statistics module
-        #if self._statistics_module and subgoal_updated:
-        #    self._statistics_module.append_collision_per_subgoal()
         
         return subgoal_updated, goal_reached
 

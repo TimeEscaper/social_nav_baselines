@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 import numpy as np
 from typing import Set, List
 
-
 class AbstractController(ABC):
 
     def __init__(self,
@@ -119,9 +118,3 @@ class AbstractController(ABC):
         new_goal = self.get_ref_direction(current_state,
                                           new_goal)
         self.goal = new_goal
-
-class ControllerFactory():
-    def __init__(self,
-                 config: dict) -> AbstractController:
-        
-        

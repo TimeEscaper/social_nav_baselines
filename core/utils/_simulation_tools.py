@@ -84,6 +84,7 @@ def create_sim(init_state: np.ndarray,
         renderer = Renderer(simulation=sim,
                             resolution=80.0,
                             screen_size=(700, 700))
+        renderer.initialize()
         return sim, renderer
     else:
         return sim, None

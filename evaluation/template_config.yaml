@@ -27,3 +27,4 @@ pedestrians_goals: [
   [[-2.82,  2.82]],
   [[ 2.82, -2.82]]
 ]
+experiment_run: True

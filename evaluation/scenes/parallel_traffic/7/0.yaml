@@ -1,12 +1,13 @@
 dt: 0.1
+experiment_run: true
 goal:
 - -1.4059172194302876
 - 2.504727099753845
-- 0
+- 0.0
 init_state:
 - -1.4059172194302876
 - -2.504727099753845
-- 0
+- 0.0
 is_robot_visible: false
 misdetection_prob: 0
 ped_detc_fov: 140

@@ -2,3 +2,4 @@ from ._predictor import AbstractPredictor
 from ._constant_velocity_predictor import ConstantVelocityPredictor
 from ._covariance_net_predictor import NeuralPredictor
 from ._tracker import PedestrianTracker
+from ._predictor_factory import PredictorFactory

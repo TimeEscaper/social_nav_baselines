@@ -95,8 +95,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                 num_samples=config["num_samples"],
                                 lambda_=config["lambda_"],
                                 device=config["device"],
-                                cost_n_samples=config["cost_n_samples"]
-                                )
+                                cost_n_samples=config["cost_n_samples"])
 
     statistics = Statistics(simulator,
                             scene_config,

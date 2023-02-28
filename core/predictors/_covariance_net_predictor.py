@@ -18,6 +18,8 @@ class NeuralPredictor(AbstractPredictor):
                  total_peds: int,
                  horizon: int = 25,
                  device: str = "cpu") -> None:
+        if total_peds == 0:  # At least one pedestrian should be in the system for the architecture
+            total_peds = 1
         super().__init__(dt=NeuralPredictor._DT,
                          total_peds=total_peds,
                          horizon=horizon,
@@ -28,7 +30,7 @@ class NeuralPredictor(AbstractPredictor):
         self._model = CovarianceNet(input_size=2,
                                     hidden_size=64,
                                     prediction_steps=NeuralPredictor._MODEL_HORIZON)
-        self._model.load_state_dict(torch.load("nn_weights/covariance_net_dt_01_horizon_25.pth",
+        self._model.load_state_dict(torch.load("core/predictors/_covariance_net/nn_weights/covariance_net_dt_01_horizon_25.pth",
                                                map_location=device))
         _ = self._model.to(device)
         self._model = self._model.eval()

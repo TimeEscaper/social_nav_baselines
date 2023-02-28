@@ -66,10 +66,10 @@ class Statistics():
         self._simulation_ticks += 1
 
     def append_collision_per_subgoal(self):
-        if len(self._collisions_per_subgoall_array) == 0:
+        if not self._collisions_per_subgoall_array:
             self._collisions_per_subgoall_array.append(self._total_collisions)
         else:
-            self._collisions_per_subgoall_array.append(self._total_collisions - self._collisions_per_subgoall_array[-1])
+            self._collisions_per_subgoall_array.append(self._total_collisions - sum(self._collisions_per_subgoall_array))
     
     @property
     def failure(self) -> int:
@@ -92,5 +92,5 @@ class Statistics():
         return self._controller_config_path
     
     @property
-    def collisions_per_subgoall_array(self) -> List[int]:
+    def collisions_per_subgoal_array(self) -> List[int]:
         return self._collisions_per_subgoall_array

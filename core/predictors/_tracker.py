@@ -7,7 +7,7 @@ from ._predictor import AbstractPredictor
 _STATE_DIM = 4
 
 
-class _CyclicBuffer:
+class _ShiftBuffer:
 
     def __init__(self, size: int, dims: Tuple[int, ...]):
         self._size = size
@@ -47,7 +47,7 @@ class _PedestrianTrack:
 
     def __init__(self, history_length: int, prediction_length: int,
                  initial_state: np.ndarray):
-        self._states = _CyclicBuffer(history_length, (_PedestrianTrack._STATE_DIM,))
+        self._states = _ShiftBuffer(history_length, (_PedestrianTrack._STATE_DIM,))
         self._predicted_poses = np.zeros((prediction_length, _PedestrianTrack._POSE_DIM))
         self._predicted_covs = np.zeros((prediction_length, _PedestrianTrack._POSE_DIM, _PedestrianTrack._POSE_DIM))
 
@@ -82,11 +82,11 @@ class _GhostTrack:
                  states: np.ndarray,
                  predicted_poses: np.ndarray,
                  predicted_covs: np.ndarray):
-        self._states = _CyclicBuffer(states.shape[0], states.shape[1:])
+        self._states = _ShiftBuffer(states.shape[0], states.shape[1:])
         self._states.all = states
-        self._predicted_poses = _CyclicBuffer(predicted_poses.shape[0], predicted_poses.shape[1:])
+        self._predicted_poses = _ShiftBuffer(predicted_poses.shape[0], predicted_poses.shape[1:])
         self._predicted_poses.all = predicted_poses
-        self._predicted_covs = _CyclicBuffer(predicted_covs.shape[0], predicted_covs.shape[1:])
+        self._predicted_covs = _ShiftBuffer(predicted_covs.shape[0], predicted_covs.shape[1:])
         self._predicted_covs.all = predicted_covs
         self._tracking_time = 0
         self._last_vel = self._states.last[2:]
