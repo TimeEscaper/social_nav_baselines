@@ -19,6 +19,7 @@
 #       2. ["ED"] : Euclidean distance constraint
 #       3. ["MD"] : Mahalanobis distance constraint
 
+controller_type: "MPC"                     # Specify controller type, ["DWA", "MPC", "MPPI", "DDP"]
 horizon: 24                                # MPC planning horizon, [steps]
 model_type: "unicycle"                     # Robot model, ["unicycle", "unicycle_double_integrator"]
 ped_predictor: "neural"                    # Pedestrian predictor, ["constant_velocity", "neural"]

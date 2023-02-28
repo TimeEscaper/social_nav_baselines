@@ -120,3 +120,8 @@ class AbstractController(ABC):
                                           new_goal)
         self.goal = new_goal
 
+class ControllerFactory():
+    def __init__(self,
+                 config: dict) -> AbstractController:
+        
+        

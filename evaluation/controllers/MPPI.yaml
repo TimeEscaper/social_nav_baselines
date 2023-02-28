@@ -16,6 +16,7 @@
 #       2. ["ED"] : Euclidean distance constraint
 #       3. ["MD"] : Mahalanobis distance constraint
 
+controller_type: "MPPI"                     # Specify controller type, ["DWA", "MPC", "MPPI", "DDP"]
 horizon: 24                                # MPC planning horizon, [steps]
 model_type: "unicycle"                     # Robot model, ["unicycle", "unicycle_double_integrator"]
 ped_predictor: "neural"                    # Pedestrian predictor, ["constant_velocity", "neural"]
@@ -30,7 +31,6 @@ lb: [-0.2, -2]                             # Lower bounds for NLP: [v, w], [m/s,
 ub: [2, 2]                                 # Upper bounds for NLP: [v, w], [m/s, rad/s]
 state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
 max_ghost_tracking_time: 20                # Amount of steps to track ghost pedestrian, [step]
-
 noise_sigma: [0.5, 0.5]
 num_samples: 50
 lambda_: 1.
