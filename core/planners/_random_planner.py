@@ -34,7 +34,12 @@ class RandomPlanner(AbstractPlanner):
         scale = np.random.uniform(self._dist_bounds[0], self._dist_bounds[1])
         direction = scale * direction
         angle = np.random.uniform(self._angle_bounds[0], self._angle_bounds[1])
-        direction = np.array([direction[0] * np.cos(angle), direction[1] * np.sin(angle)])
+
+        c, s = np.cos(angle), np.sin(angle)
+        R = np.array(((c, -s), (s, c)))
+        direction = R @ direction
+
+        # direction = np.array([direction[0] * np.cos(angle), direction[1] * np.sin(angle)])
         subgoal = position + direction
         return np.array([subgoal[0], subgoal[1], self.global_goal[2]])
 
