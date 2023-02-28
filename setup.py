@@ -10,6 +10,7 @@ setup(
         'core.predictors',
         'core.utils',
         'core.visualizer'
+        'examples'
     ],
     install_requires=[
         'pygame',
