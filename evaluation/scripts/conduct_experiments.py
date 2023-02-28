@@ -10,10 +10,10 @@ def main(controller: str = None):
     start_time = time.time()
     exp = 0
 
-    total_peds_list = [7] # [1, 2, 4, 7]
+    total_peds_list = [1, 2, 4, 7]
     scenes_list = ["circular_crossing", "parallel_traffic", "perpendicular_traffic", "random"]
-    controllers = ["MPPI"]#[controller] #["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC", "MD-MPC-EDC", "MPPI"] # Тут можно выбрать какие контроллеры запускать
-    total_scenarios_for_scene = 1
+    controllers = [controller]#[controller] #["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC", "MD-MPC-EDC", "MPPI"] # Тут можно выбрать какие контроллеры запускать
+    total_scenarios_for_scene = 30
     statistics = {scene:dict() for scene in scenes_list}
     trajectory_dataset = {scene:dict() for scene in scenes_list}
     log = ""
