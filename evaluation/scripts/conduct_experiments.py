@@ -1,6 +1,3 @@
-#import mpc_evaluation_script
-#import dwa_evaluation_script
-#import mppi_evaluation_script
 from examples import main as evaluation_script
 import json
 import time
@@ -14,7 +11,7 @@ def main(controller: str = None):
     scenes_list = ["circular_crossing", "parallel_traffic", "perpendicular_traffic", "random"]
     controllers = [controller] #["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC", "MD-MPC-EDC", "MPPI"] # Тут можно выбрать какие контроллеры запускать
     total_scenarios_for_scene = 30
-    
+
     statistics = {scene:dict() for scene in scenes_list}
     trajectory_dataset = {scene:dict() for scene in scenes_list}
     log = ""
