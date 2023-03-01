@@ -2,12 +2,23 @@ import numpy as np
 import torch
 import torch.nn as nn
 import fire
+import random
 
 from pathlib import Path
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from core.data import SubgoalEvalDataset
 from core.evaluator import SubgoalEvalNetwork
+
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+torch.cuda.manual_seed(SEED)
+torch.cuda.manual_seed_all(SEED)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
 
 
 def _run_epoch(model, loader, optimizer, criterion, device, phase):
