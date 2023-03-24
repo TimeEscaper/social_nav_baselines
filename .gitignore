@@ -155,3 +155,9 @@ test.py
 
 # datasets
 datasets/
+
+# Solver
+FORCESNLPsolver
+*.forces
+test_forces/*.png
+test_forces/*.gif
