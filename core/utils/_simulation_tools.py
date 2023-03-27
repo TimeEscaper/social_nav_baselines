@@ -43,10 +43,10 @@ def create_sim(init_state: np.ndarray,
     """
     if model_type == "unicycle":
         robot_model = UnicycleRobotModel(initial_pose=init_state,
-                                     initial_control=np.array([0., np.deg2rad(0.)]))
+                                         initial_control=np.array([0., np.deg2rad(0.)]))
     elif model_type == "unicycle_double_integrator":
         robot_model = UnicycleDoubleIntegratorRobotModel(initial_state=init_state,
-                                                        initial_control=np.array([0., np.deg2rad(0.)]))
+                                                         initial_control=np.array([0., np.deg2rad(0.)]))
     pedestrians_model = None
     sensors = []
     if total_peds > 0:
