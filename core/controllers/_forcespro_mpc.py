@@ -74,7 +74,7 @@ class FORCESPROMPCController(AbstractController):
         self.model.N = horizon # horizon length
         self.model.nvar = 5  # number of variables
         self.model.neq = 3  # number of equality constraints
-        self.model.npar = 6 # number of runtime params [x_goal y_goal p_rob_0_x p_rob_0_y]
+        self.model.npar = 4 # number of runtime params [x_goal y_goal p_rob_0_x p_rob_0_y]
 
         # Objective function
         self.model.objective =  self._stage_cost
@@ -188,19 +188,19 @@ class FORCESPROMPCController(AbstractController):
 
         Args:
             z (casadi.SX): variables z = [v, w, x, y, theta]
-            p (casadi.SX): run-time parameters p = [x_goal y_goal theta_goal p_rob_0_x p_rob_0_y p_rob_0_theta]
+            p (casadi.SX): run-time parameters p = [x_goal y_goal p_rob_0_x p_rob_0_y]  [x_goal y_goal theta_goal p_rob_0_x p_rob_0_y p_rob_0_theta]
 
         Returns:
             casadi.SX: J_N - terminal cost
         """
         u = z[0:2]
-        p_rob_N = z[2:5]
-        p_rob_0 = p[3:6]
-        current_goal = p[0:3]
+        p_rob_N = z[2:4]
+        p_rob_0 = p[2:4]
+        current_goal = p[0:2]
 
         J_state = self.Q \
-                  * FORCESPROMPCController._square_distance(p_rob_N - current_goal) \
-                  / FORCESPROMPCController._square_distance(p_rob_0 - current_goal)
+                  * FORCESPROMPCController._square_distance(p_rob_N - current_goal) #\
+                  #/ FORCESPROMPCController._square_distance(p_rob_0 - current_goal)
 
         J_control = u.T @ self.R @ u
 
@@ -217,10 +217,10 @@ class FORCESPROMPCController(AbstractController):
         self.problem["xinit"] = state.T
 
         # Initial position on the prediction step
-        p_rob_0 = state
+        p_rob_0 = state[:2]
 
         # Formulate full vector of transmitted parameters
-        parameter_vector = np.hstack([self._goal, p_rob_0])
+        parameter_vector = np.hstack([self._goal[:2], p_rob_0])
 
         # Set goal position
         self.problem["all_parameters"] = np.tile(parameter_vector, (self.model.N,))

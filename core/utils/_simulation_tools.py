@@ -79,7 +79,8 @@ def create_sim(init_state: np.ndarray,
                      world_map=EmptyWorld(),
                      robot_model=robot_model,
                      pedestrians_model=pedestrians_model,
-                     sensors=sensors)
+                     sensors=sensors,
+                     rt_factor=1)
     if create_renderer:
         renderer = Renderer(simulation=sim,
                             resolution=80.0,

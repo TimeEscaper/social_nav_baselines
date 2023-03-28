@@ -1,4 +1,4 @@
-init_state: [4, 4, 0]                     
+init_state: [4, 4, 1.5]                     
 goal: [-4, -4, 0]                           
 dt: 0.1                                   
 ped_model: "ORCA"                         
