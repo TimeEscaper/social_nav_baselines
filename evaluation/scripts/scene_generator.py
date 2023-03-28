@@ -8,7 +8,7 @@ SEED = 42
 np.random.seed(42)
 random.seed(42)
 
-with open(r"evaluation/template_config.yaml") as f:
+with open(r"evaluation/scenes/template_scene_config.yaml") as f:
     config = yaml.safe_load(f)
 
 def generate_circular_scenarios():
