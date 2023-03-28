@@ -8,8 +8,6 @@ import numpy as np
 import fire
 import yaml
 import pygame
-import pathlib
-import pathlib
 import torch
 import random
 
