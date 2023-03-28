@@ -155,3 +155,7 @@ test.py
 
 # datasets
 datasets/
+
+# forcespro
+test_forces
+FORCESNLPsolver
