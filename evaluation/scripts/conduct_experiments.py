@@ -9,7 +9,7 @@ def main(controller: str = None):
     exp = 0
 
     total_peds_list = [4, 5, 6, 7]
-    scenes_list = ["circular_crossing", "parallel_traffic", "perpendicular_traffic", "random"]
+    scenes_list = ["circular_crossing", "parallel_crossing", "random_crossing"]
     controllers = [controller] #["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC", "MD-MPC-EDC", "MPPI"] # Тут можно выбрать какие контроллеры запускать
     total_scenarios_for_scene = 30
 

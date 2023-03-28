@@ -102,7 +102,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                                                  simulator.current_state.world.pedestrians.velocities[:, :2]], axis=1)
                 observation = {k: ground_truth_pedestrians_state[k, :] for k in detected_peds_keys}
                 control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = planner.make_step(state,
-                                                                                                                      observation)
+                                                                                                                   observation)
                 predicted_robot_trajectory = controller.get_predicted_robot_trajectory()    
                 statistics.append_current_subgoal(planner.current_subgoal)
                 visualizer.append_ground_truth_robot_state(state)
