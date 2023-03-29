@@ -8,8 +8,8 @@ PEDESTRIAN_RANGE = [6]
 TOTAL_SCENARIOS = 3
 ROBOT_VISION_RANGE = 5
 INFLATION_RADIUS = 1.0 # robot_radius + pedestrian_radius + safe_distances
-BORDERS_X = [-4, 4]
-BORDERS_Y = [-4, 4]
+BORDERS_X = [-5, 5]
+BORDERS_Y = [-5, 5]
 
 SEED = 42
 np.random.seed(42)
@@ -32,8 +32,8 @@ def visualize_scenario(pedestrians_initial_positions: np.ndarray,
         robot_initial_position (np.ndarray): robot initial position
         robot_goal_position (np.ndarray): robot goal position
     """
-    print(pedestrians_initial_positions)
-    print(pedestrians_goal_positions)
+    #print(pedestrians_initial_positions)
+    #print(pedestrians_goal_positions)
     fig, ax = plt.subplots(figsize=[16, 16], facecolor='white')
 
     total_peds = pedestrians_goal_positions.shape[0]
@@ -79,10 +79,13 @@ def sample_robot_final_position(robot_initial_position: np.ndarray,
     Returns:
         np.ndarray: robot final position
     """
-    while True:
+    cnt = 0
+    limit = 200000
+    while cnt <= limit:
+        cnt += 1
         # Polar
         phi = np.random.uniform(0, 2 * np.pi)
-        r = np.random.uniform(0.75 * ROBOT_VISION_RANGE, ROBOT_VISION_RANGE)
+        r = np.random.uniform(0.5 * ROBOT_VISION_RANGE, ROBOT_VISION_RANGE)
         # Cartesian
         delta_x = r * np.cos(phi)
         delta_y = r * np.sin(phi)
@@ -99,11 +102,13 @@ def sample_robot_final_position(robot_initial_position: np.ndarray,
         for position in pedestrians_positions:
             resample_flag = is_point_belongs_circle(robot_goal_position[:2],
                                                     position[:2],
-                                                    INFLATION_RADIUS*2)
+                                                    INFLATION_RADIUS*2.5)
             if resample_flag:
                 break
         if not resample_flag:
             break
+    else:
+        print("Generation limit was reached!")
     return robot_goal_position
 
 def generate_circular_scenarios(vizualization: bool = False,
@@ -187,7 +192,9 @@ def generate_random_scenarios(vizualization: bool = False,
     pathlib.Path("evaluation/scenes/random_crossing").mkdir(parents=True, exist_ok=True)
 
     def generate_position(pedestrians_initial_positions: np.ndarray,
-                          pedestrians_goal_positions: np.ndarray) -> np.ndarray:
+                          pedestrians_goal_positions: np.ndarray,
+                          robot: bool = False) -> np.ndarray:
+        inflation_radius = INFLATION_RADIUS*2 if robot else INFLATION_RADIUS
         while True:
             # Cartesian
             x = np.random.uniform(*BORDERS_X)
@@ -197,10 +204,10 @@ def generate_random_scenarios(vizualization: bool = False,
             # Check if position i is not intersect with pedestrians
             saved_positions = np.vstack([pedestrians_initial_positions, 
                                          pedestrians_goal_positions])
-            for pos in saved_positions:
+            for pos in saved_positions: 
                 resample_flag = is_point_belongs_circle(position[:2],
                                                         pos[:2],
-                                                        INFLATION_RADIUS)
+                                                        inflation_radius)
                 if resample_flag:
                     break
             if not resample_flag:
@@ -223,7 +230,8 @@ def generate_random_scenarios(vizualization: bool = False,
                 pedestrians_goal_positions[i] = goal_position
             # Sample robot
             position = generate_position(pedestrians_initial_positions,
-                                         pedestrians_goal_positions)
+                                         pedestrians_goal_positions,
+                                         robot=True)
             robot_initial_position = position
             robot_goal_position = sample_robot_final_position(robot_initial_position,
                                                               np.vstack([pedestrians_initial_positions,

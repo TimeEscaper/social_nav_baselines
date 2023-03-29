@@ -56,7 +56,8 @@ def create_sim(init_state: np.ndarray,
             initial_poses = None
         elif waypoint_tracker == "fixed":
             waypoints = np.array(pedestrians_goals)
-            tracker = FixedWaypointTracker(waypoints=waypoints,
+            tracker = FixedWaypointTracker(initial_positions= np.array(pedestrians_init_states)[:, :2],
+                                           waypoints=waypoints,
                                            loop=True)
             initial_poses = np.array(pedestrians_init_states)
             

@@ -162,7 +162,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                 result_path, 
                                 config)
         
-    #return statistics
+    return statistics
     
 if __name__ == "__main__":
     fire.Fire(main)

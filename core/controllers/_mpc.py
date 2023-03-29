@@ -64,9 +64,6 @@ class DoMPCController(AbstractController):
         self._is_store_robot_predicted_trajectory = is_store_robot_predicted_trajectory
         self._ghost_tracking_times : List[int]= [0] * total_peds
 
-        # if cost_function == "MD-GO-MPC":
-        #     assert isinstance(predictor, NeuralPredictor), f"You should specify neural predictor for MD-GO-MPC type of cost"
-
         # Architecture requires at least one dummy pedestrian in the system
         if total_peds == 0:
             total_peds = 1
@@ -155,19 +152,17 @@ class DoMPCController(AbstractController):
         # terminal cost
         p_rob_N = self._model._x.cat[:3]
         delta_p = casadi.norm_2(p_rob_N[:2] - current_goal[:2]) / casadi.norm_2(p_rob_0[:2] - current_goal[:2])
-        #delta_p = (p_rob_N - current_goal)
-        #terminal_cost = delta_p.T @ Q @ delta_p
         terminal_cost = Q * delta_p ** 2 # GO-MPC Cost-function
 
         # set cost
         self._mpc.set_objective(lterm=stage_cost + terminal_cost,
                                 mterm=terminal_cost)
-        """
+        
         if model_type == "unicycle":
             self._mpc.set_rterm(v=1e-2, w=1e-2)
         elif model_type == "unicycle_double_integrator":                      
             self._mpc.set_rterm(u_a=1e-2, u_alpha=1e-2)
-        """
+        
         # bounds
         if model_type == "unicycle":
             # lb
@@ -220,25 +215,9 @@ class DoMPCController(AbstractController):
                     deter = 2 * np.pi * _get_determinant(casadi.reshape(cov[:, ped_ind], 2, 2))
                     deter = casadi.sqrt(deter)
                     array_mahalanobis_bounds[ped_ind] = 2 * casadi.log(deter * constraint_value / V_s)
-                    # array_mahalanobis_bounds[ped_ind] = 2 * casadi.log(
-                    #     casadi.sqrt(
-                    #     _get_determinant(2 * np.pi *  \
-                    #                      casadi.reshape(cov[:, ped_ind], 2, 2))) * \
-                    #                      (constraint_value / V_s))
                 return array_mahalanobis_bounds
+            
             mahalanobis_bounds = _get_MB_bounds(self._covariances_peds)
-
-            ### TEST
-            # test = casadi.Function("test",
-            #             {"p_rob_hcat":p_rob_hcat, "p_peds":p_peds,"cov": self._covariances_peds, "inv_cov": self._inverse_covariances_peds,"MD": pedestrians_mahalanobis_distances, "Bounds": mahalanobis_bounds},
-            #             ["cov", "inv_cov", "p_rob_hcat", "p_peds"], ["MD", "Bounds"])
-            # covariances_peds = np.array([ 1.23342298e-01,  -1.77052733e-03,  -1.77052733e-03, 8.85994434e-02])
-            # # inverse_covariances_peds = np.array([8.11, 0.162, 0.162, 11.29])
-            # inverse_covariances_peds = np.linalg.inv(covariances_peds.reshape(2, 2)).reshape(4)
-            # rob = np.array([0, 0])
-            # ped = np.array([0.5, 0.5])
-            # print(test(cov=covariances_peds, inv_cov=inverse_covariances_peds, p_rob_hcat=rob, p_peds=ped))
-            ### TEST
 
             self._mpc.set_nl_cons("mahalanobis_dist_to_peds", -pedestrians_mahalanobis_distances-mahalanobis_bounds,
                                   ub=np.zeros(total_peds))
@@ -267,22 +246,12 @@ class DoMPCController(AbstractController):
         Args:
             ground_truth_pedestrians_state (np.ndarray): Current state of the pedestrians, [2-d numpy array]
         """
-        # self._ped_tracker.update(observation)
         tracked_predictions = self._ped_tracker.get_predictions()
         predicted_trajectories = np.tile(np.array([10000., 10000., 0., 0.]), (self._horizon + 1, self._total_peds, 1))
         predicted_covs = np.tile(np.array([[0.01, 0.0], [0., 0.01]]), (self._horizon + 1, self._total_peds, 1, 1))
         for k in tracked_predictions.keys():
             predicted_trajectories[:, k, :2] = tracked_predictions[k][0]
             predicted_covs[:, k, :] = tracked_predictions[k][1]
-
-        # predicted_pedestrians_trajectories, predicted_pedestrians_covariances = self._predictor.predict(ground_truth_pedestrians_state)
-        # predicted_pedestrians_inverse_covariances = np.linalg.inv(predicted_pedestrians_covariances)
-        # """ Unfold covarince into a row for MPC
-        # [[a1, a2
-        #   b1, b2]]  -->  [a1, a2, b1, b2]
-        # """
-        # unfolded_predicted_pedestrians_covariances = predicted_pedestrians_covariances.reshape((self._horizon + 1, self._total_peds, 4))
-        # unfolded_predicted_pedestrians_inverse_covariances = predicted_pedestrians_inverse_covariances.reshape((self._horizon + 1, self._total_peds, 4))
 
         predicted_covs_inv = np.linalg.inv(predicted_covs)
         predicted_covs_flatten = predicted_covs.reshape((self._horizon + 1, self._total_peds, 4))

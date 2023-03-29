@@ -6,9 +6,8 @@ import pandas as pd
 
 
 
-scenes_list = ["circular_crossing", "parallel_traffic", "perpendicular_traffic", "random"]
-#controllers = ["dwa_0"]#["dwa_0", "mpc_0", "mpc_1", "mpc_2", "mpc_3", "mpc_4"]
-controllers = ["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC"]
+scenes_list = ["circular_crossing"]#, "parallel_crossing", "random_crossing"]
+controllers = ["ED-MPC", "ED-MPC-EDC", "ED-MPC-MDC"]
 total_peds_list = [1, 2, 4, 7]
 total_scenarios_for_scene = 30
 metrics = ["failure_status", "simulation_ticks", "total_collisions"]

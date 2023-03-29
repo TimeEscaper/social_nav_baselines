@@ -11,7 +11,7 @@ def main(controller: str = None):
     total_peds_list = [6]
     scenes_list = ["circular_crossing", "parallel_crossing", "random_crossing"]
     controllers = [controller] #["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC", "MD-MPC-EDC", "MPPI"] # Тут можно выбрать какие контроллеры запускать
-    total_scenarios_for_scene = 3
+    total_scenarios_for_scene = 2
 
     statistics = {scene:dict() for scene in scenes_list}
     trajectory_dataset = {scene:dict() for scene in scenes_list}
@@ -37,13 +37,6 @@ def main(controller: str = None):
                                                                                 "scene_config": scenario_statistics._scene_config_path,
                                                                                 "controller_config": scenario_statistics._controller_config_path,
                                                                                 "collisions_per_subgoal": scenario_statistics.collisions_per_subgoal_array}
-                        if total_peds == 7:
-                            trajectory_dataset[scene][controller][total_peds][scenario_id] = {"ground_truth_pedestrian_trajectories": scenario_statistics.ground_truth_pedestrian_trajectories.tolist(),
-                                                                                            "ground_truth_robot_trajectory": scenario_statistics.ground_truth_robot_trajectory.tolist(),
-                                                                                            "predicted_pedestrians_trajectories": scenario_statistics.predicted_pedestrians_trajectories.tolist(),
-                                                                                            "predicted_robot_trajectory": scenario_statistics.predicted_robot_trajectory.tolist(),
-                                                                                            "predicted_pedestrians_covariances": scenario_statistics.predicted_pedestrians_covariances.tolist(),
-                                                                                            "subgoals_trajectory": scenario_statistics.subgoals_trajectory.tolist()}
                         print(f"Experiment: {exp}/{total_experiments}")
                     except Exception as e:
                         error_msg = f"""
@@ -57,11 +50,6 @@ Exception: {e}
     pathlib.Path(r"evaluation/statistics").mkdir(parents=True, exist_ok=True) #TODO: Проверить создание папок
     with open(fr'evaluation/statistics/stats_{"_".join(controllers)}.json', 'w') as outfile:
             json.dump(statistics, outfile, indent=4)
-
-    pathlib.Path(r"evaluation/datasets").mkdir(parents=True, exist_ok=True)
-    with open(fr'evaluation/datasets/trajectory_dataset_{"_".join(controllers)}.json', 'w') as outfile:
-            json.dump(trajectory_dataset, outfile)
-
 
     end_time = time.time()
 

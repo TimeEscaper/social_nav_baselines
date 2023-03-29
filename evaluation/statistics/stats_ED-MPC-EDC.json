@@ -1,0 +1,80 @@
+{
+    "circular_crossing": {
+        "ED-MPC-EDC": {
+            "6": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 1000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/circular_crossing/6/0.yaml",
+                    "controller_config": "evaluation/controllers/ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                },
+                "1": {
+                    "failure_status": false,
+                    "simulation_ticks": 659,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/circular_crossing/6/1.yaml",
+                    "controller_config": "evaluation/controllers/ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    "parallel_crossing": {
+        "ED-MPC-EDC": {
+            "6": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 142,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/parallel_crossing/6/0.yaml",
+                    "controller_config": "evaluation/controllers/ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                },
+                "1": {
+                    "failure_status": false,
+                    "simulation_ticks": 560,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/parallel_crossing/6/1.yaml",
+                    "controller_config": "evaluation/controllers/ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    "random_crossing": {
+        "ED-MPC-EDC": {
+            "6": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 780,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/random_crossing/6/0.yaml",
+                    "controller_config": "evaluation/controllers/ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                },
+                "1": {
+                    "failure_status": false,
+                    "simulation_ticks": 340,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/scenes/random_crossing/6/1.yaml",
+                    "controller_config": "evaluation/controllers/ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                }
+            }
+        }
+    }
+}
