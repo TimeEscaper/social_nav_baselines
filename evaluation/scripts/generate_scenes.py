@@ -4,7 +4,7 @@ import random
 import pathlib
 import matplotlib.pyplot as plt
 
-PEDESTRIAN_RANGE = [1, 2, 3, 4, 5, 6]
+PEDESTRIAN_RANGE = [6]
 TOTAL_SCENARIOS = 3
 ROBOT_VISION_RANGE = 5
 INFLATION_RADIUS = 1.0 # robot_radius + pedestrian_radius + safe_distances
@@ -39,15 +39,15 @@ def visualize_scenario(pedestrians_initial_positions: np.ndarray,
     total_peds = pedestrians_goal_positions.shape[0]
     # Plot pedestrians
     for i in range(total_peds):
-        ax.scatter(pedestrians_initial_positions[i,0], pedestrians_initial_positions[i, 1], marker='*', color=DEFAULT_COLOR_HEX_PALETTE[i])
-        ax.scatter(pedestrians_goal_positions[i,0], pedestrians_goal_positions[i, 1], color=DEFAULT_COLOR_HEX_PALETTE[i])
+        ax.scatter(pedestrians_initial_positions[i,0], pedestrians_initial_positions[i, 1], marker='*', s=80, color=DEFAULT_COLOR_HEX_PALETTE[i])
+        ax.scatter(pedestrians_goal_positions[i,0], pedestrians_goal_positions[i, 1], color=DEFAULT_COLOR_HEX_PALETTE[i])  # noqa: E501
         ax.plot([pedestrians_initial_positions[i,0], pedestrians_goal_positions[i,0]], [pedestrians_initial_positions[i,1], pedestrians_goal_positions[i,1]], color=DEFAULT_COLOR_HEX_PALETTE[i])
         circle_plot = plt.Circle(pedestrians_initial_positions[i, :2], 0.3, fill=False, linewidth=3, color=DEFAULT_COLOR_HEX_PALETTE[i])
         ax.add_patch(circle_plot)
         circle_plot = plt.Circle(pedestrians_goal_positions[i, :2], 0.3, fill=False, linewidth=3, color=DEFAULT_COLOR_HEX_PALETTE[i])
         ax.add_patch(circle_plot)
     # Plot robot
-    ax.scatter(robot_initial_position[0], robot_initial_position[1], marker='*', color="blue", label="Robot start position")
+    ax.scatter(robot_initial_position[0], robot_initial_position[1], marker='*', s=80, color="blue", label="Robot start position")
     ax.scatter(robot_goal_position[0], robot_goal_position[1], color="blue")
     ax.plot([robot_initial_position[0], robot_goal_position[0]], [robot_initial_position[1], robot_goal_position[1]], 'b')
     circle_plot = plt.Circle(robot_initial_position[:2], 0.3, fill=False, linewidth=3, color="blue")
@@ -99,7 +99,7 @@ def sample_robot_final_position(robot_initial_position: np.ndarray,
         for position in pedestrians_positions:
             resample_flag = is_point_belongs_circle(robot_goal_position[:2],
                                                     position[:2],
-                                                    INFLATION_RADIUS)
+                                                    INFLATION_RADIUS*2)
             if resample_flag:
                 break
         if not resample_flag:
@@ -116,7 +116,8 @@ def generate_circular_scenarios(vizualization: bool = False,
     max_circle_rad = 4.2
 
     def generate_position(pedestrians_initial_positions: np.ndarray,
-                          pedestrians_goal_positions: np.ndarray) -> np.ndarray:
+                          pedestrians_goal_positions: np.ndarray,
+                          robot: bool = False) -> np.ndarray:
         while True:
             # Polar
             phi = np.random.uniform(0, 2 * np.pi)
@@ -124,6 +125,10 @@ def generate_circular_scenarios(vizualization: bool = False,
             # Cartesian
             x = r * np.cos(phi)
             y = r * np.sin(phi)
+            if robot:
+                x = np.random.uniform(*BORDERS_X)
+                y = np.random.uniform(*BORDERS_Y)
+                phi = np.random.uniform(-np.pi, np.pi)
             position = np.array([x, y, phi + np.pi])
             # Check if position i is not intersect with pedestrians
             saved_positions = np.vstack([pedestrians_initial_positions, 
@@ -152,7 +157,8 @@ def generate_circular_scenarios(vizualization: bool = False,
                 pedestrians_goal_positions[i] = position * (-1)
             # Sample robot
             position = generate_position(pedestrians_initial_positions,
-                                         pedestrians_goal_positions)
+                                         pedestrians_goal_positions,
+                                         robot=True)
             robot_initial_position = position
             robot_goal_position = sample_robot_final_position(robot_initial_position,
                                                               np.vstack([pedestrians_initial_positions,
@@ -236,7 +242,7 @@ def generate_random_scenarios(vizualization: bool = False,
                 config["pedestrians_init_states"] = pedestrians_initial_positions.tolist()
                 config["pedestrians_goals"] = pedestrians_goal_positions[:, :2].reshape(total_peds, 1, 2).tolist()
 
-                with open(fr'evaluation/scenes/circular_crossing/{total_peds}/{id}.yaml', 'w') as outfile:
+                with open(fr'evaluation/scenes/random_crossing/{total_peds}/{id}.yaml', 'w') as outfile:
                     yaml.dump(config, outfile)
                 
 def generate_parallel_scenarios(vizualization: bool = False,
@@ -307,13 +313,13 @@ def generate_parallel_scenarios(vizualization: bool = False,
                 config["pedestrians_init_states"] = pedestrians_initial_positions.tolist()
                 config["pedestrians_goals"] = pedestrians_goal_positions[:, :2].reshape(total_peds, 1, 2).tolist()
 
-                with open(fr'evaluation/scenes/circular_crossing/{total_peds}/{id}.yaml', 'w') as outfile:
+                with open(fr'evaluation/scenes/parallel_crossing/{total_peds}/{id}.yaml', 'w') as outfile:
                     yaml.dump(config, outfile)
 
 def main():
-    generate_circular_scenarios()
-    generate_random_scenarios()
-    generate_parallel_scenarios()
+    generate_circular_scenarios(True)
+    generate_random_scenarios(True)
+    generate_parallel_scenarios(True)
 
 if __name__ == "__main__":
     main()

@@ -56,7 +56,8 @@ def create_sim(init_state: np.ndarray,
             initial_poses = None
         elif waypoint_tracker == "fixed":
             waypoints = np.array(pedestrians_goals)
-            tracker = FixedWaypointTracker(waypoints=waypoints)
+            tracker = FixedWaypointTracker(waypoints=waypoints,
+                                           loop=True)
             initial_poses = np.array(pedestrians_init_states)
             
         if pedestrian_model == "ORCA":
@@ -72,7 +73,8 @@ def create_sim(init_state: np.ndarray,
                                                              initial_poses=initial_poses)
                                                              
         pedestrian_detector_config = PedestrianDetectorConfig(ped_detc_range,
-                                                              ped_detc_fov)
+                                                              ped_detc_fov,
+                                                              return_type=PedestrianDetectorConfig.RETURN_ABSOLUTE)
         sensors = [PedestrianDetector(config=pedestrian_detector_config,
                                     noise=PedestrianDetectorNoise(0, 0, 0, 0, misdetection_prob))]
     sim = Simulation(sim_dt=dt,

@@ -1,6 +1,6 @@
 from core.controllers import ControllerFactory
 from core.predictors import PredictorFactory, PedestrianTracker
-from core.planners import RandomPlanner
+from core.planners import RandomPlanner, DummyPlanner
 from core.utils import create_sim
 from core.visualizer import Visualizer
 from core.statistics import Statistics
@@ -20,8 +20,8 @@ torch.cuda.manual_seed(SEED)
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/scenes/circular_crossing/7/3.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/controllers/ED-MPC.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/scenes/circular_crossing/6/0.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/controllers/MD-MPC-EDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -51,7 +51,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                      config["pedestrians_init_states"],
                                      config["pedestrians_goals"],
                                      config["ped_model"],
-                                     create_renderer = False)
+                                     create_renderer = True)
     
     predictor = PredictorFactory.create_predictor(config)
 
@@ -67,7 +67,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                             scene_config_path,
                             controller_config_path)
 
-    planner = RandomPlanner(global_goal=np.array(config["goal"]),
+    planner = DummyPlanner(global_goal=np.array(config["goal"]),
                             controller=controller,
                             subgoal_reach_threshold=config["tolerance_error"],
                             subgoal_to_goal_threshold=2.,
@@ -98,15 +98,16 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
             if error >= config["tolerance_error"]:
                 state = simulator.current_state.world.robot.state
                 detected_peds_keys = simulator.current_state.sensors["pedestrian_detector"].reading.pedestrians.keys()
-                ground_truth_pedestrians_state = np.concatenate([simulator.current_state.world.pedestrians.poses[:, :2],
-                                                                 simulator.current_state.world.pedestrians.velocities[:, :2]], axis=1)
+                poses = np.array(list(simulator.current_state.world.pedestrians.poses.values()))[:, :2]
+                vels = np.array(list(simulator.current_state.world.pedestrians.velocities.values()))[:, :2]
+                ground_truth_pedestrians_state = np.concatenate((poses, vels), axis=1)
                 observation = {k: ground_truth_pedestrians_state[k, :] for k in detected_peds_keys}
                 control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = planner.make_step(state,
                                                                                                                    observation)
                 predicted_robot_trajectory = controller.get_predicted_robot_trajectory()    
                 statistics.append_current_subgoal(planner.current_subgoal)
                 visualizer.append_ground_truth_robot_state(state)
-                visualizer.append_ground_truth_pedestrians_pose(simulator.current_state.world.pedestrians.poses[:, :2])
+                visualizer.append_ground_truth_pedestrians_pose(np.array(list(simulator.current_state.world.pedestrians.poses.values()))[:, :2])
                 visualizer.append_predicted_pedestrians_trajectories(predicted_pedestrians_trajectories[:, :, :2])
                   
                 visualizer.append_predicted_robot_trajectory(predicted_robot_trajectory)

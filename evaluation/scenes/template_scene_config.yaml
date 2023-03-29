@@ -7,7 +7,7 @@ ped_detc_range: 5
 ped_detc_fov: 360                         
 misdetection_prob: 0                      
 is_robot_visible: False                   
-tolerance_error: 0.8                     
+tolerance_error: 0.3                     
 waypoint_tracker: "fixed"                 
 pedestrians_init_states: [                
   [ 4.0,  0.0,  0.0],                     

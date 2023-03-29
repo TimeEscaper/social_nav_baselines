@@ -1,0 +1,25 @@
+dt: 0.1
+experiment_run: true
+goal:
+- 1.1425103108383075
+- 0.1111615218957871
+- 0.0
+init_state:
+- 0.2682734138645182
+- 3.872667753594361
+- -0.516686546048307
+is_robot_visible: false
+misdetection_prob: 0
+ped_detc_fov: 360
+ped_detc_range: 5
+ped_model: ORCA
+pedestrians_goals:
+- - - 3.598069086390758
+    - -0.16099503756872924
+pedestrians_init_states:
+- - -3.598069086390758
+  - -0.16099503756872924
+  - 0.8011404530787902
+tolerance_error: 0.3
+total_peds: 1
+waypoint_tracker: fixed
