@@ -8,10 +8,10 @@ def main(controller: str = None):
     start_time = time.time()
     exp = 0
 
-    total_peds_list = [6]
+    total_peds_list = [3, 4, 5, 6]
     scenes_list = ["circular_crossing", "parallel_crossing", "random_crossing"]
     controllers = [controller] #["ED-DWA", "MD-MPC", "ED-MPC", "MPC-MDC", "MPC-EDC", "MD-MPC-EDC", "MPPI"] # Тут можно выбрать какие контроллеры запускать
-    total_scenarios_for_scene = 2
+    total_scenarios_for_scene = 100
 
     statistics = {scene:dict() for scene in scenes_list}
     trajectory_dataset = {scene:dict() for scene in scenes_list}
@@ -47,7 +47,7 @@ Exception: {e}
                         print(error_msg)
                         log += error_msg
     
-    pathlib.Path(r"evaluation/statistics").mkdir(parents=True, exist_ok=True) #TODO: Проверить создание папок
+    pathlib.Path(r"evaluation/statistics").mkdir(parents=True, exist_ok=True)
     with open(fr'evaluation/statistics/stats_{"_".join(controllers)}.json', 'w') as outfile:
             json.dump(statistics, outfile, indent=4)
 

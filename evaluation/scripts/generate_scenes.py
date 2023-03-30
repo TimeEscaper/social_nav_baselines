@@ -4,8 +4,8 @@ import random
 import pathlib
 import matplotlib.pyplot as plt
 
-PEDESTRIAN_RANGE = [6]
-TOTAL_SCENARIOS = 3
+PEDESTRIAN_RANGE = [3, 4, 5, 6]
+TOTAL_SCENARIOS = 100
 ROBOT_VISION_RANGE = 5
 INFLATION_RADIUS = 1.0 # robot_radius + pedestrian_radius + safe_distances
 BORDERS_X = [-5, 5]
@@ -325,9 +325,9 @@ def generate_parallel_scenarios(vizualization: bool = False,
                     yaml.dump(config, outfile)
 
 def main():
-    generate_circular_scenarios(True)
-    generate_random_scenarios(True)
-    generate_parallel_scenarios(True)
+    generate_circular_scenarios(False)
+    generate_random_scenarios(False)
+    generate_parallel_scenarios(False)
 
 if __name__ == "__main__":
     main()

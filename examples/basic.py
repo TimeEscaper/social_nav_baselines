@@ -51,7 +51,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                      config["pedestrians_init_states"],
                                      config["pedestrians_goals"],
                                      config["ped_model"],
-                                     create_renderer = True)
+                                     create_renderer = False)
     
     predictor = PredictorFactory.create_predictor(config)
 
@@ -84,7 +84,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
     state = config["init_state"]
     control = np.array([0, 0]) 
 
-    plot_start_position = True
+    plot_start_position = False
 
     while True:
         # if simulation time exceeded
