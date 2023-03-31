@@ -156,7 +156,9 @@ test.py
 # datasets
 datasets/
 logs/
-scenes
+evaluation/configs/scenes/circular_crossing
+evaluation/configs/scenes/parallel_crossing
+evaluation/configs/scenes/random_crossing
 
 # forcespro
 test_forces
