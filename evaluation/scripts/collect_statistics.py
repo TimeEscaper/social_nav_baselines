@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import fire
+import pathlib
 from typing import List
 
 # TODO: Refactor code on statistics collection
@@ -17,6 +18,12 @@ def collect_statistics(folder_name: str,
                        total_scenarios: int,
                        metrics: List[str]) -> None:
     
+    # Folder creation
+    pathlib.Path(f"evaluation/studies/{folder_name}/results").mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f"evaluation/studies/{folder_name}/results/datasets").mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f"evaluation/studies/{folder_name}/results/plots").mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f"evaluation/studies/{folder_name}/results/tables").mkdir(parents=True, exist_ok=True)
+
     tables_data = np.empty([len(scenes_list), len(controller_list), len(metrics)*len(pedestrian_range)], dtype='<U10')
     graph_tables_data = np.zeros([len(scenes_list), len(controller_list), len(metrics)*len(pedestrian_range)])
     statistics = {}
