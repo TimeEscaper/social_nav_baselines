@@ -13,7 +13,6 @@ def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH)
     with open(experiment_config_path) as f:
         experiment_config = yaml.safe_load(f)
 
-    # TODO: Check scene generation on the server
     # Scene generation 
     if experiment_config["generate_scenes"]:
         print("---------------1. Starting to generate scenes!---------------")
@@ -28,22 +27,21 @@ def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH)
                         experiment_config["seed"])
         print("--------------------Scenes are generated!--------------------")
 
-    if False:
     # Conduct experiments
-        print("-------------2. Starting to conduct experiments!-------------")
-        input_data_list = []
-        input_data_template = [experiment_config["folder_name"],
-                            experiment_config["pedestrian_range"],
-                            experiment_config["scenes_list"],
-                            experiment_config["total_scenarios"]]
-        for controller in experiment_config["controller_list"]:
-            input_data_i = input_data_template.copy()
-            input_data_i.append(controller)
-            input_data_list.append(tuple(input_data_i))
-        num_processes = len(experiment_config["controller_list"])
-        pool = multiprocessing.Pool(num_processes)
-        _ = pool.starmap(conduct_experiments, input_data_list)
-        print("------------------Experiments are conducted!-----------------")
+    print("-------------2. Starting to conduct experiments!-------------")
+    input_data_list = []
+    input_data_template = [experiment_config["folder_name"],
+                        experiment_config["pedestrian_range"],
+                        experiment_config["scenes_list"],
+                        experiment_config["total_scenarios"]]
+    for controller in experiment_config["controller_list"]:
+        input_data_i = input_data_template.copy()
+        input_data_i.append(controller)
+        input_data_list.append(tuple(input_data_i))
+    num_processes = len(experiment_config["controller_list"])
+    pool = multiprocessing.Pool(num_processes)
+    _ = pool.starmap(conduct_experiments, input_data_list)
+    print("------------------Experiments are conducted!-----------------")
     
     # Form statistics
     print("----------3. Starting to form statistics and plots!----------")
