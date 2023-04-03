@@ -291,7 +291,7 @@ def generate_parallel_scenarios(folder_name,
     with open(f"evaluation/studies/{folder_name}/configs/scenes/scene_config.yaml") as f:
         config = yaml.safe_load(f)
         
-    pathlib.Path("evaluation/studies/{folder_name}/configs/scenes/parallel_crossing").mkdir(parents=True, exist_ok=True)
+    pathlib.Path(f"evaluation/studies/{folder_name}/configs/scenes/parallel_crossing").mkdir(parents=True, exist_ok=True)
 
     range_x = [-4, -3]
     range_y = [-4, 4]
@@ -386,10 +386,10 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=True,
+                                    visualization=False,
                                     save_config=True)
     
-    if "parallel_crossing" in scenes_list:
+    if "random_crossing" in scenes_list:
         generate_random_scenarios(folder_name,
                                     pedestrian_range,
                                     total_scenarios,
@@ -397,10 +397,10 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=True,
+                                    visualization=False,
                                     save_config=True)
     
-    if "random_crossing" in scenes_list:
+    if "parallel_crossing" in scenes_list:
         generate_parallel_scenarios(folder_name,
                                     pedestrian_range,
                                     total_scenarios,
@@ -408,7 +408,7 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=True,
+                                    visualization=False,
                                     save_config=True)
 
 

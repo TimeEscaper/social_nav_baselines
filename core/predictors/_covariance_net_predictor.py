@@ -17,7 +17,7 @@ class NeuralPredictor(AbstractPredictor):
     def __init__(self,
                  total_peds: int,
                  horizon: int = 25,
-                 device: str = "cpu") -> None:
+                 device: str = "cuda") -> None:
         if total_peds == 0:  # At least one pedestrian should be in the system for the architecture
             total_peds = 1
         super().__init__(dt=NeuralPredictor._DT,

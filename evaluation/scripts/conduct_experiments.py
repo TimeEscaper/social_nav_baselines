@@ -7,9 +7,9 @@ from typing import List
 
 def conduct_experiments(folder_name: str,       
                         pedestrian_range: List[int],
-                        scenes_list: List[int],
+                        scenes_list: List[str],
                         total_scenarios: int,
-                        controller: str = None):
+                        controller: str = None) -> None:
     start_time = time.time()
     exp = 0
 
@@ -39,7 +39,7 @@ def conduct_experiments(folder_name: str,
                                                                                 "scene_config": scenario_statistics._scene_config_path,
                                                                                 "controller_config": scenario_statistics._controller_config_path,
                                                                                 "collisions_per_subgoal": scenario_statistics.collisions_per_subgoal_array}
-                        print(f"Experiment: {exp}/{total_experiments}")
+                        print(f"Experiment with {controller}: {exp}/{total_experiments}")
                     except Exception as e:
                         error_msg = f"""
 Error in scene config: evaluation/studies/{folder_name}/configs/scenes/{scene}/{total_peds}/{scenario_id}.yaml
@@ -55,6 +55,7 @@ Exception: {e}
     end_time = time.time()
 
     conclusion_msg = f"""
+    Experiment set with {controller}
     Total time: {round(end_time - start_time, 3)}s
     Experiments conducted: {exp}/{total_experiments}
     Mean time for one experiment: {round((end_time - start_time) / exp, 3)}s

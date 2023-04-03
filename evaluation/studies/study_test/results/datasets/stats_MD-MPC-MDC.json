@@ -1,0 +1,144 @@
+{
+    "circular_crossing": {
+        "MD-MPC-MDC": {
+            "3": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 241,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/circular_crossing/3/0.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                },
+                "1": {
+                    "failure_status": false,
+                    "simulation_ticks": 252,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/circular_crossing/3/1.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                }
+            },
+            "6": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 769,
+                    "total_collisions": 3,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/circular_crossing/6/0.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": [
+                        3
+                    ]
+                },
+                "1": {
+                    "failure_status": false,
+                    "simulation_ticks": 153,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/circular_crossing/6/1.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    "parallel_crossing": {
+        "MD-MPC-MDC": {
+            "3": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 153,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/parallel_crossing/3/0.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                },
+                "1": {
+                    "failure_status": false,
+                    "simulation_ticks": 153,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/parallel_crossing/3/1.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                }
+            },
+            "6": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 1275,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/parallel_crossing/6/0.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                },
+                "1": {
+                    "failure_status": false,
+                    "simulation_ticks": 164,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/parallel_crossing/6/1.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    "random_crossing": {
+        "MD-MPC-MDC": {
+            "3": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 274,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/random_crossing/3/0.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                },
+                "1": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/random_crossing/3/1.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": []
+                }
+            },
+            "6": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 340,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/random_crossing/6/0.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                },
+                "1": {
+                    "failure_status": false,
+                    "simulation_ticks": 296,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_test/configs/scenes/random_crossing/6/1.yaml",
+                    "controller_config": "evaluation/studies/study_test/configs/controllers/MD-MPC-MDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                }
+            }
+        }
+    }
+}
