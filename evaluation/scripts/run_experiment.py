@@ -24,7 +24,7 @@ DEFAULT_SCENE_CONFIG_PATH = r"evaluation/scenes/circular_crossing/6/0.yaml"
 DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/controllers/MD-MPC-EDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
-def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
+def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
          controller_config_path: str = DEFAULT_CONTROLLER_CONFIG_PATH,
          result_path: str = DEFAULT_RESULT_PATH) -> Statistics:
 
@@ -82,9 +82,7 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
     simulator.step()
     hold_time = simulator.sim_dt
     state = config["init_state"]
-    control = np.array([0, 0]) 
-
-    plot_start_position = False
+    control = np.array([0, 0])
 
     while True:
         # if simulation time exceeded
@@ -119,11 +117,6 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                     visualizer.visualize_predicted_pedestrians_trajectory_with_covariances(predicted_pedestrians_trajectories[:, :, :2], predicted_pedestrians_covariances)      
                 hold_time = 0.
 
-                if plot_start_position:
-                    visualizer.plot_final_trajectories(f"Circular Crossing Pattern", 
-                                                       r"results/circular_crossing_starting_position.png", 
-                                                       config)
-                    plot_start_position = False
             else:
                 if config["experiment_run"]:
                     break
@@ -165,4 +158,4 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
     return statistics
     
 if __name__ == "__main__":
-    fire.Fire(main)
+    fire.Fire(run_experiment)

@@ -13,9 +13,6 @@ BORDERS_X = [-5, 5]
 BORDERS_Y = [-5, 5]
 DEFAULT_COLOR_HEX_PALETTE = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
-with open(r"evaluation/configs/scenes/scene_config.yaml") as f:
-    config = yaml.safe_load(f)
-
 def visualize_scenario(pedestrians_initial_positions: np.ndarray, 
                        pedestrians_goal_positions: np.ndarray,
                        robot_initial_position: np.ndarray,
@@ -109,7 +106,8 @@ def sample_robot_final_position(robot_initial_position: np.ndarray,
         print("Generation limit was reached!")
     return robot_goal_position
 
-def generate_circular_scenarios(pedestrian_range: List[int],
+def generate_circular_scenarios(folder_name,
+                                pedestrian_range: List[int],
                                 total_scenarios: int,
                                 robot_vision_range: float,
                                 inflation_radius: float,
@@ -119,7 +117,10 @@ def generate_circular_scenarios(pedestrian_range: List[int],
                                 save_config: bool = True) -> None:
     """ Circular crossing scenario
     """
-    pathlib.Path("evaluation/configs/scenes/circular_crossing").mkdir(parents=True, exist_ok=True)
+    with open(f"evaluation/studies/{folder_name}/configs/scenes/scene_config.yaml") as f:
+        config = yaml.safe_load(f)
+
+    pathlib.Path(f"evaluation/studies/{folder_name}/configs/scenes/circular_crossing").mkdir(parents=True, exist_ok=True)
 
     min_circle_rad = 3.8
     max_circle_rad = 4.2
@@ -153,7 +154,7 @@ def generate_circular_scenarios(pedestrian_range: List[int],
         return position
 
     for total_peds in pedestrian_range:
-        pathlib.Path(f"evaluation/configs/scenes/circular_crossing/{total_peds}").mkdir(parents=True, exist_ok=True)
+        pathlib.Path(f"evaluation/studies/{folder_name}/configs/scenes/circular_crossing/{total_peds}").mkdir(parents=True, exist_ok=True)
         for id in range(total_scenarios):
             pedestrians_initial_positions = np.zeros([total_peds, 3])
             pedestrians_goal_positions = np.zeros([total_peds, 3])
@@ -190,10 +191,11 @@ def generate_circular_scenarios(pedestrian_range: List[int],
                 config["pedestrians_init_states"] = pedestrians_initial_positions.tolist()
                 config["pedestrians_goals"] = pedestrians_goal_positions[:, :2].reshape(total_peds, 1, 2).tolist()
 
-                with open(fr'evaluation/configs/scenes/circular_crossing/{total_peds}/{id}.yaml', 'w') as outfile:
+                with open(f'evaluation/studies/{folder_name}/configs/scenes/circular_crossing/{total_peds}/{id}.yaml', 'w') as outfile:
                     yaml.dump(config, outfile)
     
-def generate_random_scenarios(pedestrian_range: List[int],
+def generate_random_scenarios(folder_name,
+                                pedestrian_range: List[int],
                                 total_scenarios: int,
                                 robot_vision_range: float,
                                 inflation_radius: float,
@@ -203,7 +205,10 @@ def generate_random_scenarios(pedestrian_range: List[int],
                                 save_config: bool = True) -> None:
     """ Random crossing scenario
     """
-    pathlib.Path("evaluation/configs/scenes/random_crossing").mkdir(parents=True, exist_ok=True)
+    with open(f"evaluation/studies/{folder_name}/configs/scenes/scene_config.yaml") as f:
+        config = yaml.safe_load(f)
+
+    pathlib.Path(f"evaluation/studies/{folder_name}/configs/scenes/random_crossing").mkdir(parents=True, exist_ok=True)
 
     def generate_position(pedestrians_initial_positions: np.ndarray,
                           pedestrians_goal_positions: np.ndarray,
@@ -229,7 +234,7 @@ def generate_random_scenarios(pedestrian_range: List[int],
         return position
 
     for total_peds in pedestrian_range:
-        pathlib.Path(f"evaluation/configs/scenes/random_crossing/{total_peds}").mkdir(parents=True, exist_ok=True)
+        pathlib.Path(f"evaluation/studies/{folder_name}/configs/scenes/random_crossing/{total_peds}").mkdir(parents=True, exist_ok=True)
         for id in range(total_scenarios):
             pedestrians_initial_positions = np.zeros([total_peds, 3])
             pedestrians_goal_positions = np.zeros([total_peds, 3])
@@ -268,10 +273,11 @@ def generate_random_scenarios(pedestrian_range: List[int],
                 config["pedestrians_init_states"] = pedestrians_initial_positions.tolist()
                 config["pedestrians_goals"] = pedestrians_goal_positions[:, :2].reshape(total_peds, 1, 2).tolist()
 
-                with open(fr'evaluation/configs/scenes/random_crossing/{total_peds}/{id}.yaml', 'w') as outfile:
+                with open(fr'evaluation/studies/{folder_name}/configs/scenes/random_crossing/{total_peds}/{id}.yaml', 'w') as outfile:
                     yaml.dump(config, outfile)
                 
-def generate_parallel_scenarios(pedestrian_range: List[int],
+def generate_parallel_scenarios(folder_name,
+                                pedestrian_range: List[int],
                                 total_scenarios: int,
                                 robot_vision_range: float,
                                 inflation_radius: float,
@@ -281,7 +287,11 @@ def generate_parallel_scenarios(pedestrian_range: List[int],
                                   save_config: bool = True)-> None:
     """ Parallel crossing scenario
     """
-    pathlib.Path("evaluation/configs/scenes/parallel_crossing").mkdir(parents=True, exist_ok=True)
+
+    with open(f"evaluation/studies/{folder_name}/configs/scenes/scene_config.yaml") as f:
+        config = yaml.safe_load(f)
+        
+    pathlib.Path("evaluation/studies/{folder_name}/configs/scenes/parallel_crossing").mkdir(parents=True, exist_ok=True)
 
     range_x = [-4, -3]
     range_y = [-4, 4]
@@ -311,7 +321,7 @@ def generate_parallel_scenarios(pedestrian_range: List[int],
         return position
 
     for total_peds in pedestrian_range:
-        pathlib.Path(f"evaluation/configs/scenes/parallel_crossing/{total_peds}").mkdir(parents=True, exist_ok=True)
+        pathlib.Path(f"evaluation/studies/{folder_name}/configs/scenes/parallel_crossing/{total_peds}").mkdir(parents=True, exist_ok=True)
         for id in range(total_scenarios):
             pedestrians_initial_positions = np.zeros([total_peds, 3])
             pedestrians_goal_positions = np.zeros([total_peds, 3])
@@ -349,49 +359,57 @@ def generate_parallel_scenarios(pedestrian_range: List[int],
                 config["pedestrians_init_states"] = pedestrians_initial_positions.tolist()
                 config["pedestrians_goals"] = pedestrians_goal_positions[:, :2].reshape(total_peds, 1, 2).tolist()
 
-                with open(fr'evaluation/configs/scenes/parallel_crossing/{total_peds}/{id}.yaml', 'w') as outfile:
+                with open(fr'evaluation/studies/{folder_name}/configs/scenes/parallel_crossing/{total_peds}/{id}.yaml', 'w') as outfile:
                     yaml.dump(config, outfile)
 
 
 
-def generate_scenes(pedestrian_range: List[int] = PEDESTRIAN_RANGE,
+def generate_scenes(folder_name: str,
+                    scenes_list: List[str],
+                    pedestrian_range: List[int] = PEDESTRIAN_RANGE,
                     total_scenarios: int = TOTAL_SCENARIOS,
                     robot_vision_range: float = ROBOT_VISION_RANGE,
                     inflation_radius: float = INFLATION_RADIUS,
                     borders_x: List[int] = BORDERS_X,
                     borders_y: List[int] = BORDERS_Y,
                     seed: int = 42) -> None:
-    
+
     # Set random seed
     np.random.seed(seed)
     random.seed(seed)
 
-    generate_circular_scenarios(pedestrian_range,
-                                total_scenarios,
-                                robot_vision_range,
-                                inflation_radius,
-                                borders_x,
-                                borders_y,
-                                visualization=True,
-                                save_config=True)
+    if "circular_crossing" in scenes_list:
+        generate_circular_scenarios(folder_name,
+                                    pedestrian_range,
+                                    total_scenarios,
+                                    robot_vision_range,
+                                    inflation_radius,
+                                    borders_x,
+                                    borders_y,
+                                    visualization=True,
+                                    save_config=True)
     
-    generate_random_scenarios(pedestrian_range,
-                                total_scenarios,
-                                robot_vision_range,
-                                inflation_radius,
-                                borders_x,
-                                borders_y,
-                                visualization=True,
-                                save_config=True)
+    if "parallel_crossing" in scenes_list:
+        generate_random_scenarios(folder_name,
+                                    pedestrian_range,
+                                    total_scenarios,
+                                    robot_vision_range,
+                                    inflation_radius,
+                                    borders_x,
+                                    borders_y,
+                                    visualization=True,
+                                    save_config=True)
     
-    generate_parallel_scenarios(pedestrian_range,
-                                total_scenarios,
-                                robot_vision_range,
-                                inflation_radius,
-                                borders_x,
-                                borders_y,
-                                visualization=True,
-                                save_config=True)
+    if "random_crossing" in scenes_list:
+        generate_parallel_scenarios(folder_name,
+                                    pedestrian_range,
+                                    total_scenarios,
+                                    robot_vision_range,
+                                    inflation_radius,
+                                    borders_x,
+                                    borders_y,
+                                    visualization=True,
+                                    save_config=True)
 
 
 
