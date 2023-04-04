@@ -9,7 +9,7 @@ from typing import List
 
 # TODO: Refactor code on statistics collection
 
-DEFAULT_COLOR_HEX_PALETTE = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+DEFAULT_COLOR_HEX_PALETTE = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#084c61', '#724e56', '#db504a', '#df8328', '#e19c17', '#e3b505', '#999140', '#4f6d7a', '#538890', '#56a3a6']
 
 def collect_statistics(folder_name: str,
                        scenes_list: List[str],

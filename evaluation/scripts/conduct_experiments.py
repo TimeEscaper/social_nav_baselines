@@ -48,6 +48,7 @@ Exception: {e}
                         """
                         print(error_msg)
                         log += error_msg
+    pathlib.Path(f"evaluation/studies/{folder_name}/results").mkdir(parents=True, exist_ok=True)
     pathlib.Path(f"evaluation/studies/{folder_name}/results/datasets").mkdir(parents=True, exist_ok=True)
     with open(fr'evaluation/studies/{folder_name}/results/datasets/stats_{"_".join(controllers)}.json', 'w') as outfile:
             json.dump(statistics, outfile, indent=4)

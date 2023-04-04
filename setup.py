@@ -10,7 +10,6 @@ setup(
         'core.predictors',
         'core.utils',
         'core.visualizer'
-        'examples'
     ],
     install_requires=[
         'pygame',
@@ -22,7 +21,8 @@ setup(
         'casadi',
         'pytorch_mppi',
         'fire',
-        'pyyaml'
+        'pyyaml',
+        'pandas'
     ],
     extras_require={
         'test': [
