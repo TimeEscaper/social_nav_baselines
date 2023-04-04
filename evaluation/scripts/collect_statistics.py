@@ -38,7 +38,7 @@ def collect_statistics(folder_name: str,
     for scene_id, scene in enumerate(scenes_list):
         # Create distribution plot for a scene
         fig_hist, axs_hist = plt.subplots(len(controller_list), len(metrics)*len(pedestrian_range), 
-                                figsize=[32, 16], constrained_layout=True, facecolor='white')
+                                figsize=[32*2, 25*2], constrained_layout=True, facecolor='white')
         fig_hist.suptitle(scenes_list[scene_id], fontsize=28)
         for controller_id, controller in enumerate(controller_list):
             for total_peds_id, total_peds in enumerate(pedestrian_range):
@@ -75,13 +75,13 @@ def collect_statistics(folder_name: str,
                 axs_hist[controller_id, total_peds_id+len(pedestrian_range)*2].grid(True)
 
                 # Calculate mean
-                mean_sim_ticks_for_scenario_batch = round(np.mean(np.array(list_sim_ticks_for_scenario_batch)), 1)
-                mean_collisions_for_scenario_batch = round(np.mean(np.array(list_collisions_for_scenario_batch)), 1)
-                mean_timeouts_for_scenario_batch = round(np.mean(np.array(list_timeouts_for_scenario_batch)), 1)
+                mean_sim_ticks_for_scenario_batch = round(np.mean(np.array(list_sim_ticks_for_scenario_batch)), 3)
+                mean_collisions_for_scenario_batch = round(np.mean(np.array(list_collisions_for_scenario_batch)), 3)
+                mean_timeouts_for_scenario_batch = round(np.mean(np.array(list_timeouts_for_scenario_batch)), 3)
                 # Calculate std
-                std_sim_ticks_for_scenario_batch = round(np.std(np.array(list_sim_ticks_for_scenario_batch)), 1)
-                std_collisions_for_scenario_batch = round(np.std(np.array(list_collisions_for_scenario_batch)), 1)
-                std_timeouts_for_scenario_batch = round(np.std(np.array(list_timeouts_for_scenario_batch)), 1)
+                std_sim_ticks_for_scenario_batch = round(np.std(np.array(list_sim_ticks_for_scenario_batch)), 3)
+                std_collisions_for_scenario_batch = round(np.std(np.array(list_collisions_for_scenario_batch)), 3)
+                std_timeouts_for_scenario_batch = round(np.std(np.array(list_timeouts_for_scenario_batch)), 3)
                 # Add calculated data into the table
                 tables_data[scene_id, controller_id, total_peds_id] = f"{mean_sim_ticks_for_scenario_batch}±{std_sim_ticks_for_scenario_batch}"  # simulation_ticks
                 tables_data[scene_id, controller_id, total_peds_id+len(pedestrian_range)] = f"{mean_collisions_for_scenario_batch}±{std_collisions_for_scenario_batch}" #collisions
