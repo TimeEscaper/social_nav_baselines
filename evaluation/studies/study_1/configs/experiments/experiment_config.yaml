@@ -31,14 +31,14 @@ controller_list: ["ED-MPC-EDC_ORIGIN",          # Specify controllers you would 
                   "ED-MPC-EDC_Q500", 
                   "ED-MPC-EDC_Q1500",
                   "ED-MPC-EDC_ConsVal05",
-                  "ED-MPC-EDC_ConsVal1"]
-                  #"MD-MPC-EDC_ORIGIN",         
-                  #"MD-MPC-EDC_W500",            
-                  #"MD-MPC-EDC_W2000", 
-                  #"MD-MPC-EDC_Q500", 
-                  #"MD-MPC-EDC_Q1200",
-                  #"MD-MPC-EDC_ConsVal05",
-                  #"MD-MPC-EDC_ConsVal1"]
+                  "ED-MPC-EDC_ConsVal1",
+                  "MD-MPC-EDC_ORIGIN",         
+                  "MD-MPC-EDC_W500",            
+                  "MD-MPC-EDC_W2000", 
+                  "MD-MPC-EDC_Q500", 
+                  "MD-MPC-EDC_Q1200",
+                  "MD-MPC-EDC_ConsVal05",
+                  "MD-MPC-EDC_ConsVal1"]
 
 # Statistics Collection
 metrics: ["failure_status",                     # Specify metrics, only three are currenlty avalaible:
