@@ -5,8 +5,8 @@ import pathlib
 import matplotlib.pyplot as plt
 from typing import List
 
-PEDESTRIAN_RANGE = [3, 4, 5, 6]
-TOTAL_SCENARIOS = 100
+PEDESTRIAN_RANGE = [7]
+TOTAL_SCENARIOS = 3
 ROBOT_VISION_RANGE = 5
 INFLATION_RADIUS = 1.0 # robot_radius + pedestrian_radius + safe_distances
 BORDERS_X = [-5, 5]

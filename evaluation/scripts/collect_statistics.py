@@ -9,7 +9,7 @@ from typing import List
 
 # TODO: Refactor code on statistics collection
 
-DEFAULT_COLOR_HEX_PALETTE = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#084c61', '#724e56', '#db504a', '#df8328', '#e19c17', '#e3b505', '#999140', '#4f6d7a', '#538890', '#56a3a6']
+DEFAULT_COLOR_HEX_PALETTE = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#724e56', '#999140', '#4f6d7a', '#f8c9a3', '#000000', '#4d4f53']
 
 def collect_statistics(folder_name: str,
                        scenes_list: List[str],
@@ -24,7 +24,7 @@ def collect_statistics(folder_name: str,
     pathlib.Path(f"evaluation/studies/{folder_name}/results/plots").mkdir(parents=True, exist_ok=True)
     pathlib.Path(f"evaluation/studies/{folder_name}/results/tables").mkdir(parents=True, exist_ok=True)
 
-    tables_data = np.empty([len(scenes_list), len(controller_list), len(metrics)*len(pedestrian_range)], dtype='<U10')
+    tables_data = np.empty([len(scenes_list), len(controller_list), len(metrics)*len(pedestrian_range)], dtype='<U20')
     graph_tables_data = np.zeros([len(scenes_list), len(controller_list), len(metrics)*len(pedestrian_range)])
     statistics = {}
 
@@ -38,7 +38,7 @@ def collect_statistics(folder_name: str,
     for scene_id, scene in enumerate(scenes_list):
         # Create distribution plot for a scene
         fig_hist, axs_hist = plt.subplots(len(controller_list), len(metrics)*len(pedestrian_range), 
-                                figsize=[32*2, 25*2], constrained_layout=True, facecolor='white')
+                                figsize=[12*4, len(controller_list)*4], constrained_layout=True, facecolor='white')
         fig_hist.suptitle(scenes_list[scene_id], fontsize=28)
         for controller_id, controller in enumerate(controller_list):
             for total_peds_id, total_peds in enumerate(pedestrian_range):
@@ -56,19 +56,19 @@ def collect_statistics(folder_name: str,
 
                 # Plot Histograms 
                 # Simulation time distribution  
-                n, bins, patches = axs_hist[controller_id, total_peds_id].hist(list_sim_ticks_for_scenario_batch, 10, density=False, alpha=0.75, rwidth=0.85, color="#1f77b4")
+                n, bins, patches = axs_hist[controller_id, total_peds_id].hist(list_sim_ticks_for_scenario_batch, 20, density=False, alpha=0.75, rwidth=0.85, color="#1f77b4")
                 axs_hist[controller_id, total_peds_id].set_xlabel(r'Range of Simulation Time, [s]')
                 axs_hist[controller_id, total_peds_id].set_ylabel(r'Amount of Experiments')
                 axs_hist[controller_id, total_peds_id].set_title(f'Metric: Simulation Time \n Controller: {controller} \n Number of Pedestrians: {total_peds}')
                 axs_hist[controller_id, total_peds_id].grid(True)
                 # Collision distribution
-                n, bins, patches = axs_hist[controller_id, total_peds_id+len(pedestrian_range)].hist(list_collisions_for_scenario_batch, 10, density=False, alpha=0.75, rwidth=0.85, color="#ff7f0e")
+                n, bins, patches = axs_hist[controller_id, total_peds_id+len(pedestrian_range)].hist(list_collisions_for_scenario_batch, 20, density=False, alpha=0.75, rwidth=0.85, color="#ff7f0e")
                 axs_hist[controller_id, total_peds_id+len(pedestrian_range)].set_xlabel(r'Range of Collisions')
                 axs_hist[controller_id, total_peds_id+len(pedestrian_range)].set_ylabel(r'Amount of Experiments')
                 axs_hist[controller_id, total_peds_id+len(pedestrian_range)].set_title(f'Metric: Collision \n Controller: {controller} \n Number of Pedestrians: {total_peds}')
                 axs_hist[controller_id, total_peds_id+len(pedestrian_range)].grid(True)
                 # Timeout distribution
-                n, bins, patches = axs_hist[controller_id, total_peds_id+len(pedestrian_range)*2].hist(np.array(list_timeouts_for_scenario_batch).astype(int), 10, density=False, alpha=0.75, rwidth=0.85, color="#2ca02c")
+                n, bins, patches = axs_hist[controller_id, total_peds_id+len(pedestrian_range)*2].hist(np.array(list_timeouts_for_scenario_batch).astype(int), 20, density=False, alpha=0.75, rwidth=0.85, color="#2ca02c")
                 axs_hist[controller_id, total_peds_id+len(pedestrian_range)*2].set_xlabel(r'Range of Timeouts')
                 axs_hist[controller_id, total_peds_id+len(pedestrian_range)*2].set_ylabel(r'Amount of Experiments')
                 axs_hist[controller_id, total_peds_id+len(pedestrian_range)*2].set_title(f'Metric: Timeout \n Controller: {controller} \n Number of Pedestrians: {total_peds}')
@@ -95,37 +95,41 @@ def collect_statistics(folder_name: str,
         # Save histogram figure
         fig_hist.savefig(fr"evaluation/studies/{folder_name}/results/plots/{scene}_distribution.png")
 
-    size = 25
+    size = 20
     # Create graph plot
     for scene_id, scene in enumerate(scenes_list):
         
-        fig_graph, axs_graph = plt.subplots(1, 3, 
-                                figsize=[32, 16], constrained_layout=True, facecolor='white')
+        fig_graph, axs_graph = plt.subplot_mosaic([[0, 1, 2]], 
+                                figsize=[21, 8.5], facecolor='white', layout='constrained')
         fig_graph.suptitle(scenes_list[scene_id], fontsize=28)
 
         for controller_id, controller in enumerate(controller_list):
             # Create graph
             # Simulation step to goal
-            axs_graph[0].plot(pedestrian_range, graph_tables_data[scene_id, controller_id, :len(pedestrian_range)], linewidth=5, label=f"{controller}", color=DEFAULT_COLOR_HEX_PALETTE[controller_id], marker="o", markersize=size)
+            axs_graph[0].plot(pedestrian_range, graph_tables_data[scene_id, controller_id, :len(pedestrian_range)], linewidth=3, label=f"{controller}", marker="o", markersize=size//2, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
             axs_graph[0].grid(True)
             axs_graph[0].set_xlabel("Number of Pedestrians, [#]", fontsize=size)
             axs_graph[0].set_ylabel("Simulation Steps to Goal, [#]", fontsize=size)
-            axs_graph[0].set_title("Simulation Steps to Goal, [#]", fontsize=size)
-            axs_graph[0].legend(fontsize=size)
+            axs_graph[0].set_title("Simulation Steps to Goal, [#]", fontsize=size*1.2)
+            axs_graph[0].tick_params(labelsize=12)
+            #axs_graph[0].legend(fontsize=size)
             # Collisions
-            axs_graph[1].plot(pedestrian_range, graph_tables_data[scene_id, controller_id, len(pedestrian_range):len(pedestrian_range)*2], linewidth=5, label=f"{controller}", color=DEFAULT_COLOR_HEX_PALETTE[controller_id], marker="o", markersize=size)
+            axs_graph[1].plot(pedestrian_range, graph_tables_data[scene_id, controller_id, len(pedestrian_range):len(pedestrian_range)*2], linewidth=3, label=f"{controller}",  marker="o", markersize=size//2, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
             axs_graph[1].grid(True)
             axs_graph[1].set_xlabel("Number of Pedestrians, [#]", fontsize=size)
             axs_graph[1].set_ylabel("Number of Collisions, [#]", fontsize=size)
-            axs_graph[1].set_title("Number of Collisions, [#]", fontsize=size)
-            axs_graph[1].legend(fontsize=size)
+            axs_graph[1].set_title("Number of Collisions, [#]", fontsize=size*1.2)
+            axs_graph[1].tick_params(labelsize=12)
+            #axs_graph[1].legend(fontsize=size)
             # Timeouts
-            axs_graph[2].plot(pedestrian_range, graph_tables_data[scene_id, controller_id, len(pedestrian_range)*2:], linewidth=5, label=f"{controller}", color=DEFAULT_COLOR_HEX_PALETTE[controller_id], marker="o", markersize=size)
+            axs_graph[2].plot(pedestrian_range, graph_tables_data[scene_id, controller_id, len(pedestrian_range)*2:], linewidth=3, label=f"{controller}", marker="o", markersize=size//2, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
             axs_graph[2].grid(True)
             axs_graph[2].set_xlabel("Number of Pedestrians, [#]", fontsize=size)
             axs_graph[2].set_ylabel("Number of Timeouts, [#]", fontsize=size)
-            axs_graph[2].set_title("Number of Timeouts, [#]", fontsize=size)
-            axs_graph[2].legend(fontsize=size)
+            axs_graph[2].set_title("Number of Timeouts, [#]", fontsize=size*1.1)
+            axs_graph[2].tick_params(labelsize=12)
+            # Legend
+            axs_graph[2].legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=20)
         
         fig_graph.savefig(fr"evaluation/studies/{folder_name}/results/plots/{scene}_graph.png")
 
