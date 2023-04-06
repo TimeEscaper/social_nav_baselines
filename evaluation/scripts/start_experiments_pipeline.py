@@ -8,7 +8,7 @@ from generate_scenes import generate_scenes
 from conduct_experiments import conduct_experiments
 from collect_statistics import collect_statistics
 
-DEFAULT_EXPERIMENT_CONFIG_PATH = r"evaluation/studies/study_2/configs/experiments/experiment_config.yaml"
+DEFAULT_EXPERIMENT_CONFIG_PATH = r"evaluation/studies/study_0/configs/experiments/experiment_config.yaml"
 
 def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH) -> None:
     
@@ -53,7 +53,7 @@ def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH)
         _ = pool.starmap(conduct_experiments, input_data_list)
         print("------------------Experiments are conducted!-----------------")
     
-    if True:
+    if False:
         # Form statistics
         print("----------3. Starting to form statistics and plots!----------")
         collect_statistics(experiment_config["folder_name"],

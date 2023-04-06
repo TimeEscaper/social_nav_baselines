@@ -313,7 +313,7 @@ def generate_parallel_scenarios(folder_name,
             for pos in saved_positions:
                 resample_flag = is_point_belongs_circle(position[:2],
                                                         pos[:2],
-                                                        inflation_radius)
+                                                        inflation_radius*0.95)
                 if resample_flag:
                     break
             if not resample_flag:

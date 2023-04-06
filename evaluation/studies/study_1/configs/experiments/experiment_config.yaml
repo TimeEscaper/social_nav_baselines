@@ -11,7 +11,7 @@
 folder_name: "study_1"                          # Folder name of your study
 
 # Scene Generation
-pedestrian_range: [3, 4, 5, 6]                  # List of an amount pedestrians in a scene
+pedestrian_range: [7, 8]                  # List of an amount pedestrians in a scene
 total_scenarios: 100                            # Amount of scenarios per one scene, [#]
 robot_vision_range: 5                           # Robot Vision Range, [m]
 inflation_radius: 1.0                           # robot_radius + pedestrian_radius + safe_distances
@@ -31,16 +31,16 @@ controller_list: ["ED-MPC-EDC_ORIGIN",          # Specify controllers you would 
                   "ED-MPC-EDC_Q500", 
                   "ED-MPC-EDC_Q1500",
                   "ED-MPC-EDC_ConsVal05",
-                  "ED-MPC-EDC_ConsVal1",
-                  "MD-MPC-EDC_ORIGIN",         
-                  "MD-MPC-EDC_W500",            
-                  "MD-MPC-EDC_W2000", 
-                  "MD-MPC-EDC_Q500", 
-                  "MD-MPC-EDC_Q1200",
-                  "MD-MPC-EDC_ConsVal05",
-                  "MD-MPC-EDC_ConsVal1",
-                  "MD-MPC-EDC_ConsVal05_W500_Q250",
-                  "MD-MPC-EDC_ConsVal05_W500"]
+                  "ED-MPC-EDC_ConsVal1"]
+                  #"MD-MPC-EDC_ORIGIN",         
+                  #"MD-MPC-EDC_W500",            
+                  #"MD-MPC-EDC_W2000", 
+                  #"MD-MPC-EDC_Q500", 
+                  #"MD-MPC-EDC_Q1200",
+                  #"MD-MPC-EDC_ConsVal05",
+                  #"MD-MPC-EDC_ConsVal1",
+                  #"MD-MPC-EDC_ConsVal05_W500_Q250",
+                  #"MD-MPC-EDC_ConsVal05_W500"]
 
 # Statistics Collection
 metrics: ["failure_status",                     # Specify metrics, only three are currenlty avalaible:
