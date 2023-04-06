@@ -18,7 +18,7 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 
-pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
+#pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
 DEFAULT_SCENE_CONFIG_PATH = r"evaluation/scenes/circular_crossing/6/0.yaml"
 DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/controllers/MD-MPC-EDC.yaml"
