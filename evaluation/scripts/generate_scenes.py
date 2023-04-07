@@ -8,9 +8,9 @@ from typing import List
 PEDESTRIAN_RANGE = [7]
 TOTAL_SCENARIOS = 3
 ROBOT_VISION_RANGE = 5
-INFLATION_RADIUS = 1.0 # robot_radius + pedestrian_radius + safe_distances
-BORDERS_X = [-5, 5]
-BORDERS_Y = [-5, 5]
+INFLATION_RADIUS = 0.8 # robot_radius + pedestrian_radius + safe_distances
+BORDERS_X = [-4, 4]
+BORDERS_Y = [-4, 4]
 DEFAULT_COLOR_HEX_PALETTE = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
 
 def visualize_scenario(pedestrians_initial_positions: np.ndarray, 
@@ -75,12 +75,12 @@ def sample_robot_final_position(robot_initial_position: np.ndarray,
         np.ndarray: robot final position
     """
     cnt = 0
-    limit = 200000
+    limit = 10000
     while cnt <= limit:
         cnt += 1
         # Polar
         phi = np.random.uniform(0, 2 * np.pi)
-        r = np.random.uniform(0.5 * robot_vision_range, robot_vision_range)
+        r = np.random.uniform(0.85 * robot_vision_range, 2*robot_vision_range)
         # Cartesian
         delta_x = r * np.cos(phi)
         delta_y = r * np.sin(phi)
@@ -104,6 +104,7 @@ def sample_robot_final_position(robot_initial_position: np.ndarray,
             break
     else:
         print("Generation limit was reached!")
+        return False
     return robot_goal_position
 
 def generate_circular_scenarios(folder_name,
@@ -146,7 +147,7 @@ def generate_circular_scenarios(folder_name,
             for pos in saved_positions:
                 resample_flag = is_point_belongs_circle(position[:2],
                                                         pos[:2],
-                                                        inflation_radius)
+                                                        1.0) #inflation_radius)
                 if resample_flag:
                     break
             if not resample_flag:
@@ -166,17 +167,19 @@ def generate_circular_scenarios(folder_name,
                 pedestrians_initial_positions[i] = position
                 pedestrians_goal_positions[i] = position * (-1)
             # Sample robot
-            position = generate_position(pedestrians_initial_positions,
-                                         pedestrians_goal_positions,
-                                         robot=True)
-            robot_initial_position = position
-            robot_goal_position = sample_robot_final_position(robot_initial_position,
-                                                              np.vstack([pedestrians_initial_positions,
-                                                                         pedestrians_goal_positions]),
-                                                            robot_vision_range=robot_vision_range,
-                                                            borders_x=borders_x,
-                                                            borders_y=borders_y,
-                                                            inflation_radius=inflation_radius)
+            robot_goal_position = False
+            while type(robot_goal_position) == bool:
+                position = generate_position(pedestrians_initial_positions,
+                                            pedestrians_goal_positions,
+                                            robot=True)
+                robot_initial_position = position
+                robot_goal_position = sample_robot_final_position(robot_initial_position,
+                                                                    np.vstack([pedestrians_initial_positions,
+                                                                                pedestrians_goal_positions]),
+                                                                    robot_vision_range=robot_vision_range,
+                                                                    borders_x=borders_x,
+                                                                    borders_y=borders_y,
+                                                                    inflation_radius=inflation_radius)
             if visualization:
                 # Plot points
                 visualize_scenario(pedestrians_initial_positions,
@@ -213,11 +216,21 @@ def generate_random_scenarios(folder_name,
     def generate_position(pedestrians_initial_positions: np.ndarray,
                           pedestrians_goal_positions: np.ndarray,
                           robot: bool = False) -> np.ndarray:
-        inf_rad = inflation_radius*2 if robot else inflation_radius
+        inf_rad = inflation_radius*2 if robot else inflation_radius   
         while True:
             # Cartesian
-            x = np.random.uniform(*borders_x)
-            y = np.random.uniform(*borders_y)
+            if robot:
+                pedestrian_center_mass_initial_positions = np.mean(pedestrians_initial_positions, axis=1)
+                x0 = pedestrian_center_mass_initial_positions[0]
+                y0 = pedestrian_center_mass_initial_positions[1]
+                L = 3 # Length of sampling
+                bord_x = [x0 - L, x0 + L]
+                bord_y = [y0 - L, y0 + L]
+                x = np.random.uniform(*bord_x)
+                y = np.random.uniform(*bord_y)
+            else:
+                x = np.random.uniform(*borders_x)
+                y = np.random.uniform(*borders_y)
             phi = np.random.uniform(-np.pi, np.pi)
             position = np.array([x, y, phi])
             # Check if position i is not intersect with pedestrians
@@ -248,17 +261,19 @@ def generate_random_scenarios(folder_name,
                                                   pedestrians_goal_positions)
                 pedestrians_goal_positions[i] = goal_position
             # Sample robot
-            position = generate_position(pedestrians_initial_positions,
-                                         pedestrians_goal_positions,
-                                         robot=True)
-            robot_initial_position = position
-            robot_goal_position = sample_robot_final_position(robot_initial_position,
-                                                              np.vstack([pedestrians_initial_positions,
-                                                                         pedestrians_goal_positions]),
-                                                            robot_vision_range=robot_vision_range,
-                                                            borders_x=borders_x,
-                                                            borders_y=borders_y,
-                                                            inflation_radius=inflation_radius)
+            robot_goal_position = False
+            while type(robot_goal_position) == bool:
+                position = generate_position(pedestrians_initial_positions,
+                                            pedestrians_goal_positions,
+                                            robot=True)
+                robot_initial_position = position
+                robot_goal_position = sample_robot_final_position(robot_initial_position,
+                                                                np.vstack([pedestrians_initial_positions,
+                                                                            pedestrians_goal_positions]),
+                                                                robot_vision_range=robot_vision_range,
+                                                                borders_x=borders_x,
+                                                                borders_y=borders_y,
+                                                                inflation_radius=inflation_radius)
             if visualization:
                 # Plot points
                 visualize_scenario(pedestrians_initial_positions,
@@ -284,7 +299,7 @@ def generate_parallel_scenarios(folder_name,
                                 borders_x: List[int],
                                 borders_y: List[int],
                                 visualization: bool = False,
-                                  save_config: bool = True)-> None:
+                                save_config: bool = True)-> None:
     """ Parallel crossing scenario
     """
 
@@ -301,7 +316,8 @@ def generate_parallel_scenarios(folder_name,
                           robot: bool = False) -> np.ndarray:
         while True:
             # Cartesian
-            x = np.random.uniform(*range_x)
+            sign = np.random.choice([1, -1])
+            x = sign * np.random.uniform(*range_x)
             y = np.random.uniform(*range_y)
             if robot:
                 x = np.random.uniform(*[-0.5, 0.5])
@@ -334,17 +350,19 @@ def generate_parallel_scenarios(folder_name,
                 goal_position = np.array([init_position[0] * (-1), init_position[1], init_position[2]])
                 pedestrians_goal_positions[i] = goal_position
             # Sample robot
-            position = generate_position(pedestrians_initial_positions,
-                                         pedestrians_goal_positions,
-                                         True)
-            robot_initial_position = position
-            robot_goal_position = sample_robot_final_position(robot_initial_position,
-                                                              np.vstack([pedestrians_initial_positions,
-                                                                         pedestrians_goal_positions]),
-                                                            robot_vision_range=robot_vision_range,
-                                                            borders_x=borders_x,
-                                                            borders_y=borders_y,
-                                                            inflation_radius=inflation_radius)
+            robot_goal_position = False
+            while type(robot_goal_position) == bool:
+                position = generate_position(pedestrians_initial_positions,
+                                            pedestrians_goal_positions,
+                                            True)
+                robot_initial_position = position
+                robot_goal_position = sample_robot_final_position(robot_initial_position,
+                                                                np.vstack([pedestrians_initial_positions,
+                                                                            pedestrians_goal_positions]),
+                                                                robot_vision_range=robot_vision_range,
+                                                                borders_x=borders_x,
+                                                                borders_y=borders_y,
+                                                                inflation_radius=inflation_radius)
             if visualization:
                 # Plot points
                 visualize_scenario(pedestrians_initial_positions,
@@ -386,8 +404,8 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=True,
-                                    save_config=False)
+                                    visualization=False,
+                                    save_config=True)
     
     if "random_crossing" in scenes_list:
         generate_random_scenarios(folder_name,
@@ -397,8 +415,8 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=True,
-                                    save_config=False)
+                                    visualization=False,
+                                    save_config=True)
     
     if "parallel_crossing" in scenes_list:
         generate_parallel_scenarios(folder_name,
@@ -408,8 +426,8 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=True,
-                                    save_config=False)
+                                    visualization=False,
+                                    save_config=True)
 
 
 

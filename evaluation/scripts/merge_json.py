@@ -1,8 +1,8 @@
 import json
 
-first_file_path = "evaluation/studies/study_0/results/datasets/stats_ED-MPC.json"
-second_file_path = "evaluation/studies/study_2/merged/stats_ED-MPC.json"
-merged_file_path = "evaluation/studies/study_0//results/merged/stats_ED-MPC.json"
+first_file_path = "evaluation/studies/study_1/results_3_6/datasets/stats_MD-MPC-EDC_W2000.json"
+second_file_path = "evaluation/studies/study_1/results_7_8/datasets/stats_MD-MPC-EDC_W2000.json"
+merged_file_path = "evaluation/studies/study_1/results/datasets/stats_MD-MPC-EDC_W2000.json"
 
 with open(first_file_path) as file:
      first_file = json.load(file)
