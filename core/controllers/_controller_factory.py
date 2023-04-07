@@ -1,4 +1,5 @@
-from core.controllers import AbstractController, DDPController, DWAController, MPPIController, DoMPCController
+from core.controllers import AbstractController, DDPController, DWAController, MPPIController, DoMPCController, \
+    RLController
 from core.predictors import AbstractPredictor, PedestrianTracker
 from typing import Union
 import numpy as np
@@ -86,5 +87,15 @@ class ControllerFactory():
                                        is_store_robot_predicted_trajectory=config["is_store_robot_predicted_trajectory"],
                                        max_ghost_tracking_time=config["max_ghost_tracking_time"],
                                        state_dummy_ped=config["state_dummy_ped"])
+        elif config["controller_type"] == "RL":
+            controller = RLController(
+                init_state=np.array(config["init_state"]),
+                goal=np.array(config["goal"]),
+                pedestrian_tracker=pedestrian_tracker,
+                max_ghost_tracking_time=config["max_ghost_tracking_time"],
+                state_dummy_ped=config["state_dummy_ped"],
+                total_peds=config["total_peds"],
+                horizon=config["horizon"]
+            )
 
         return controller

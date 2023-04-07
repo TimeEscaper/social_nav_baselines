@@ -68,6 +68,10 @@ class _PedestrianTrack:
         return self._states.all
 
     @property
+    def current_pose(self) -> np.ndarray:
+        return self._states.last
+
+    @property
     def predicted_poses(self) -> np.ndarray:
         return self._predicted_poses
 
@@ -104,6 +108,10 @@ class _GhostTrack:
     @property
     def history(self) -> np.ndarray:
         return self._states.all
+
+    @property
+    def current_pose(self) -> np.ndarray:
+        return self._states.last
 
     @property
     def predicted_poses(self) -> np.ndarray:
@@ -188,6 +196,12 @@ class PedestrianTracker:
         preds.update({k: (v.predicted_poses.copy(), v.predicted_covs.copy()) for k, v in self._tracks.items()})
         preds.update({k: (v.predicted_poses.copy(), v.predicted_covs.copy()) for k, v in self._ghosts.items()})
         return preds
+
+    def get_current_poses(self) -> Dict[int, np.ndarray]:
+        result = {}
+        result.update({k: v.current_pose[:2] for k, v in self._tracks.items()})
+        result.update({k: v.current_pose[:2] for k, v in self._ghosts.items()})
+        return result
 
     @property
     def joint_track(self) -> Optional[np.ndarray]:

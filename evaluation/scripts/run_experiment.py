@@ -96,12 +96,14 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
             if error >= config["tolerance_error"]:
                 state = simulator.current_state.world.robot.state
                 detected_peds_keys = simulator.current_state.sensors["pedestrian_detector"].reading.pedestrians.keys()
+                robot_velocity = simulator.current_state.world.robot.velocity
                 poses = np.array(list(simulator.current_state.world.pedestrians.poses.values()))[:, :2]
                 vels = np.array(list(simulator.current_state.world.pedestrians.velocities.values()))[:, :2]
                 ground_truth_pedestrians_state = np.concatenate((poses, vels), axis=1)
                 observation = {k: ground_truth_pedestrians_state[k, :] for k in detected_peds_keys}
                 control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = planner.make_step(state,
-                                                                                                                   observation)
+                                                                                                                   observation,
+                                                                                                                   robot_velocity)
                 predicted_robot_trajectory = controller.get_predicted_robot_trajectory()    
                 statistics.append_current_subgoal(planner.current_subgoal)
                 visualizer.append_ground_truth_robot_state(state)

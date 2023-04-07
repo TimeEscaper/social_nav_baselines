@@ -11,6 +11,7 @@ import pygame
 import pathlib
 import random
 import torch
+from core.controllers import RLController
 
 SEED = 42
 random.seed(SEED)
@@ -20,8 +21,8 @@ torch.cuda.manual_seed(SEED)
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/scenes/circular_crossing/6/0.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/controllers/MD-MPC-EDC.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"examples/configs/scenes/parallel_crossing/6.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"examples/configs/controllers/MD-MPC-EDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -51,13 +52,21 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                      config["pedestrians_init_states"],
                                      config["pedestrians_goals"],
                                      config["ped_model"],
-                                     create_renderer = False)
+                                     create_renderer = True)
     
     predictor = PredictorFactory.create_predictor(config)
 
     ped_tracker = PedestrianTracker(predictor, 
                                     config["max_ghost_tracking_time"], 
                                     False)
+
+    # controller = RLController(init_state=np.array([0., 0., 0.]),
+    #                              goal=np.array([0., 0., 0.]),
+    #                              pedestrian_tracker=ped_tracker,
+    #                              max_ghost_tracking_time=4,
+    #                              state_dummy_ped=(10000., 10000.),
+    #                              total_peds=config["total_peds"],
+    #                           horizon=config["horizon"])
 
     controller = ControllerFactory.create_controller(config,
                                                      predictor,
@@ -97,13 +106,15 @@ def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
             error = np.linalg.norm(planner.global_goal[:2] - state[:2])
             if error >= config["tolerance_error"]:
                 state = simulator.current_state.world.robot.state
+                robot_velocity = simulator.current_state.world.robot.velocity
                 detected_peds_keys = simulator.current_state.sensors["pedestrian_detector"].reading.pedestrians.keys()
                 poses = np.array(list(simulator.current_state.world.pedestrians.poses.values()))[:, :2]
                 vels = np.array(list(simulator.current_state.world.pedestrians.velocities.values()))[:, :2]
                 ground_truth_pedestrians_state = np.concatenate((poses, vels), axis=1)
                 observation = {k: ground_truth_pedestrians_state[k, :] for k in detected_peds_keys}
                 control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = planner.make_step(state,
-                                                                                                                   observation)
+                                                                                                                   observation,
+                                                                                                                   robot_velocity)
                 predicted_robot_trajectory = controller.get_predicted_robot_trajectory()    
                 statistics.append_current_subgoal(planner.current_subgoal)
                 visualizer.append_ground_truth_robot_state(state)
