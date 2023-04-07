@@ -54,8 +54,8 @@ def collect_statistics(folder_name: str,
         fig_hist.suptitle(scenes_list[scene_id], fontsize=28)
 
         # Create mean plot
-        fig_graph, axs_graph = plt.subplot_mosaic([[0, 1]], 
-                                figsize=[21, 8.5], facecolor='white', layout='constrained')
+        fig_graph, axs_graph = plt.subplot_mosaic([[0, 1, 2]], 
+                                figsize=[25, 8.5], facecolor='white', layout='constrained')
         fig_graph.suptitle(scenes_list[scene_id], fontsize=28)
 
         displacement = np.linspace(-0.25, 0.25, len(controller_list))
@@ -157,8 +157,7 @@ def collect_statistics(folder_name: str,
             legend_elements = [Line2D([0], [0], color='black', marker="o", lw=0, label='Mean'),
                                Line2D([0], [0], marker='^', color='black', label='Median', linestyle='--',
                           markerfacecolor='black', markersize=10),
-                               Patch(facecolor='black', alpha=0.5, 
-                         label='IQR')]
+                               Line2D([0], [0], color='black', alpha=0.5, label='IQR')]
 
             axs_graph[0].legend(handles=legend_elements, bbox_to_anchor=(-.2, 1), loc='upper right', borderaxespad=0., fontsize=20)
             # Collisions
@@ -176,15 +175,15 @@ def collect_statistics(folder_name: str,
             axs_graph[1].tick_params(labelsize=12)
             #axs_graph[1].legend(fontsize=size)
             # Timeouts
-            #axs_graph[2].scatter(pedestrian_range, mean_tables_data[scene_id, controller_id, len(pedestrian_range)*2:], linewidth=1, label=f"{controller}", marker="o", color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
-            #axs_graph[2].plot(pedestrian_range, median_tables_data[scene_id, controller_id, len(pedestrian_range)*2:], linewidth=2, linestyle="--", marker="^", markersize=SIZE//2, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
-            #axs_graph[2].grid(True)
-            #axs_graph[2].set_xlabel("Number of Pedestrians, [#]", fontsize=SIZE)
-            #axs_graph[2].set_ylabel("Number of Timeouts, [#]", fontsize=SIZE)
-            #axs_graph[2].set_title("Number of Timeouts, [#]", fontsize=SIZE*1.2)
-            #axs_graph[2].tick_params(labelsize=12)
+            axs_graph[2].scatter(pedestrian_range + displacement[controller_id], mean_tables_data[scene_id, controller_id, len(pedestrian_range)*2:], linewidth=1, label=f"{controller}", marker="o", color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
+            axs_graph[2].plot(pedestrian_range + displacement[controller_id], median_tables_data[scene_id, controller_id, len(pedestrian_range)*2:], linewidth=2, linestyle="--", marker="^", markersize=SIZE//2, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
+            axs_graph[2].grid(True)
+            axs_graph[2].set_xlabel("Number of Pedestrians, [#]", fontsize=SIZE)
+            axs_graph[2].set_ylabel("Number of Timeouts, [#]", fontsize=SIZE)
+            axs_graph[2].set_title("Number of Timeouts, [#]", fontsize=SIZE*1.2)
+            axs_graph[2].tick_params(labelsize=12)
             # Legend
-            axs_graph[1].legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=20)
+            axs_graph[2].legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=20)
 
 
         # Save histogram figure
