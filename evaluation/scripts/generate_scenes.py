@@ -386,8 +386,8 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=False,
-                                    save_config=True)
+                                    visualization=True,
+                                    save_config=False)
     
     if "random_crossing" in scenes_list:
         generate_random_scenarios(folder_name,
@@ -397,8 +397,8 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=False,
-                                    save_config=True)
+                                    visualization=True,
+                                    save_config=False)
     
     if "parallel_crossing" in scenes_list:
         generate_parallel_scenarios(folder_name,
@@ -408,8 +408,8 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=False,
-                                    save_config=True)
+                                    visualization=True,
+                                    save_config=False)
 
 
 

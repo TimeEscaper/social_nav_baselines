@@ -11,13 +11,13 @@
 folder_name: "study_0"                          # Folder name of your study
 
 # Scene Generation
-pedestrian_range: [3, 4, 5, 6, 7, 8]                  # List of an amount pedestrians in a scene
-total_scenarios: 100                            # Amount of scenarios per one scene, [#]
+pedestrian_range: [7   ]                        # List of an amount pedestrians in a scene
+total_scenarios: 3                              # Amount of scenarios per one scene, [#]
 robot_vision_range: 5                           # Robot Vision Range, [m]
 inflation_radius: 1.0                           # robot_radius + pedestrian_radius + safe_distances
 borders_x: [-5, 5]                              # Map X borders range
 borders_y: [-5, 5]                              # Map Y borders range
-generate_scenes: False                          # Flag to generate new scenes. Attention, this will rewrite existed scene files.
+generate_scenes: True                          # Flag to generate new scenes. Attention, this will rewrite existed scene files.
 seed: 42                                        # Choose random seed
 
 # Parallel Experiments Run
