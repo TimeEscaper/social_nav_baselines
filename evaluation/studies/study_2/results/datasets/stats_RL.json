@@ -1,0 +1,98 @@
+{
+    "circular_crossing": {
+        "RL": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/circular_crossing/4/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL.yaml",
+                    "collisions_per_subgoal": []
+                },
+                "1": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 1,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/circular_crossing/4/1.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL.yaml",
+                    "collisions_per_subgoal": []
+                },
+                "2": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 1,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/circular_crossing/4/2.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL.yaml",
+                    "collisions_per_subgoal": []
+                }
+            }
+        }
+    },
+    "parallel_crossing": {
+        "RL": {
+            "4": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 2,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/parallel_crossing/4/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL.yaml",
+                    "collisions_per_subgoal": []
+                },
+                "1": {
+                    "failure_status": false,
+                    "simulation_ticks": 461,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/parallel_crossing/4/1.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                },
+                "2": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 1,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/parallel_crossing/4/2.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL.yaml",
+                    "collisions_per_subgoal": []
+                }
+            }
+        }
+    },
+    "random_crossing": {
+        "RL": {
+            "4": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 1638,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/random_crossing/4/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                },
+                "1": {
+                    "failure_status": false,
+                    "simulation_ticks": 1869,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/random_crossing/4/1.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                },
+                "2": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/random_crossing/4/2.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL.yaml",
+                    "collisions_per_subgoal": []
+                }
+            }
+        }
+    }
+}

@@ -51,7 +51,7 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                      config["pedestrians_init_states"],
                                      config["pedestrians_goals"],
                                      config["ped_model"],
-                                     create_renderer = False)
+                                     create_renderer = True)
     
     predictor = PredictorFactory.create_predictor(config)
 
