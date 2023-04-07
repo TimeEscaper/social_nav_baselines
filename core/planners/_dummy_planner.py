@@ -30,9 +30,9 @@ class DummyPlanner(AbstractPlanner):
     def generate_subgoal(self, state: np.ndarray, observation: Any) -> np.ndarray:
         return self.global_goal[:2]
 
-    def make_step(self, state: np.ndarray, observation: Any) -> Tuple[np.ndarray, Any]:
+    def make_step(self, state: np.ndarray, observation: Any, robot_velocity: Optional[np.ndarray] = None) -> Tuple[np.ndarray, Any]:
         self._pedestrian_tracker.update(observation)
         new_subgoal, global_goal_reached = self.update_subgoal(state, observation)
         if new_subgoal:
             self._controller.set_new_goal(state, self._current_subgoal)
-        return self._controller.make_step(state, observation)
+        return self._controller.make_step(state, observation, robot_velocity)

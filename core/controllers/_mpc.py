@@ -4,7 +4,7 @@ from core.predictors import PedestrianTracker
 import numpy as np
 import do_mpc
 import casadi
-from typing import List, Dict
+from typing import List, Dict, Optional
 
 
 class DoMPCController(AbstractController):
@@ -271,7 +271,8 @@ class DoMPCController(AbstractController):
 
     def make_step(self, 
                   state: np.ndarray,
-                  observation: Dict[int, np.ndarray]) -> np.ndarray:
+                  observation: Dict[int, np.ndarray],
+                  robot_velocity: Optional[np.ndarray] = None) -> np.ndarray:
         self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances = self.predict(observation)
         control = self._mpc.make_step(state).T[0]
         return control, self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances

@@ -22,7 +22,8 @@ setup(
         'pytorch_mppi',
         'fire',
         'pyyaml',
-        'pandas'
+        'pandas',
+        'stable-baselines3'
     ],
     extras_require={
         'test': [
