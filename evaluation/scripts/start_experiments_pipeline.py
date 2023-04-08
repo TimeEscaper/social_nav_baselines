@@ -36,7 +36,7 @@ def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH)
                         experiment_config["seed"])
         print("--------------------Scenes are generated!--------------------")
 
-    if True:
+    if False:
         # Conduct experiments
         print("-------------2. Starting to conduct experiments!-------------")
         input_data_list = []
@@ -53,7 +53,7 @@ def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH)
         _ = pool.starmap(conduct_experiments, input_data_list)
         print("------------------Experiments are conducted!-----------------")
     
-    if False:
+    if True:
         # Form statistics
         print("----------3. Starting to form statistics and plots!----------")
         collect_statistics(experiment_config["folder_name"],
