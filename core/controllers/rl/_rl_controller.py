@@ -21,7 +21,7 @@ class RLController(AbstractController):
                  state_dummy_ped: List[float],
                  total_peds: int,
                  horizon: int,
-                 weights: Optional[str] = None,
+                 weights: str = "ppo_model_v1",
                  device: str = "cuda"):
         super(RLController, self).__init__(init_state=init_state,
                                            goal=goal,
@@ -34,8 +34,8 @@ class RLController(AbstractController):
         self._peds_padding = 8
         self._rl_horizon = 5
 
-        weighs = weights or pkg_resources.resource_filename("core.controllers.rl", "weights/ppo_model_v1.zip")
-        self._rl_model = PPO.load(weighs, device=device)
+        weights = pkg_resources.resource_filename("core.controllers.rl", f"weights/{weights}.zip")
+        self._rl_model = PPO.load(weights, device=device)
         self._states = None
 
     def _get_output_predictions(self) -> np.ndarray:

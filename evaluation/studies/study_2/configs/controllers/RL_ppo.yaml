@@ -1,0 +1,19 @@
+# Scenario: Reinforcement Learning
+
+# Robot Model, [model_type]: 
+#       1. ["unicycle"] : Unicycle Model with State Vector: [x, y, phi], Control Vector: [v, w]
+#       2. ["unicycle_double_integrator"] : Unicycle Double Integration Model with State Vector: [x, y, phi, v, w], Control Vector: [u_a, u_alpha]
+
+
+controller_type: "RL"                      # Specify controller type, ["DWA", "MPC", "MPPI", "DDP"]
+weights: "ppo_model_v1"                    # Specify arcive name of the weights 
+model_type: "unicycle"                     # Robot model, ["unicycle", "unicycle_double_integrator"]
+horizon: 24                                # MPC planning horizon, [steps]
+ped_predictor: "neural"                    # Pedestrian predictor, ["constant_velocity", "neural"]
+r_rob: 0.35                                # Robot radius, [m]
+r_ped: 0.3                                 # Pedestrian radius, [m]
+lb: [0, -2.826]                                # Lower bounds for NLP: [v, w], [m/s, rad/s]
+ub: [2, 2.826]                                 # Upper bounds for NLP: [v, w], [m/s, rad/s]
+state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
+is_store_robot_predicted_trajectory: True  # Flag to store robot predicted trajectory, [True, False]
+max_ghost_tracking_time: 20                # Amount of steps to track ghost pedestrian, [step]
