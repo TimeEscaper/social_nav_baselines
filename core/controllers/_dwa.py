@@ -1,7 +1,7 @@
 from ._controller import AbstractController
 from core.predictors import AbstractPredictor
 import numpy as np
-from typing import List
+from typing import List, Optional
 
 class DWAController(AbstractController):
     
@@ -81,7 +81,8 @@ class DWAController(AbstractController):
 
     def make_step(self, 
                   state: np.ndarray,
-                  ground_truth_pedestrians_state: np.ndarray) -> np.ndarray:
+                  ground_truth_pedestrians_state: np.ndarray,
+                  robot_velocity: Optional[np.ndarray] = None) -> np.ndarray:
         
         min_cost = np.inf
         control = [0, 0]

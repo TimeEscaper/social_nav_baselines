@@ -14,7 +14,7 @@ from typing import List
 DEFAULT_COLOR_HEX_PALETTE = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf', '#724e56', '#999140', '#4f6d7a', '#f8c9a3', '#000000', '#4d4f53']
 SIZE = 20
 
-def add_box(ax, center, q25, q75, color, width=0.1, alpha=0.3):
+def add_box(ax, center, q25, q75, color, width=0.03, alpha=0.3):
     x0 = center - width / 2
     y0 = q25
     height = q75 - q25
@@ -55,7 +55,7 @@ def collect_statistics(folder_name: str,
 
         # Create mean plot
         fig_graph, axs_graph = plt.subplot_mosaic([[0, 1, 2]], 
-                                figsize=[25, 8.5], facecolor='white', layout='constrained')
+                                figsize=[26, 8.5], facecolor='white', layout='constrained')
         fig_graph.suptitle(scenes_list[scene_id], fontsize=28)
 
         displacement = np.linspace(-0.25, 0.25, len(controller_list))
@@ -147,7 +147,7 @@ def collect_statistics(folder_name: str,
                 center_range = np.linspace(-0.25, 0.25, len(controller_list)) + ped
                 q25 = q25_tables_data[scene_id, controller_id, i]
                 q75 = q75_tables_data[scene_id, controller_id, i]
-                add_box(axs_graph[0], center_range[controller_id], q25, q75, color=DEFAULT_COLOR_HEX_PALETTE[controller_id], width=0.01, alpha=0.5)
+                add_box(axs_graph[0], center_range[controller_id], q25, q75, color=DEFAULT_COLOR_HEX_PALETTE[controller_id], width=0.03, alpha=0.5)
             axs_graph[0].grid(True)
             axs_graph[0].set_xlabel("Number of Pedestrians, [#]", fontsize=SIZE)
             axs_graph[0].set_ylabel("Simulation Steps to Goal, [#]", fontsize=SIZE)
@@ -167,7 +167,7 @@ def collect_statistics(folder_name: str,
                 center_range = np.linspace(-0.25, 0.25, len(controller_list)) + ped
                 q25 = q25_tables_data[scene_id, controller_id, i+len(pedestrian_range)]
                 q75 = q75_tables_data[scene_id, controller_id, i+len(pedestrian_range)]
-                add_box(axs_graph[1], center_range[controller_id], q25, q75, color=DEFAULT_COLOR_HEX_PALETTE[controller_id], width=0.01, alpha=0.5)
+                add_box(axs_graph[1], center_range[controller_id], q25, q75, color=DEFAULT_COLOR_HEX_PALETTE[controller_id], width=0.03, alpha=0.5)
             axs_graph[1].grid(True)
             axs_graph[1].set_xlabel("Number of Pedestrians, [#]", fontsize=SIZE)
             axs_graph[1].set_ylabel("Number of Collisions, [#]", fontsize=SIZE)

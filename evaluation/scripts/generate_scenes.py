@@ -3,6 +3,8 @@ import numpy as np
 import random
 import pathlib
 import matplotlib.pyplot as plt
+from matplotlib import patches
+from matplotlib.lines import Line2D
 from typing import List
 
 PEDESTRIAN_RANGE = [7]
@@ -12,11 +14,14 @@ INFLATION_RADIUS = 0.8 # robot_radius + pedestrian_radius + safe_distances
 BORDERS_X = [-4, 4]
 BORDERS_Y = [-4, 4]
 DEFAULT_COLOR_HEX_PALETTE = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b', '#e377c2', '#7f7f7f', '#bcbd22', '#17becf']
+SIZE = 20
 
 def visualize_scenario(pedestrians_initial_positions: np.ndarray, 
                        pedestrians_goal_positions: np.ndarray,
                        robot_initial_position: np.ndarray,
-                       robot_goal_position: np.ndarray) -> None:
+                       robot_goal_position: np.ndarray,
+                       title="Scenario Generator",
+                       ax = None) -> None:
     """ Plot scenario
 
     Args:
@@ -25,33 +30,91 @@ def visualize_scenario(pedestrians_initial_positions: np.ndarray,
         robot_initial_position (np.ndarray): robot initial position
         robot_goal_position (np.ndarray): robot goal position
     """
-    fig, ax = plt.subplots(figsize=[16, 16], facecolor='white')
+    
+    if ax == None:
+        fig, ax = plt.subplots(figsize=[8.5, 8.5], facecolor='white')
+    else:
+        fig = None
+
+    annotation_offset: np.ndarray = np.array([0, 0.15])
+    r_rob = 0.35
+    r_ped = 0.3
+
+    if title == "Circular Crossing":
+        circle_plot = plt.Circle([0, 0], 4.8, fill=True, linewidth=0, color="wheat", alpha=0.3)
+        ax.add_patch(circle_plot)
+        circle_plot = plt.Circle([0, 0], 3.5, fill=True, linewidth=0, color="white", alpha=1)
+        ax.add_patch(circle_plot)
+        circle_plot = plt.Circle([0, 0], 3.5, fill=None, linewidth=1, color="salmon", alpha=0.9, hatch='/')
+        ax.add_patch(circle_plot)
+    elif title == "Random Crossing":
+        p = patches.Rectangle((-4,-4), 8, 8, linewidth=1, fill=None, hatch='/', color="salmon", alpha=0.9)
+        ax.add_patch(p)
+        p = patches.Rectangle((-4,-4), 8, 8, linewidth=0, fill=True, color="wheat", alpha=0.3)
+        ax.add_patch(p)
+    elif title == "Parallel Crossing":
+        p = patches.Rectangle((-1,-4), 2, 8, linewidth=1, fill=None, hatch='/', color="salmon", alpha=0.9)
+        ax.add_patch(p)
+        p = patches.Rectangle((-4,-4), 1, 8, linewidth=0, fill=True, color="wheat", alpha=0.3)
+        ax.add_patch(p)
+        p = patches.Rectangle((3,-4), 1, 8, linewidth=0, fill=True, color="wheat", alpha=0.3)
+        ax.add_patch(p)
+        pass
+
 
     total_peds = pedestrians_goal_positions.shape[0]
     # Plot pedestrians
     for i in range(total_peds):
-        ax.scatter(pedestrians_initial_positions[i,0], pedestrians_initial_positions[i, 1], marker='*', s=80, color=DEFAULT_COLOR_HEX_PALETTE[i])
+        #ax.scatter(pedestrians_initial_positions[i,0], pedestrians_initial_positions[i, 1], marker='*', s=80, color=DEFAULT_COLOR_HEX_PALETTE[i])
         ax.scatter(pedestrians_goal_positions[i,0], pedestrians_goal_positions[i, 1], color=DEFAULT_COLOR_HEX_PALETTE[i])  # noqa: E501
         ax.plot([pedestrians_initial_positions[i,0], pedestrians_goal_positions[i,0]], [pedestrians_initial_positions[i,1], pedestrians_goal_positions[i,1]], color=DEFAULT_COLOR_HEX_PALETTE[i])
         circle_plot = plt.Circle(pedestrians_initial_positions[i, :2], 0.3, fill=False, linewidth=3, color=DEFAULT_COLOR_HEX_PALETTE[i])
         ax.add_patch(circle_plot)
-        circle_plot = plt.Circle(pedestrians_goal_positions[i, :2], 0.3, fill=False, linewidth=3, color=DEFAULT_COLOR_HEX_PALETTE[i])
+        circle_plot = plt.Circle(pedestrians_goal_positions[i, :2], 0.08, fill=True, linewidth=3, color=DEFAULT_COLOR_HEX_PALETTE[i])
         ax.add_patch(circle_plot)
+        circle_plot = plt.Circle(pedestrians_goal_positions[i, :2], 0.03, fill=True, linewidth=3, color="black")
+        ax.add_patch(circle_plot)
+        ax.annotate(f'Pedestrian {i+1}', pedestrians_initial_positions[i, :2] + np.array([0, r_ped]) + annotation_offset,  ha='center')
+        # Plot direction arrow
+        x = pedestrians_initial_positions[i, 0]
+        y = pedestrians_initial_positions[i, 1]
+        dx = (pedestrians_goal_positions[i, 0] - x) / np.linalg.norm((pedestrians_goal_positions[i, :2] - pedestrians_initial_positions[i, :2])) * r_ped
+        dy = (pedestrians_goal_positions[i, 1] - y) / np.linalg.norm((pedestrians_goal_positions[i, :2] - pedestrians_initial_positions[i, :2])) * r_ped
+        ax.arrow(x, y, dx, dy, color=DEFAULT_COLOR_HEX_PALETTE[i], width=r_ped/5)
+    
     # Plot robot
-    ax.scatter(robot_initial_position[0], robot_initial_position[1], marker='*', s=80, color="blue", label="Robot start position")
+    # ax.scatter(robot_initial_position[0], robot_initial_position[1], marker='*', s=80, color="blue", label="Robot start position")
     ax.scatter(robot_goal_position[0], robot_goal_position[1], color="blue")
     ax.plot([robot_initial_position[0], robot_goal_position[0]], [robot_initial_position[1], robot_goal_position[1]], 'b')
-    circle_plot = plt.Circle(robot_initial_position[:2], 0.3, fill=False, linewidth=3, color="blue")
+    ax.annotate(f'Robot', robot_initial_position[:2] + np.array([0, r_rob]) + annotation_offset,  ha='center')
+    # Plot direction arrow
+    x = robot_initial_position[0]
+    y = robot_initial_position[1]
+    dx = (robot_goal_position[0] - x) / np.linalg.norm((robot_goal_position[:2] - robot_initial_position[:2])) * r_rob
+    dy = (robot_goal_position[1] - y) / np.linalg.norm((robot_goal_position[:2] - robot_initial_position[:2])) * r_rob
+    ax.arrow(x, y, dx, dy, color='b', width=r_rob/5)
+
+    circle_plot = plt.Circle(robot_initial_position[:2], 0.35, fill=False, linewidth=3, color="blue")
     ax.add_patch(circle_plot)
-    circle_plot = plt.Circle(robot_goal_position[:2], 0.3, fill=False, linewidth=3, color="blue")
+    circle_plot = plt.Circle(robot_initial_position[:2], 0.35, fill=True, linewidth=3, color="blue", alpha=0.3)
     ax.add_patch(circle_plot)
-    ax.set_xlabel("x, [m]")
-    ax.set_ylabel("y, [m]")
-    ax.set_title("Scenario Generator")
-    ax.legend()
+    circle_plot = plt.Circle(robot_goal_position[:2], 0.08, fill=True, linewidth=3, color="blue")
+    ax.add_patch(circle_plot)
+    circle_plot = plt.Circle(robot_goal_position[:2], 0.03, fill=True, linewidth=3, color="black")
+    ax.add_patch(circle_plot)
+
+    ax.set_xlabel("x, [m]", fontsize=SIZE)
+    ax.set_ylabel("y, [m]", fontsize=SIZE)
+    ax.set_title(title, fontsize=SIZE*1.2)
+    #ax.legend()
     ax.grid(True)
+    ax.tick_params(labelsize=12)
     ax.set_aspect('equal', adjustable='box')
-    plt.show()
+    
+    if fig != None:
+        plt.show()
+    else:
+        return ax
 
 def is_point_belongs_circle(point: np.ndarray,
                             circle_center: np.ndarray,
@@ -115,7 +178,8 @@ def generate_circular_scenarios(folder_name,
                                 borders_x: List[int],
                                 borders_y: List[int],
                                 visualization: bool = False,
-                                save_config: bool = True) -> None:
+                                save_config: bool = True,
+                                ax=None) -> None:
     """ Circular crossing scenario
     """
     with open(f"evaluation/studies/{folder_name}/configs/scenes/scene_config.yaml") as f:
@@ -185,7 +249,9 @@ def generate_circular_scenarios(folder_name,
                 visualize_scenario(pedestrians_initial_positions,
                                 pedestrians_goal_positions,
                                 robot_initial_position,
-                                robot_goal_position)
+                                robot_goal_position,
+                                "Circular Crossing",
+                                ax)
             
             if save_config:
                 config["init_state"] = robot_initial_position.tolist()
@@ -205,7 +271,8 @@ def generate_random_scenarios(folder_name,
                                 borders_x: List[int],
                                 borders_y: List[int],
                                 visualization: bool = False,
-                                save_config: bool = True) -> None:
+                                save_config: bool = True,
+                                ax=None) -> None:
     """ Random crossing scenario
     """
     with open(f"evaluation/studies/{folder_name}/configs/scenes/scene_config.yaml") as f:
@@ -279,7 +346,9 @@ def generate_random_scenarios(folder_name,
                 visualize_scenario(pedestrians_initial_positions,
                                 pedestrians_goal_positions,
                                 robot_initial_position,
-                                robot_goal_position)
+                                robot_goal_position,
+                                "Random Crossing",
+                                ax)
                 
             if save_config:
                 config["init_state"] = robot_initial_position.tolist()
@@ -299,7 +368,8 @@ def generate_parallel_scenarios(folder_name,
                                 borders_x: List[int],
                                 borders_y: List[int],
                                 visualization: bool = False,
-                                save_config: bool = True)-> None:
+                                save_config: bool = True,
+                                ax=None)-> None:
     """ Parallel crossing scenario
     """
 
@@ -368,7 +438,9 @@ def generate_parallel_scenarios(folder_name,
                 visualize_scenario(pedestrians_initial_positions,
                                 pedestrians_goal_positions,
                                 robot_initial_position,
-                                robot_goal_position)
+                                robot_goal_position,
+                                "Parallel Crossing",
+                                ax)
             
             if save_config:
                 config["init_state"] = robot_initial_position.tolist()
@@ -396,6 +468,12 @@ def generate_scenes(folder_name: str,
     np.random.seed(seed)
     random.seed(seed)
 
+    if True:
+        fig, axes = plt.subplot_mosaic([[0, 1, 2]], figsize=[25, 9], facecolor='white')
+    else:
+        fig = None
+        axes=[None]*3
+
     if "circular_crossing" in scenes_list:
         generate_circular_scenarios(folder_name,
                                     pedestrian_range,
@@ -404,8 +482,9 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=False,
-                                    save_config=True)
+                                    visualization=True,
+                                    save_config=False,
+                                    ax=axes[0])
     
     if "random_crossing" in scenes_list:
         generate_random_scenarios(folder_name,
@@ -415,8 +494,9 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=False,
-                                    save_config=True)
+                                    visualization=True,
+                                    save_config=False,
+                                    ax=axes[1])
     
     if "parallel_crossing" in scenes_list:
         generate_parallel_scenarios(folder_name,
@@ -426,9 +506,26 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=False,
-                                    save_config=True)
+                                    visualization=True,
+                                    save_config=False,
+                                    ax=axes[2])
+    if fig:
+        legend_elements = [patches.Circle([0, 0], 1, fill=None, linewidth=0, color="white", alpha=0.9, label="Initial State"),
+                           patches.Circle([0, 0], 1, fill=None, linewidth=0, color="white", alpha=0.9, label="Target Point"),
+                           patches.Rectangle((0, 0), 1, 1, color='salmon', fill=False, linewidth=1, hatch="//", alpha=0.9, label='Robot Spawn Area'),
+                           patches.Rectangle((0, 0), 1, 1, facecolor='wheat', linewidth=1, edgecolor='black', alpha=0.3, label='Pedestrains Spawn Area')]
 
+        fig.legend(handles=legend_elements, bbox_to_anchor=(0.002, 0.003, 0.996, 1.003),
+                         loc='lower left', mode="expand", ncols=4, borderaxespad=0., fontsize=20)
+        fig.subplots_adjust(left=0.03,
+                    bottom=0.1,
+                    right=0.999,
+                    top=1,
+                    wspace=0.2,
+                    hspace=0)
+        
+        #fig.suptitle("Scenario Generation", fontsize=28)
+        plt.savefig("paper/plots/scenario_generation.png")
 
 
 if __name__ == "__main__":

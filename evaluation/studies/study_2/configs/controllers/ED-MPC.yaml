@@ -28,7 +28,7 @@ constraint_value: 0                        # Minimum safe distance to pedestrian
 Q: 1000                                    # Terminal cost weight
 R: [[1, 0],   
     [0, 1]]                                # Control input weighted matrix
-W: 500                                    # Mahalanobis/Euclidean distance weight in cost function
+W: 500                                     # Mahalanobis/Euclidean distance weight in cost function
 r_rob: 0.35                                # Robot radius, [m]
 r_ped: 0.3                                 # Pedestrian radius, [m]
 lb: [0, -2]                                # Lower bounds for NLP: [v, w], [m/s, rad/s]

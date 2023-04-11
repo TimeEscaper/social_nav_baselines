@@ -22,7 +22,7 @@ torch.cuda.manual_seed(SEED)
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
 DEFAULT_SCENE_CONFIG_PATH = r"examples/configs/scenes/parallel_crossing/6.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"examples/configs/controllers/MD-MPC-EDC.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"examples/configs/controllers/ED-DWA.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,

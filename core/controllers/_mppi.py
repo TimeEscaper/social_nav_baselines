@@ -231,7 +231,8 @@ class MPPIController(AbstractController):
 
     def make_step(self,
                   state: np.ndarray,
-                  observation: Dict[int, np.ndarray]) -> np.ndarray:
+                  observation: Dict[int, np.ndarray],
+                  robot_velocity: Optional[np.ndarray] = None) -> np.ndarray:
         ped_samples = self.predict(observation)
         self._full_traj_cost.update(self._goal, state, ped_samples)
         controls = self._mppi.command(state).clone().detach().cpu().numpy()

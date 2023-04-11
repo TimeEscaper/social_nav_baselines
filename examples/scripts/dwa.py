@@ -11,9 +11,9 @@ import pathlib
 
 pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"configs/scenes/perpendicular_traffic/7_pedestrians.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"examples/configs/scenes/circular_crossing/5.yaml"
 DEFAULT_CONTROLLER_CONFIG_PATH = r"configs/controllers/dwa.yaml"
-DEFAULT_RESULT_PATH = r"results/mpc.gif"
+DEFAULT_RESULT_PATH = r"results/dwa.gif"
 
 def main(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
          controller_config_path: str = DEFAULT_CONTROLLER_CONFIG_PATH,

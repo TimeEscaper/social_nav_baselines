@@ -10,7 +10,7 @@
 controller_type: "DWA"                     # Specify controller type, ["DWA", "MPC", "MPPI", "DDP"]
 horizon: 10                                # DWA planning horizon, [steps]
 model_type: "unicycle"                     # Robot model, ["unicycle"]
-ped_predictor: "constant_velocity"         # Pedestrian predictor, ["constant_velocity", "neural"]
+ped_predictor: "neural"                    # Pedestrian predictor, ["constant_velocity", "neural"]
 cost_function: "euclidean"                 # Cost function for the DWA controller, ["original", "euclidean"]
 v_res: 0.1                                 # Discretization resolution for linear velocity v, [m/s]
 w_res: 0.1                                 # Discretization resolution for angular velocity w, [ras/s]

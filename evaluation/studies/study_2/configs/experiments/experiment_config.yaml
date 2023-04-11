@@ -31,10 +31,10 @@ scenes_list: [ "circular_crossing",              # Specify scenes you want to ru
 controller_list: [ "ED-MPC",                     # Specify controllers you would like to run.
                    "ED-MPC-EDC",                 # All controllers are located here: evaluation/configs/controllers
                    "ED-MPC-MDC", 
-                   "MD-MPC-MDC", 
-                   "MD-MPC-EDC",
-                   "RL_ppo",
-                   "RL_best"]
+                   "MD-MPC-EDC", 
+                   "MD-MPC-MDC",
+                   "RL"] #,
+                   #"RL_best"]
 
 # Statistics Collection
 metrics: ["failure_status",                     # Specify metrics, only three are currenlty avalaible:
