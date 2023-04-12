@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle, Patch
+from matplotlib.patches import Rectangle, Patch, Circle
 from matplotlib.lines import Line2D
 import fire
 import pathlib
@@ -55,10 +55,11 @@ def collect_statistics(folder_name: str,
 
         # Create mean plot
         fig_graph, axs_graph = plt.subplot_mosaic([[0, 1, 2]], 
-                                figsize=[26, 8.5], facecolor='white', layout='constrained')
-        fig_graph.suptitle(scenes_list[scene_id], fontsize=28)
+                                figsize=[25, 7], facecolor='white') #, layout='constrained'
+        #fig_graph.suptitle(scenes_list[scene_id], fontsize=28)
 
         displacement = np.linspace(-0.25, 0.25, len(controller_list))
+        legend_elements_controllers = []
         for controller_id, controller in enumerate(controller_list):
             for total_peds_id, total_peds in enumerate(pedestrian_range):
                 list_sim_ticks_for_scenario_batch = []
@@ -108,11 +109,11 @@ def collect_statistics(folder_name: str,
                 # Calculate quantile 25
                 q25_sim_ticks_for_scenario_batch = round(np.quantile(np.array(list_sim_ticks_for_scenario_batch), 0.25), 3)
                 q25_collisions_for_scenario_batch = round(np.quantile(np.array(list_collisions_for_scenario_batch), 0.25), 3)
-                #q25_timeouts_for_scenario_batch = round(np.quantile(np.array(list_timeouts_for_scenario_batch), 0.25), 3)
+                q25_timeouts_for_scenario_batch = round(np.quantile(np.array(list_timeouts_for_scenario_batch).astype(int), 0.25), 3)
                 # Calculate quantile 75
                 q75_sim_ticks_for_scenario_batch = round(np.quantile(np.array(list_sim_ticks_for_scenario_batch), 0.75), 3)
                 q75_collisions_for_scenario_batch = round(np.quantile(np.array(list_collisions_for_scenario_batch), 0.75), 3)
-                #q75_timeouts_for_scenario_batch = round(np.quantile(np.array(list_timeouts_for_scenario_batch), 0.75), 3)
+                q75_timeouts_for_scenario_batch = round(np.quantile(np.array(list_timeouts_for_scenario_batch).astype(int), 0.75), 3)
                 
                 # Add calculated data into the table
                 tables_data[scene_id, controller_id, total_peds_id] = f"{mean_sim_ticks_for_scenario_batch}±{std_sim_ticks_for_scenario_batch}"  # simulation_ticks
@@ -132,12 +133,12 @@ def collect_statistics(folder_name: str,
                 # Add q25 to the graph table
                 q25_tables_data[scene_id, controller_id, total_peds_id] = q25_sim_ticks_for_scenario_batch
                 q25_tables_data[scene_id, controller_id, total_peds_id+len(pedestrian_range)] = q25_collisions_for_scenario_batch
-                #q25_tables_data[scene_id, controller_id, total_peds_id+len(pedestrian_range)*2] = q25_timeouts_for_scenario_batch
+                q25_tables_data[scene_id, controller_id, total_peds_id+len(pedestrian_range)*2] = q25_timeouts_for_scenario_batch
 
                 # Add q75 to the graph table
                 q75_tables_data[scene_id, controller_id, total_peds_id] = q75_sim_ticks_for_scenario_batch
                 q75_tables_data[scene_id, controller_id, total_peds_id+len(pedestrian_range)] = q75_collisions_for_scenario_batch
-                #q75_tables_data[scene_id, controller_id, total_peds_id+len(pedestrian_range)*2] = q75_timeouts_for_scenario_batch
+                q75_tables_data[scene_id, controller_id, total_peds_id+len(pedestrian_range)*2] = q75_timeouts_for_scenario_batch
 
             # Create graph
             # Simulation step to goal
@@ -150,8 +151,8 @@ def collect_statistics(folder_name: str,
                 add_box(axs_graph[0], center_range[controller_id], q25, q75, color=DEFAULT_COLOR_HEX_PALETTE[controller_id], width=0.03, alpha=0.5)
             axs_graph[0].grid(True)
             axs_graph[0].set_xlabel("Number of Pedestrians, [#]", fontsize=SIZE)
-            axs_graph[0].set_ylabel("Simulation Steps to Goal, [#]", fontsize=SIZE)
-            axs_graph[0].set_title("Simulation Steps to Goal, [#]", fontsize=SIZE*1.2)
+            axs_graph[0].set_ylabel("Simulation Steps to Subgoal, [#]", fontsize=SIZE)
+            axs_graph[0].set_title("Simulation Steps to Subgoal, [#]", fontsize=SIZE*1.2)
             axs_graph[0].tick_params(labelsize=12)
             #axs_graph[0].legend(fontsize=size)
             legend_elements = [Line2D([0], [0], color='black', marker="o", lw=0, label='Mean'),
@@ -177,19 +178,34 @@ def collect_statistics(folder_name: str,
             # Timeouts
             axs_graph[2].scatter(pedestrian_range + displacement[controller_id], mean_tables_data[scene_id, controller_id, len(pedestrian_range)*2:], linewidth=1, label=f"{controller}", marker="o", color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
             axs_graph[2].plot(pedestrian_range + displacement[controller_id], median_tables_data[scene_id, controller_id, len(pedestrian_range)*2:], linewidth=2, linestyle="--", marker="^", markersize=SIZE//2, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
+            # for i, ped in enumerate(pedestrian_range):
+            #     center_range = np.linspace(-0.25, 0.25, len(controller_list)) + ped
+            #     q25 = q25_tables_data[scene_id, controller_id, i+len(pedestrian_range)*2]
+            #     q75 = q75_tables_data[scene_id, controller_id, i+len(pedestrian_range)*2]
+            #     add_box(axs_graph[2], center_range[controller_id], q25, q75, color=DEFAULT_COLOR_HEX_PALETTE[controller_id], width=0.03, alpha=0.5)
             axs_graph[2].grid(True)
             axs_graph[2].set_xlabel("Number of Pedestrians, [#]", fontsize=SIZE)
             axs_graph[2].set_ylabel("Number of Timeouts, [#]", fontsize=SIZE)
             axs_graph[2].set_title("Number of Timeouts, [#]", fontsize=SIZE*1.2)
             axs_graph[2].tick_params(labelsize=12)
             # Legend
-            axs_graph[2].legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=20)
-
+            #axs_graph[2].legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0., fontsize=20)
+            legend_elements_controllers.append(Line2D([0], [0], color=DEFAULT_COLOR_HEX_PALETTE[controller_id], lw=0, marker="o", markersize=15, label=controller))
 
         # Save histogram figure
         fig_hist.savefig(fr"evaluation/studies/{folder_name}/results/plots/{scene}_distribution.png")
         
         # Save mean plot
+        fig_graph.legend(handles=legend_elements_controllers, bbox_to_anchor=(0.002, 0.363, 0.13, 1.003),
+                        loc='lower left', mode="expand", ncols=1, borderaxespad=0., fontsize=20)
+        
+        fig_graph.subplots_adjust(left=0.18,
+                    bottom=0.09,
+                    right=0.999,
+                    top=0.94,
+                    wspace=0.2,
+                    hspace=0)
+        
         fig_graph.savefig(fr"evaluation/studies/{folder_name}/results/plots/{scene}_graph.png")
 
     # convert array into dataframe
