@@ -20,8 +20,8 @@ torch.cuda.manual_seed(SEED)
 
 #pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_2/configs/scenes/parallel_crossing/8/3.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_2/configs/controllers/MD-MPC-EDC.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_2/configs/scenes/parallel_crossing/4/0.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_2/configs/controllers/RL-MD-MPC-EDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -67,19 +67,19 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                             scene_config_path,
                             controller_config_path)
 
-    planner = DummyPlanner(global_goal=np.array(config["goal"]),
-                            controller=controller,
-                            subgoal_reach_threshold=config["tolerance_error"],
-                            subgoal_to_goal_threshold=2.,
-                            pedestrian_tracker=ped_tracker,
-                            statistics_module=statistics)
-    # planner = RLPlanner(global_goal=np.array(config["goal"]),
+    # planner = DummyPlanner(global_goal=np.array(config["goal"]),
     #                         controller=controller,
     #                         subgoal_reach_threshold=config["tolerance_error"],
-    #                         subgoal_to_goal_threshold=1.,
+    #                         subgoal_to_goal_threshold=2.,
     #                         pedestrian_tracker=ped_tracker,
-    #                         statistics_module=statistics,
-    #                     max_subgoal_steps=25)
+    #                         statistics_module=statistics)
+    planner = RLPlanner(global_goal=np.array(config["goal"]),
+                            controller=controller,
+                            subgoal_reach_threshold=config["tolerance_error"],
+                            subgoal_to_goal_threshold=1.,
+                            pedestrian_tracker=ped_tracker,
+                            statistics_module=statistics,
+                        max_subgoal_steps=25)
 
     visualizer = Visualizer(config["total_peds"],
                             renderer)

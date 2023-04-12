@@ -14,7 +14,7 @@ folder_name: "study_2"                          # Folder name of your study
 
 # Scene Generation
 pedestrian_range: [3, 4, 5, 6, 7, 8]            # List of an amount pedestrians in a scene
-total_scenarios: 100                            # Amount of scenarios per one scene, [#]
+total_scenarios: 100                           # Amount of scenarios per one scene, [#]
 robot_vision_range: 5                           # Robot Vision Range, [m]
 inflation_radius: 0.75                          # robot_radius + pedestrian_radius + safe_distances
 borders_x: [-4, 4]                              # Map X borders range
@@ -28,13 +28,15 @@ scenes_list: [ "circular_crossing",              # Specify scenes you want to ru
                "random_crossing"]
 
 
-controller_list: [ "ED-MPC",                     # Specify controllers you would like to run.
-                   "ED-MPC-EDC",                 # All controllers are located here: evaluation/configs/controllers
-                   "ED-MPC-MDC", 
-                   "MD-MPC-EDC", 
-                   "MD-MPC-MDC",
-                   "RL"] #,
+controller_list: [ #"ED-MPC",                     # Specify controllers you would like to run.
+                   #"ED-MPC-EDC",                 # All controllers are located here: evaluation/configs/controllers
+                   #"ED-MPC-MDC", 
+                   #"MD-MPC-EDC", 
+                   #"MD-MPC-MDC",
+                   #"RL"] #,
                    #"RL_best"]
+                   "RL-ED-MPC-EDC",
+                   "RL-MD-MPC-EDC"]
 
 # Statistics Collection
 metrics: ["failure_status",                     # Specify metrics, only three are currenlty avalaible:

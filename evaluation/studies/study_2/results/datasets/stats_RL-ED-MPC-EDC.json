@@ -1,0 +1,239 @@
+{
+    "circular_crossing": {
+        "RL-ED-MPC-EDC": {
+            "3": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 604,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/circular_crossing/3/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "4": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 1132,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/circular_crossing/4/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "5": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 681,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/circular_crossing/5/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0
+                    ]
+                }
+            },
+            "6": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 648,
+                    "total_collisions": 1,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/circular_crossing/6/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        1
+                    ]
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/circular_crossing/7/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "8": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/circular_crossing/8/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    "parallel_crossing": {
+        "RL-ED-MPC-EDC": {
+            "3": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 1044,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/parallel_crossing/3/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "4": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 516,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/parallel_crossing/4/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "5": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 648,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/parallel_crossing/5/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "6": {},
+            "7": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 582,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/parallel_crossing/7/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "8": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 1418,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/parallel_crossing/8/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    "random_crossing": {
+        "RL-ED-MPC-EDC": {
+            "3": {},
+            "4": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 1330,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/random_crossing/4/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0
+                    ]
+                }
+            },
+            "5": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 846,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/random_crossing/5/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "6": {},
+            "7": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/random_crossing/7/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "8": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_2/configs/scenes/random_crossing/8/0.yaml",
+                    "controller_config": "evaluation/studies/study_2/configs/controllers/RL-ED-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            }
+        }
+    }
+}
