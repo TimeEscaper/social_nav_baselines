@@ -57,11 +57,11 @@ def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH)
         # Form statistics
         print("----------3. Starting to form statistics and plots!----------")
         collect_statistics(experiment_config["folder_name"],
-                        experiment_config["scenes_list"],
-                        experiment_config["controller_list"],
-                        experiment_config["pedestrian_range"],
-                        experiment_config["total_scenarios"],
-                        experiment_config["metrics"])
+                           experiment_config["scenes_list"],
+                           experiment_config["controller_list"],
+                           experiment_config["pedestrian_range"],
+                           experiment_config["total_scenarios"],
+                           experiment_config["metrics"])
         print("----------------Statistics and plots are formed!-------------")
 
 if __name__ == "__main__":
