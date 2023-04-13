@@ -1,6 +1,6 @@
 from core.controllers import ControllerFactory
 from core.predictors import PredictorFactory, PedestrianTracker
-from core.planners import RandomPlanner, DummyPlanner, RLPlanner
+from core.planners import PlannerFactory
 from core.utils import create_sim
 from core.visualizer import Visualizer
 from core.statistics import Statistics
@@ -18,10 +18,8 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 
-#pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
-
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_2/configs/scenes/parallel_crossing/4/0.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_2/configs/controllers/RL-MD-MPC-EDC-2.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/parallel_crossing/4/0.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_4/configs/controllers/RL-ED-MPC-EDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -67,20 +65,10 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                             scene_config_path,
                             controller_config_path)
 
-    # planner = DummyPlanner(global_goal=np.array(config["goal"]),
-    #                         controller=controller,
-    #                         subgoal_reach_threshold=config["tolerance_error"],
-    #                         subgoal_to_goal_threshold=2.,
-    #                         pedestrian_tracker=ped_tracker,
-    #                         statistics_module=statistics)
-    planner = RLPlanner(version=2,
-                        global_goal=np.array(config["goal"]),
-                        controller=controller,
-                        subgoal_reach_threshold=config["tolerance_error"],
-                        subgoal_to_goal_threshold=1.,
-                        pedestrian_tracker=ped_tracker,
-                        statistics_module=statistics,
-                        max_subgoal_steps=25)
+    planner = PlannerFactory.create_planner(config=config,
+                                            controller=controller,
+                                            pedestrian_tracker=ped_tracker,
+                                            statistics_module=statistics)
 
     visualizer = Visualizer(config["total_peds"],
                             renderer)

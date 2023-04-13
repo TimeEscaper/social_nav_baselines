@@ -468,7 +468,7 @@ def generate_scenes(folder_name: str,
     np.random.seed(seed)
     random.seed(seed)
 
-    if True:
+    if False:
         fig, axes = plt.subplot_mosaic([[0, 1, 2]], figsize=[25, 9], facecolor='white')
     else:
         fig = None
@@ -482,8 +482,8 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=True,
-                                    save_config=False,
+                                    visualization=False,
+                                    save_config=True,
                                     ax=axes[0])
     
     if "random_crossing" in scenes_list:
@@ -494,8 +494,8 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=True,
-                                    save_config=False,
+                                    visualization=False,
+                                    save_config=True,
                                     ax=axes[1])
     
     if "parallel_crossing" in scenes_list:
@@ -506,8 +506,8 @@ def generate_scenes(folder_name: str,
                                     inflation_radius,
                                     borders_x,
                                     borders_y,
-                                    visualization=True,
-                                    save_config=False,
+                                    visualization=False,
+                                    save_config=True,
                                     ax=axes[2])
     if fig:
         legend_elements = [patches.Circle([0, 0], 1, fill=None, linewidth=0, color="white", alpha=0.9, label="Initial State"),
