@@ -56,6 +56,9 @@ class CADRL(Policy):
         self.human_state_dim = 7
         self.joint_state_dim = self.self_state_dim + self.human_state_dim
 
+        self.risk_measure = None
+        self.n_risk_samples = None
+
     def configure(self, config):
         self.set_common_parameters(config)
         mlp_dims = [int(x) for x in config.get('cadrl', 'mlp_dims').split(', ')]
@@ -73,6 +76,8 @@ class CADRL(Policy):
         self.cell_num = config.getint('om', 'cell_num')
         self.cell_size = config.getfloat('om', 'cell_size')
         self.om_channel_size = config.getint('om', 'om_channel_size')
+        self.risk_measure = config.get('cadrl', 'risk')
+        self.n_risk_samples = config.getint('cadrl', 'n_risk_samples')
 
     def set_device(self, device):
         self.device = device

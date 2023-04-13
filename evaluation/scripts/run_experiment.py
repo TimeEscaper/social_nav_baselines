@@ -152,7 +152,7 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
         visualizer.make_animation(f"Model Predictive Control", 
                                 result_path, 
                                 config)
-        
+
     return statistics
     
 if __name__ == "__main__":
