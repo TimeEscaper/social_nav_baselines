@@ -45,36 +45,15 @@ class MultiHumanRL(CADRL):
             max_action = None
             for action in self.action_space:
                 next_self_state = self.propagate(state.self_state, action)
-                if self.query_env:
-                    if self.kinematics == "subgoal":
-                        proxy_action = ActionPoint(s_lin=action.s_lin,
-                                                   s_ang=action.s_ang,
-                                                   px=next_self_state.px,
-                                                   py=next_self_state.py,
-                                                   theta=next_self_state.theta,
-                                                   vx=next_self_state.vx,
-                                                   vy=next_self_state.vy)
-                    else:
-                        proxy_action = action
-                    next_human_states, reward, done, info = self.env.onestep_lookahead(proxy_action)
+                if self.risk_measure == "none":
+                    value = self._get_action_value(next_self_state, state, action, occupancy_maps)
                 else:
-                    next_human_states = [self.propagate(human_state, ActionXY(human_state.vx, human_state.vy))
-                                         for human_state in state.human_states]
-                    reward = self.compute_reward(next_self_state, next_human_states)
-                batch_next_states = torch.cat([torch.Tensor([next_self_state + next_human_state]).to(self.device)
-                                               for next_human_state in next_human_states], dim=0)
-                rotated_batch_input = self.rotate(batch_next_states).unsqueeze(0)
-                if self.with_om:
-                    if occupancy_maps is None:
-                        occupancy_maps = self.build_occupancy_maps(next_human_states).unsqueeze(0)
-                    rotated_batch_input = torch.cat([rotated_batch_input, occupancy_maps.to(self.device)], dim=2)
-                # VALUE UPDATE
-                next_state_value = self.model(rotated_batch_input).data.item()
-                value = reward + pow(self.gamma, self.time_step * state.self_state.v_pref) * next_state_value
+                    value = self._get_action_value_risk(next_self_state, state, action, occupancy_maps)
                 self.action_values.append(value)
                 if value > max_value:
                     max_value = value
                     max_action = action
+
             if max_action is None:
                 raise ValueError('Value network is not well trained. ')
 
@@ -136,7 +115,7 @@ class MultiHumanRL(CADRL):
         occupancy_maps = []
         for human in human_states:
             other_humans = np.concatenate([np.array([(other_human.px, other_human.py, other_human.vx, other_human.vy)])
-                                           for other_human in human_states if other_human != human], axis=0)
+                                         for other_human in human_states if other_human != human], axis=0)
             other_px = other_humans[:, 0] - human.px
             other_py = other_humans[:, 1] - human.py
             # new x-axis is in the direction of human's velocity
@@ -182,3 +161,80 @@ class MultiHumanRL(CADRL):
                 occupancy_maps.append([dm])
 
         return torch.from_numpy(np.concatenate(occupancy_maps, axis=0)).float()
+
+    def _get_action_value(self, next_self_state, state, action, occupancy_maps):
+        if self.query_env:
+            if self.kinematics == "subgoal":
+                proxy_action = ActionPoint(s_lin=action.s_lin,
+                                           s_ang=action.s_ang,
+                                           px=next_self_state.px,
+                                           py=next_self_state.py,
+                                           theta=next_self_state.theta,
+                                           vx=next_self_state.vx,
+                                           vy=next_self_state.vy)
+            else:
+                proxy_action = action
+            next_human_states, reward, done, info = self.env.onestep_lookahead(proxy_action)
+        else:
+            next_human_states = [self.propagate(human_state, ActionXY(human_state.vx, human_state.vy))
+                                 for human_state in state.human_states]
+            reward = self.compute_reward(next_self_state, next_human_states)
+        batch_next_states = torch.cat([torch.Tensor([next_self_state + next_human_state]).to(self.device)
+                                       for next_human_state in next_human_states], dim=0)
+        rotated_batch_input = self.rotate(batch_next_states).unsqueeze(0)
+        if self.with_om:
+            if occupancy_maps is None:
+                occupancy_maps = self.build_occupancy_maps(next_human_states).unsqueeze(0)
+            rotated_batch_input = torch.cat([rotated_batch_input, occupancy_maps.to(self.device)], dim=2)
+        # VALUE UPDATE
+        next_state_value = self.model(rotated_batch_input).data.item()
+        value = reward + pow(self.gamma, self.time_step * state.self_state.v_pref) * next_state_value
+        return value
+
+    def _get_action_value_risk(self, next_self_state, state, action, occupancy_maps):
+        if self.query_env:
+            if self.kinematics == "subgoal":
+                proxy_action = ActionPoint(s_lin=action.s_lin,
+                                           s_ang=action.s_ang,
+                                           px=next_self_state.px,
+                                           py=next_self_state.py,
+                                           theta=next_self_state.theta,
+                                           vx=next_self_state.vx,
+                                           vy=next_self_state.vy)
+            else:
+                proxy_action = action
+            # next_human_states, reward, done, info = self.env.onestep_lookahead(proxy_action)
+            env_outcomes = self.env.onestep_lookahead(proxy_action, n_samples=self.n_risk_samples)
+        else:
+            raise RuntimeError(f"For risk-aware setting, only lookup is possible")
+
+        values = []
+        for i in range(len(env_outcomes)):
+            batch_next_states = torch.cat([torch.Tensor([next_self_state + next_human_state]).to(self.device)
+                                           for next_human_state in env_outcomes[i][0]], dim=0)
+            rotated_batch_input = self.rotate(batch_next_states).unsqueeze(0)
+            if self.with_om:
+                if occupancy_maps is None:
+                    occupancy_maps = self.build_occupancy_maps(env_outcomes[i][0]).unsqueeze(0)
+                rotated_batch_input = torch.cat([rotated_batch_input, occupancy_maps.to(self.device)], dim=2)
+            # VALUE UPDATE
+            next_state_value = self.model(rotated_batch_input).data.item()
+            value = env_outcomes[i][1] + pow(self.gamma, self.time_step * state.self_state.v_pref) * next_state_value
+            values.append(value)
+
+        if self.risk_measure == "worst_case":
+            return min(values)
+        elif self.risk_measure == "cvar_95":
+            return self._cvar(values, percentile=95)
+        elif self.risk_measure == "cvar_90":
+            return self._cvar(values, percentile=90)
+        else:
+            raise ValueError(f"Unknown risk measure {self.risk_measure}")
+
+    def _cvar(self, values, percentile: float = 95) -> float:
+        values = np.array(values)
+        var = np.percentile(values, percentile)
+        mask = values > var
+        masked = values[mask]
+        cvar = np.mean(masked)
+        return cvar

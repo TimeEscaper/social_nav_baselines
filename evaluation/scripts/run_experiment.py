@@ -20,7 +20,7 @@ torch.cuda.manual_seed(SEED)
 
 #pathlib.Path(r"results").mkdir(parents=True, exist_ok=True)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_2/configs/scenes/parallel_crossing/8/3.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_2/configs/scenes/parallel_crossing/8/28.yaml"
 DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_2/configs/controllers/MD-MPC-EDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
@@ -73,13 +73,14 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                             subgoal_to_goal_threshold=2.,
                             pedestrian_tracker=ped_tracker,
                             statistics_module=statistics)
-    # planner = RLPlanner(global_goal=np.array(config["goal"]),
+    # planner = RLPlanner(version=2, global_goal=np.array(config["goal"]),
     #                         controller=controller,
     #                         subgoal_reach_threshold=config["tolerance_error"],
     #                         subgoal_to_goal_threshold=1.,
     #                         pedestrian_tracker=ped_tracker,
     #                         statistics_module=statistics,
-    #                     max_subgoal_steps=25)
+    #                     max_subgoal_steps=25,
+    #                     risk=None)
 
     visualizer = Visualizer(config["total_peds"],
                             renderer)
@@ -163,7 +164,7 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
         visualizer.make_animation(f"Model Predictive Control", 
                                 result_path, 
                                 config)
-        
+
     return statistics
     
 if __name__ == "__main__":
