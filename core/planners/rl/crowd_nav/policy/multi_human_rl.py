@@ -2,6 +2,7 @@ import torch
 import numpy as np
 from core.planners.rl.crowd_nav.utils.action import ActionRot, ActionXY, ActionPoint
 from core.planners.rl.crowd_nav.policy.cadrl import CADRL
+from core.planners.rl.crowd_nav.utils.utils import transition_to_subgoal_polar
 
 
 class MultiHumanRL(CADRL):
@@ -23,9 +24,12 @@ class MultiHumanRL(CADRL):
             if self.kinematics == 'holonomic':
                 return ActionXY(0, 0)
             elif self.kinematics == "subgoal":
-                return ActionPoint(px=state.px,
-                                   py=state.py,
-                                   theta=state.theta)
+                subgoal_polar = transition_to_subgoal_polar(
+                    np.array([state.self_state.px, state.self_state.py, state.self_state.theta]),
+                    np.array([state.self_state.gx, state.self_state.gy, 0.])
+                )
+                return ActionPoint(s_lin=subgoal_polar[0],
+                                   s_ang=subgoal_polar[1])
             else:
                 return ActionRot(0, 0)
         if self.action_space is None:
@@ -55,10 +59,10 @@ class MultiHumanRL(CADRL):
                     next_human_states, reward, done, info = self.env.onestep_lookahead(proxy_action)
                 else:
                     next_human_states = [self.propagate(human_state, ActionXY(human_state.vx, human_state.vy))
-                                       for human_state in state.human_states]
+                                         for human_state in state.human_states]
                     reward = self.compute_reward(next_self_state, next_human_states)
                 batch_next_states = torch.cat([torch.Tensor([next_self_state + next_human_state]).to(self.device)
-                                              for next_human_state in next_human_states], dim=0)
+                                               for next_human_state in next_human_states], dim=0)
                 rotated_batch_input = self.rotate(batch_next_states).unsqueeze(0)
                 if self.with_om:
                     if occupancy_maps is None:
@@ -132,7 +136,7 @@ class MultiHumanRL(CADRL):
         occupancy_maps = []
         for human in human_states:
             other_humans = np.concatenate([np.array([(other_human.px, other_human.py, other_human.vx, other_human.vy)])
-                                         for other_human in human_states if other_human != human], axis=0)
+                                           for other_human in human_states if other_human != human], axis=0)
             other_px = other_humans[:, 0] - human.px
             other_py = other_humans[:, 1] - human.py
             # new x-axis is in the direction of human's velocity
@@ -178,4 +182,3 @@ class MultiHumanRL(CADRL):
                 occupancy_maps.append([dm])
 
         return torch.from_numpy(np.concatenate(occupancy_maps, axis=0)).float()
-
