@@ -35,8 +35,8 @@ controller_list: [ #"ED-MPC",                     # Specify controllers you woul
                    #"MD-MPC-MDC",
                    #"RL"] #,
                    #"RL_best"]
-                   "RL-ED-MPC-EDC",
-                   "RL-MD-MPC-EDC"]
+                   "RL-ED-MPC-EDC-2",
+                   "RL-MD-MPC-EDC-2"]
 
 # Statistics Collection
 metrics: ["failure_status",                     # Specify metrics, only three are currenlty avalaible:
