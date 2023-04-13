@@ -151,6 +151,7 @@ class _EnvStub:
 class RLPlanner(AbstractPlanner):
 
     def __init__(self,
+                 version: int,
                  global_goal: np.ndarray,
                  controller: AbstractController,
                  subgoal_reach_threshold: float,
@@ -158,6 +159,7 @@ class RLPlanner(AbstractPlanner):
                  pedestrian_tracker: PedestrianTracker,
                  max_subgoal_steps: int = 25,
                  statistics_module: Optional[Statistics] = None):
+        assert version > 0, f"Version must be an integer > 0"
         super(RLPlanner, self).__init__(global_goal=global_goal,
                                             controller=controller,
                                             subgoal_reach_threshold=subgoal_reach_threshold,
@@ -169,15 +171,15 @@ class RLPlanner(AbstractPlanner):
         self._policy = policy_factory["sarl"]()
         policy_config = configparser.RawConfigParser( )
         policy_config.read(pkg_resources.resource_filename("core.planners.rl",
-                                                           "config/policy_subgoal.config"))
+                                                           f"config/v{version}/policy_subgoal.config"))
         device = "cuda" if torch.cuda.is_available() else "cpu"
         self._policy.configure(policy_config)
         self._policy.get_model().load_state_dict(torch.load(pkg_resources.resource_filename("core.planners.rl",
-                                                           "weights/rl_model.pth"), map_location=device))
+                                                           f"weights/v{version}/rl_model.pth"), map_location=device))
 
         env_config = configparser.RawConfigParser()
         env_config.read(pkg_resources.resource_filename("core.planners.rl",
-                                                        "config/env.config"))
+                                                        f"config/v{version}/env.config"))
         self._env = _EnvStub(pedestrian_tracker, global_goal)
         self._env.configure(env_config)
 
