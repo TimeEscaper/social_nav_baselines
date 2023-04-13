@@ -19,6 +19,7 @@ class PlannerFactory():
                                     pedestrian_tracker=pedestrian_tracker,
                                     statistics_module=statistics_module)
         elif config["planner"] == "RL":
+            risk_measure = config["risk_measure"] if "risk_measure" in config else None
             planner = RLPlanner(version=2,
                                 global_goal=np.array(config["goal"]),
                                 controller=controller,
@@ -26,7 +27,8 @@ class PlannerFactory():
                                 subgoal_to_goal_threshold=1.,
                                 pedestrian_tracker=pedestrian_tracker,
                                 statistics_module=statistics_module,
-                                max_subgoal_steps=25)
+                                max_subgoal_steps=25,
+                                risk=risk_measure)
         elif config["planner"] == "random":
             planner = RandomPlanner(global_goal=np.array(config["goal"]),
                                     controller=controller,

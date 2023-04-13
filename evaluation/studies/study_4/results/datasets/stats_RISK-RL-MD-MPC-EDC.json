@@ -1,0 +1,242 @@
+{
+    "circular_crossing": {
+        "RISK-RL-MD-MPC-EDC": {
+            "3": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 417,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/circular_crossing/3/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0
+                    ]
+                }
+            },
+            "4": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 450,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/circular_crossing/4/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "5": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 505,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/circular_crossing/5/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0
+                    ]
+                }
+            },
+            "6": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 1132,
+                    "total_collisions": 5,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/circular_crossing/6/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        5,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 318,
+                    "total_collisions": 1,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/circular_crossing/7/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        1
+                    ]
+                }
+            },
+            "8": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 4,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/circular_crossing/8/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        4,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    "parallel_crossing": {
+        "RISK-RL-MD-MPC-EDC": {
+            "3": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 450,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/parallel_crossing/3/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "4": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 329,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/parallel_crossing/4/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0
+                    ]
+                }
+            },
+            "5": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 384,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/parallel_crossing/5/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "6": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 516,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/parallel_crossing/6/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 1033,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/parallel_crossing/7/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "8": {
+                "0": {
+                    "failure_status": true,
+                    "simulation_ticks": 2000,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/parallel_crossing/8/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            }
+        }
+    },
+    "random_crossing": {
+        "RISK-RL-MD-MPC-EDC": {
+            "3": {},
+            "4": {},
+            "5": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 604,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/random_crossing/5/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0
+                    ]
+                }
+            },
+            "6": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 1044,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/random_crossing/6/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0
+                    ]
+                }
+            },
+            "7": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 1682,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/random_crossing/7/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0,
+                        0,
+                        0
+                    ]
+                }
+            },
+            "8": {
+                "0": {
+                    "failure_status": false,
+                    "simulation_ticks": 373,
+                    "total_collisions": 0,
+                    "scene_config": "evaluation/studies/study_4/configs/scenes/random_crossing/8/0.yaml",
+                    "controller_config": "evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml",
+                    "collisions_per_subgoal": [
+                        0,
+                        0
+                    ]
+                }
+            }
+        }
+    }
+}
