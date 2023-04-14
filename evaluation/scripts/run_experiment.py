@@ -18,8 +18,8 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/parallel_crossing/4/0.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_4/configs/controllers/RL-ED-MPC-EDC.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/circular_crossing/6/0.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_4/configs/controllers/RISK-RL-ED-MPC-EDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -132,6 +132,9 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
         statistics.track_collisions()
         statistics.track_simulation_ticks()
         hold_time += simulator.sim_dt
+
+        if statistics.total_collisions >= 1:
+            break
 
         if config["experiment_run"] == False:
             # Terminate the simulation anytime by pressing ESC
