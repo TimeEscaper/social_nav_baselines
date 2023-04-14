@@ -103,6 +103,8 @@ class _EnvStub:
 
         predictions = self._tracker.get_predictions()
 
+        return_list = n_samples is not None
+
         if len(predictions) == 0:
             goal_reached = np.linalg.norm(robot_position - self._global_goal) < ROBOT_RADIUS
             if goal_reached:
@@ -116,7 +118,11 @@ class _EnvStub:
             obs = []
             for _ in range(_EnvStub._PEDS_PADDING):
                 obs.append(ObservableState(-10., -10., 0., 0., 0.01))
-            return [(obs, reward, done, info)]
+            result = [(obs, reward, done, info)]
+            if return_list:
+                return result
+            else:
+                return result[0]
 
         predicted_positions = np.stack([v[0][approx_timesteps_index] for v in predictions.values()], axis=0)
         predicted_covariances = np.stack([v[1][approx_timesteps_index] for v in predictions.values()], axis=0)
@@ -130,8 +136,6 @@ class _EnvStub:
         vel_estimations = np.stack(vel_estimations, axis=0)
 
         result = []
-
-        return_list = n_samples is not None
 
         for i in range(n_samples or 1):
             collision = False
