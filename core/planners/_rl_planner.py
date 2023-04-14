@@ -218,7 +218,7 @@ class RLPlanner(AbstractPlanner):
         policy_config = configparser.RawConfigParser( )
         policy_config.read(pkg_resources.resource_filename("core.planners.rl",
                                                            f"config/v{version}/policy_subgoal.config"))
-        device = "cpu"  #  "cuda" if torch.cuda.is_available() else "cpu"
+        device = "cuda" if torch.cuda.is_available() else "cpu"
         self._policy.configure(policy_config)
         self._policy.get_model().load_state_dict(torch.load(pkg_resources.resource_filename("core.planners.rl",
                                                            f"weights/v{version}/rl_model.pth"), map_location=device))

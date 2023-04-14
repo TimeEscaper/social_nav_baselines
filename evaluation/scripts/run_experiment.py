@@ -18,8 +18,8 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/circular_crossing/6/0.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_4/configs/controllers/RISK-RL-ED-MPC-EDC.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/circular_crossing/3/4.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_4/configs/controllers/RL-MD-MPC-EDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
