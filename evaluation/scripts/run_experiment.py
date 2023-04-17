@@ -18,8 +18,8 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/circular_crossing/3/3.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/circular_crossing/8/49.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_4/configs/controllers/MD-MPC-EDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -49,7 +49,7 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                      config["pedestrians_init_states"],
                                      config["pedestrians_goals"],
                                      config["ped_model"],
-                                     create_renderer = True)
+                                     create_renderer = False)
     
     predictor = PredictorFactory.create_predictor(config)
 
@@ -80,6 +80,9 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
     state = config["init_state"]
     control = np.array([0, 0])
 
+    control = np.array([0, 0, 0])
+    control_array = []
+
     while True:
         # if simulation time exceeded
         if statistics.simulation_ticks >= 2000:
@@ -100,6 +103,9 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                 control, predicted_pedestrians_trajectories, predicted_pedestrians_covariances = planner.make_step(state,
                                                                                                                    observation,
                                                                                                                    robot_velocity)
+                control_array.append(control)
+                
+
                 predicted_robot_trajectory = controller.get_predicted_robot_trajectory()    
                 statistics.append_current_subgoal(planner.current_subgoal)
                 visualizer.append_ground_truth_robot_state(state)
@@ -144,6 +150,16 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                     if event.key == pygame.K_ESCAPE:
                         pygame.quit()
     pygame.quit()
+
+    control_array = np.array(control_array)
+    import matplotlib.pyplot as plt
+    t = np.linspace(0, len(control_array)*config["dt"], len(control_array))
+    plt.plot(t, control_array[:, 2], linewidth=3)
+    plt.grid(True)
+    plt.xlabel('Simulation Time, [s]')
+    plt.ylabel('Slack Variable: Adaptive Euclidean Constraint')
+    plt.title('Slack Variable: Adaptive Euclidean Constraint')
+    
 
     statistics._ground_truth_pedestrian_trajectories = visualizer._ground_truth_pedestrian_trajectories
     statistics._ground_truth_robot_trajectory = visualizer._ground_truth_robot_trajectory

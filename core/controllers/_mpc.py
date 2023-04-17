@@ -79,6 +79,8 @@ class DoMPCController(AbstractController):
             # control input variables
             v = self._model.set_variable("_u", "v")
             w = self._model.set_variable("_u", "w")
+            sv = self._model.set_variable("_u", "sv")
+            #sW = self._model.set_variable("_u", "sW")
         elif model_type == "unicycle_double_integrator":
             # state variables
             v = self._model.set_variable("_x", "v")
@@ -128,6 +130,13 @@ class DoMPCController(AbstractController):
         p_rob_hcat = casadi.hcat([self._model._x.cat[:2] for _ in range(total_peds)])
         p_peds = self._state_peds[:2, :]
 
+        if True:
+            R = np.array([[0.005, 0, 0],
+                          [0, 0.005, 0],
+                          [0, 0, 100000]])
+        else:
+            R = np.eye(3)
+
         # stage cost
         u = self._model._u.cat
         if cost_function == "GO-MPC":
@@ -159,7 +168,7 @@ class DoMPCController(AbstractController):
                                 mterm=terminal_cost)
         
         if model_type == "unicycle":
-            self._mpc.set_rterm(v=1e-2, w=1e-2)
+            self._mpc.set_rterm(v=1e-2, w=1e-2, sv=1e-2,)
         elif model_type == "unicycle_double_integrator":                      
             self._mpc.set_rterm(u_a=1e-2, u_alpha=1e-2)
         
@@ -168,9 +177,12 @@ class DoMPCController(AbstractController):
             # lb
             self._mpc.bounds['lower', '_u', 'v'] = lb[0]
             self._mpc.bounds['lower', '_u', 'w'] = lb[1]
+            self._mpc.bounds['lower', '_u', 'sv'] = 0
             # ub
             self._mpc.bounds['upper', '_u', 'v'] = ub[0]
             self._mpc.bounds['upper', '_u', 'w'] = ub[1]
+            self._mpc.bounds['upper', '_u', 'sv'] = np.inf
+
         elif model_type == "unicycle_double_integrator":
             # lb
             self._mpc.bounds["lower", "_x", "v"] = lb[0]
@@ -190,7 +202,7 @@ class DoMPCController(AbstractController):
             lb_dists_square = np.array([lb_dist_square for _ in range(total_peds)])
             # inequality constrain for pedestrians
             dx_dy_square = (p_rob_hcat - p_peds) ** 2
-            pedestrians_distances_squared = dx_dy_square[0, :] + dx_dy_square[1, :]
+            pedestrians_distances_squared = dx_dy_square[0, :] + dx_dy_square[1, :] + sv
             self._mpc.set_nl_cons("euclidean_dist_to_peds", -pedestrians_distances_squared,
                                   ub=-lb_dists_square)
         elif constraint_type == "MD":
@@ -199,8 +211,8 @@ class DoMPCController(AbstractController):
                 delta = (p_rob - peds)
                 array_mahalanobis_distances = casadi.SX(1, total_peds)
                 for ped_ind in range(self._total_peds):
-                    array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind]
-                return array_mahalanobis_distances
+                    array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind] + sv
+                return array_mahalanobis_distances 
 
             pedestrians_mahalanobis_distances = _get_MD(p_rob_hcat, p_peds, self._inverse_covariances_peds)
             
