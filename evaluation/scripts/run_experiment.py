@@ -18,8 +18,8 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/circular_crossing/3/4.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_4/configs/controllers/RL-MD-MPC-EDC.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/circular_crossing/3/3.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_4/configs/controllers/RISK-RL-MD-MPC-EDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -49,7 +49,7 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                      config["pedestrians_init_states"],
                                      config["pedestrians_goals"],
                                      config["ped_model"],
-                                     create_renderer = False)
+                                     create_renderer = True)
     
     predictor = PredictorFactory.create_predictor(config)
 
