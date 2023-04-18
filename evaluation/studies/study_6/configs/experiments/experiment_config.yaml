@@ -25,8 +25,9 @@ scenes_list: ["circular_crossing",              # Specify scenes you want to run
               "parallel_crossing", 
               "random_crossing"]
 
-controller_list: [                    # Specify controllers you would like to run.
+controller_list: ["ED-MPC-EDC",                   # Specify controllers you would like to run.
                   "ED-MPC-EDC-Ad",                 # All controllers are located here: evaluation/configs/controllers
+                  "MD-MPC-EDC",
                   "MD-MPC-EDC-Ad",
                   "MPC-EDC-Ad"]
 
