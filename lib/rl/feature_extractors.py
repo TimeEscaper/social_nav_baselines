@@ -3,8 +3,9 @@ import torch
 import torch.nn as nn
 import gym
 
-from typing import Callable
+from typing import Callable, Tuple
 from stable_baselines3.common.torch_layers import BaseFeaturesExtractor
+
 
 def get_activation(name: str) -> Callable:
     if name is None or name == "none":
@@ -14,6 +15,19 @@ def get_activation(name: str) -> Callable:
     if name == "tanh":
         return nn.Tanh
     raise ValueError(f"Unknown activation {name}")
+
+
+def mlp(input_dim, mlp_dims, activation, last_activation=None):
+    layers = []
+    mlp_dims = (input_dim,) + mlp_dims
+    for i in range(len(mlp_dims) - 1):
+        layers.append(nn.Linear(mlp_dims[i], mlp_dims[i + 1]))
+        if i != len(mlp_dims) - 2:
+            layers.append(activation())
+    if last_activation is not None:
+        layers.append(last_activation())
+    net = nn.Sequential(*layers)
+    return net
 
 
 class BasicGraphExtractor(BaseFeaturesExtractor):
@@ -313,3 +327,99 @@ class DoubleAttentionExtractor(BaseFeaturesExtractor):
                                                                key_padding_mask=key_padding_mask,
                                                                need_weights=False)
         return robot_peds_emb
+
+
+class SARLFeatureExtractor(BaseFeaturesExtractor):
+    NAME = "sarl_extractor"
+
+    def __init__(self,
+                 observation_space: gym.spaces.Dict,
+                 mlp1_dims: Tuple[int, ...] = (150, 100),
+                 mlp2_dims: Tuple[int, ...] = (100, 50),
+                 mlp3_dims: Tuple[int, ...] = (150,),
+                 attention_dims: Tuple[int, ...] = (100, 100, 1),
+                 with_global_state: bool = True,
+                 with_visibility_mask: bool = False,
+                 features_dim: int = 256,
+                 activation: str = "tanh"):
+        super(SARLFeatureExtractor, self).__init__(observation_space, features_dim)
+        activation = get_activation(activation)
+
+        self_state_dim = observation_space["robot"].shape[0]
+        input_dim = self_state_dim + observation_space["peds"].shape[1]
+        mlp3_dims = mlp3_dims + (features_dim,)
+
+        self.global_state_dim = mlp1_dims[-1]
+        self.mlp1 = mlp(input_dim, mlp1_dims, activation, last_activation=activation)
+        self.mlp2 = mlp(mlp1_dims[-1], mlp2_dims, activation)
+        self.with_global_state = with_global_state
+        if with_global_state:
+            self.attention = mlp(mlp1_dims[-1] * 2, attention_dims, activation)
+            self.attention_dim = mlp1_dims[-1] * 2
+        else:
+            self.attention = mlp(mlp1_dims[-1], attention_dims, activation)
+            self.attention_dim = mlp1_dims[-1]
+
+        mlp3_input_dim = mlp2_dims[-1] + self_state_dim
+        self.mlp3 = mlp(mlp3_input_dim, mlp3_dims, activation)
+        self.with_visibility_mask = with_visibility_mask
+
+        self.mlp1_dim = mlp1_dims[1]
+        self.mlp2_dim = mlp2_dims[1]
+
+    def forward(self, observations) -> torch.Tensor:
+        self_state = observations["robot"]
+        peds_state = observations["peds"]
+        peds_vis = observations["visibility"]
+
+        n_peds = peds_state.shape[1]
+        state = torch.tile(self_state, (n_peds, 1, 1)).transpose(0, 1)
+        state = torch.cat((state, peds_state), dim=-1)
+
+        if self.with_visibility_mask:
+            visibility_mask = peds_vis > 0
+        else:
+            visibility_mask = torch.ones_like(peds_vis)
+        visibility_mask_flatten_1 = torch.tile(visibility_mask.reshape(-1).unsqueeze(1), (1, self.mlp1_dim))
+        visibility_mask_flatten_2 = torch.tile(visibility_mask.reshape(-1).unsqueeze(1), (1, self.mlp2_dim))
+        visibility_mask_flatten_3 = torch.tile(visibility_mask.reshape(-1).unsqueeze(1), (1, self.attention_dim))
+
+        size = state.shape
+        mlp1_output = self.mlp1(state.view((-1, size[2])))
+        mlp2_output = self.mlp2(mlp1_output)
+
+        mlp1_output = mlp1_output * visibility_mask_flatten_1
+        mlp2_output = mlp2_output * visibility_mask_flatten_2
+
+        if self.with_global_state:
+            # compute attention scores
+            global_state = torch.mean(mlp1_output.view(size[0], size[1], -1), 1, keepdim=True)
+            global_state = global_state.expand((size[0], size[1], self.global_state_dim)). \
+                contiguous().view(-1, self.global_state_dim)
+            attention_input = torch.cat([mlp1_output, global_state], dim=1)
+            attention_input = attention_input * visibility_mask_flatten_3
+        else:
+            attention_input = mlp1_output
+        scores = self.attention(attention_input).view(size[0], size[1], 1).squeeze(dim=2)
+        scores = scores * visibility_mask
+
+        # masked softmax
+        # weights = softmax(scores, dim=1).unsqueeze(2)
+        scores_mask = scores != 0
+        for i in range(scores_mask.shape[0]):
+            if not scores_mask[i].any():
+                scores[i, 0] = 1.
+        scores_exp = torch.exp(scores) * (scores != 0).float()
+        weights = (scores_exp / torch.sum(scores_exp, dim=1, keepdim=True)).unsqueeze(2)
+        # self.attention_weights = weights[0, :, 0].data.cpu().numpy()
+
+        # output feature is a linear combination of input features
+        features = mlp2_output.view(size[0], size[1], -1)
+        # for converting to onnx
+        # expanded_weights = torch.cat([torch.zeros(weights.size()).copy_(weights) for _ in range(50)], dim=2)
+        weighted_feature = torch.sum(torch.mul(weights, features), dim=1)
+
+        # concatenate agent's state with global weighted humans' state
+        joint_state = torch.cat([self_state, weighted_feature], dim=1)
+        feature = self.mlp3(joint_state)
+        return feature

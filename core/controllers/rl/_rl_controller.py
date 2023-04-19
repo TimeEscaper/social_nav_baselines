@@ -3,6 +3,8 @@ import numpy as np
 import torch
 import gym
 import pkg_resources
+from pyminisim.core import ROBOT_RADIUS, PEDESTRIAN_RADIUS
+from pyminisim.util import wrap_angle
 
 from stable_baselines3 import PPO
 
@@ -21,7 +23,7 @@ class RLController(AbstractController):
                  state_dummy_ped: List[float],
                  total_peds: int,
                  horizon: int,
-                 weights: str = "ppo_model_v1",
+                 weights: str = "ppo_model_v2",
                  device: str = "cuda"):
         super(RLController, self).__init__(init_state=init_state,
                                            goal=goal,
@@ -37,6 +39,7 @@ class RLController(AbstractController):
         weights = pkg_resources.resource_filename("core.controllers.rl", f"weights/{weights}.zip")
         self._rl_model = PPO.load(weights, device=device)
         self._states = None
+
 
     def _get_output_predictions(self) -> np.ndarray:
         """Method predicts pedestrian trajectories with specified predictor
@@ -54,35 +57,35 @@ class RLController(AbstractController):
         return predicted_trajectories, predicted_covs
 
     def _build_model_obs(self, robot_pose: np.ndarray, robot_vel: np.ndarray):
-        current_poses = self._ped_tracker.get_current_poses()
-        predictions = {k: v[0] for k, v in self._ped_tracker.get_predictions().items()}
+        goal = self.goal[:2]
 
-        obs_ped_traj = np.ones((self._peds_padding, self._rl_horizon + 1, 2)) * 100.
-        obs_peds_ids = current_poses.keys()
-        obs_peds_vis = np.zeros(self._peds_padding, dtype=np.bool)
-        for k in obs_peds_ids:
-            obs_ped_traj[k, 0, :] = current_poses[k] - robot_pose[:2]
-            obs_ped_traj[k, 1:, :] = predictions[k][:self._rl_horizon, :] - robot_pose[:2]
-            obs_peds_vis[k] = True
+        rotation_matrix = np.array([[np.cos(robot_pose[2]), -np.sin(robot_pose[2])],
+                                    [np.sin(robot_pose[2]), np.cos(robot_pose[2])]])
+        robot_vel = rotation_matrix @ robot_vel[:2]
 
-        # TODO: Should we make soring optional?
-        distances = np.linalg.norm(obs_ped_traj[:, 0, :], axis=1)
-        sorted_indices = np.argsort(distances)
-        obs_ped_traj = obs_ped_traj[sorted_indices]
-        obs_peds_vis = obs_peds_vis[sorted_indices]
+        d_g = np.linalg.norm(robot_pose[:2] - goal)
+        phi_goal = wrap_angle(robot_pose[2] - np.arctan2(goal[1] - robot_pose[1], goal[0] - robot_pose[0]))
+        robot_obs = np.array([d_g, phi_goal, robot_vel[0], robot_vel[1], ROBOT_RADIUS])
 
-        robot_obs = np.array([np.linalg.norm(self._goal[:2] - robot_pose[:2]),
-                         self._goal[0] - robot_pose[0],
-                         self._goal[1] - robot_pose[1],
-                         robot_pose[2],
-                         robot_vel[0],
-                         robot_vel[1],
-                         robot_vel[2]]).astype(np.float32)
+        peds_obs = np.tile(np.array([-10., -10., 0., 0., 0., 0., 100, ROBOT_RADIUS]), (self._peds_padding, 1))
+        peds_vis = np.zeros(self._peds_padding, dtype=np.bool)
+        detections = self._ped_tracker.get_current_poses(return_velocities=True)
+        for i, (k, v) in enumerate(detections.items()):
+            ped_pose = v[:2]
+            ped_vel = v[2:]
+            ped_pose = ped_pose - robot_pose[:2]
+            ped_pose = rotation_matrix @ ped_pose
+            ped_phi = np.arctan2(ped_pose[1], ped_pose[0])
+            ped_vel = rotation_matrix @ ped_vel
+            d = np.linalg.norm(ped_pose)
+            peds_obs[i] = np.array([ped_pose[0], ped_pose[1], ped_phi, ped_vel[0], ped_vel[1], PEDESTRIAN_RADIUS,
+                                    d, PEDESTRIAN_RADIUS + ROBOT_RADIUS])
+            peds_vis[i] = True
 
         return {
-            "peds_traj": obs_ped_traj[np.newaxis, :, :, :],
-            "peds_visibility": obs_peds_vis[np.newaxis, :],
-            "robot_state": robot_obs[np.newaxis, :]
+            "robot": robot_obs[np.newaxis],
+            "peds": peds_obs[np.newaxis],
+            "visibility": peds_vis[np.newaxis]
         }
 
     def make_step(self, state: np.ndarray, observation: Dict[int, np.ndarray], robot_velocity: np.ndarray) -> np.ndarray:

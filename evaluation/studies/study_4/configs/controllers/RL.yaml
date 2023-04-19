@@ -6,7 +6,7 @@
 
 
 controller_type: "RL"                      # Specify controller type, ["DWA", "MPC", "MPPI", "DDP"]
-weights: "ppo_model_v1"                    # Specify arcive name of the weights 
+weights: "ppo_model_v2"                    # Specify arcive name of the weights
 model_type: "unicycle"                     # Robot model, ["unicycle", "unicycle_double_integrator"]
 horizon: 24                                # MPC planning horizon, [steps]
 ped_predictor: "neural"                    # Pedestrian predictor, ["constant_velocity", "neural"]
