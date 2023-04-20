@@ -423,3 +423,101 @@ class SARLFeatureExtractor(BaseFeaturesExtractor):
         joint_state = torch.cat([self_state, weighted_feature], dim=1)
         feature = self.mlp3(joint_state)
         return feature
+
+
+class SARLPredictionFeatureExtractor(BaseFeaturesExtractor):
+    NAME = "sarl_prediction_extractor"
+
+    def __init__(self,
+                 observation_space: gym.spaces.Dict,
+                 mlp1_dims: Tuple[int, ...] = (150, 100),
+                 mlp2_dims: Tuple[int, ...] = (100, 50),
+                 mlp3_dims: Tuple[int, ...] = (150,),
+                 attention_dims: Tuple[int, ...] = (100, 100, 1),
+                 with_global_state: bool = True,
+                 with_visibility_mask: bool = False,
+                 features_dim: int = 256,
+                 activation: str = "tanh"):
+        super(SARLPredictionFeatureExtractor, self).__init__(observation_space, features_dim)
+        activation = get_activation(activation)
+
+        self_state_dim = observation_space["robot"].shape[0]
+        input_dim = \
+            self_state_dim + observation_space["pred_mean_rl"].shape[1] * observation_space["pred_mean_rl"].shape[2]
+        mlp3_dims = mlp3_dims + (features_dim,)
+
+        self.global_state_dim = mlp1_dims[-1]
+        self.mlp1 = mlp(input_dim, mlp1_dims, activation, last_activation=activation)
+        self.mlp2 = mlp(mlp1_dims[-1], mlp2_dims, activation)
+        self.with_global_state = with_global_state
+        if with_global_state:
+            self.attention = mlp(mlp1_dims[-1] * 2, attention_dims, activation)
+            self.attention_dim = mlp1_dims[-1] * 2
+        else:
+            self.attention = mlp(mlp1_dims[-1], attention_dims, activation)
+            self.attention_dim = mlp1_dims[-1]
+
+        mlp3_input_dim = mlp2_dims[-1] + self_state_dim
+        self.mlp3 = mlp(mlp3_input_dim, mlp3_dims, activation)
+        self.with_visibility_mask = with_visibility_mask
+
+        self.mlp1_dim = mlp1_dims[1]
+        self.mlp2_dim = mlp2_dims[1]
+
+    def forward(self, observations) -> torch.Tensor:
+        self_state = observations["robot"]
+        peds_state = observations["pred_mean_rl"]
+        peds_vis = observations["visibility"]
+
+        n_envs, n_peds, seq_len, ped_dim = peds_state.shape
+        peds_state = peds_state.reshape((n_envs, n_peds, seq_len * ped_dim))
+        state = torch.tile(self_state, (n_peds, 1, 1)).transpose(0, 1)
+        state = torch.cat((state, peds_state), dim=-1)
+
+        if self.with_visibility_mask:
+            visibility_mask = peds_vis > 0
+        else:
+            visibility_mask = torch.ones_like(peds_vis)
+        visibility_mask_flatten_1 = torch.tile(visibility_mask.reshape(-1).unsqueeze(1), (1, self.mlp1_dim))
+        visibility_mask_flatten_2 = torch.tile(visibility_mask.reshape(-1).unsqueeze(1), (1, self.mlp2_dim))
+        visibility_mask_flatten_3 = torch.tile(visibility_mask.reshape(-1).unsqueeze(1), (1, self.attention_dim))
+
+        size = state.shape
+        mlp1_output = self.mlp1(state.view((-1, size[2])))
+        mlp2_output = self.mlp2(mlp1_output)
+
+        mlp1_output = mlp1_output * visibility_mask_flatten_1
+        mlp2_output = mlp2_output * visibility_mask_flatten_2
+
+        if self.with_global_state:
+            # compute attention scores
+            global_state = torch.mean(mlp1_output.view(size[0], size[1], -1), 1, keepdim=True)
+            global_state = global_state.expand((size[0], size[1], self.global_state_dim)). \
+                contiguous().view(-1, self.global_state_dim)
+            attention_input = torch.cat([mlp1_output, global_state], dim=1)
+            attention_input = attention_input * visibility_mask_flatten_3
+        else:
+            attention_input = mlp1_output
+        scores = self.attention(attention_input).view(size[0], size[1], 1).squeeze(dim=2)
+        scores = scores * visibility_mask
+
+        # masked softmax
+        # weights = softmax(scores, dim=1).unsqueeze(2)
+        scores_mask = scores != 0
+        for i in range(scores_mask.shape[0]):
+            if not scores_mask[i].any():
+                scores[i, 0] = 1.
+        scores_exp = torch.exp(scores) * (scores != 0).float()
+        weights = (scores_exp / torch.sum(scores_exp, dim=1, keepdim=True)).unsqueeze(2)
+        # self.attention_weights = weights[0, :, 0].data.cpu().numpy()
+
+        # output feature is a linear combination of input features
+        features = mlp2_output.view(size[0], size[1], -1)
+        # for converting to onnx
+        # expanded_weights = torch.cat([torch.zeros(weights.size()).copy_(weights) for _ in range(50)], dim=2)
+        weighted_feature = torch.sum(torch.mul(weights, features), dim=1)
+
+        # concatenate agent's state with global weighted humans' state
+        joint_state = torch.cat([self_state, weighted_feature], dim=1)
+        feature = self.mlp3(joint_state)
+        return feature

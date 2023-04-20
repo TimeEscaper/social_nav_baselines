@@ -8,9 +8,18 @@ from pyminisim.util import wrap_angle
 
 from stable_baselines3 import PPO
 
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Union
 from core.controllers._controller import AbstractController
 from core.predictors import PedestrianTracker
+
+
+def unnormalize_symmetric(action: np.ndarray,
+                          lb: np.ndarray,
+                          ub: np.ndarray) -> np.ndarray:
+    deviation = (ub - lb) / 2.
+    shift = (ub + lb) / 2.
+    action = (action * deviation) + shift
+    return action
 
 
 class RLController(AbstractController):
@@ -35,6 +44,7 @@ class RLController(AbstractController):
         self._total_peds = total_peds
         self._peds_padding = 8
         self._rl_horizon = 5
+        self._model_id = weights
 
         weights = pkg_resources.resource_filename("core.controllers.rl", f"weights/{weights}.zip")
         self._rl_model = PPO.load(weights, device=device)
@@ -88,15 +98,55 @@ class RLController(AbstractController):
             "visibility": peds_vis[np.newaxis]
         }
 
+    def _build_model_obs_v3(self, robot_pose: np.ndarray, robot_vel: np.ndarray):
+        goal = self.goal[:2]
+
+        rotation_matrix = np.array([[np.cos(robot_pose[2]), -np.sin(robot_pose[2])],
+                                    [np.sin(robot_pose[2]), np.cos(robot_pose[2])]])
+        robot_vel = rotation_matrix @ robot_vel[:2]
+        d_g = np.linalg.norm(robot_pose[:2] - goal)
+        phi_goal = wrap_angle(robot_pose[2] - np.arctan2(goal[1] - robot_pose[1], goal[0] - robot_pose[0]))
+        obs_robot = np.array([d_g, phi_goal, robot_vel[0], robot_vel[1], ROBOT_RADIUS])
+
+        current_poses = self._ped_tracker.get_current_poses()
+        obs_pred_mean = np.tile(np.array([-10., -10.]), (self._peds_padding, 6, 1))
+        obs_pred_cov = np.tile(np.eye(2) * 0.001, (self._peds_padding, 5, 1, 1))
+        peds_vis = np.zeros(self._peds_padding, dtype=np.bool)
+
+        for i, (k, v) in enumerate(self._ped_tracker.get_predictions().items()):
+            obs_pred_mean[i, :, :] = np.concatenate((current_poses[k][np.newaxis], v[0][:5]), axis=0)
+            obs_pred_cov[i] = v[1][:5]
+            peds_vis[i] = True
+
+        obs_pred_mean = np.einsum("ij,mnj->mni", rotation_matrix, obs_pred_mean)
+        obs_pred_cov = np.einsum("ij,mnjk->mnik", rotation_matrix, obs_pred_cov)
+        obs_pred_cov = np.einsum("mnij,jk->mnik", obs_pred_cov, rotation_matrix.T)
+
+        return {
+            "robot": obs_robot[np.newaxis],
+            "pred_mean_rl": obs_pred_mean[np.newaxis],
+            "pred_cov_rl": obs_pred_cov[np.newaxis],
+            "visibility": peds_vis[np.newaxis]
+        }
+
+
     def make_step(self, state: np.ndarray, observation: Dict[int, np.ndarray], robot_velocity: np.ndarray) -> np.ndarray:
         self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances = self._get_output_predictions()
-        obs = self._build_model_obs(state, robot_velocity)
+        if self._model_id != "ppo_model_v3":
+            obs = self._build_model_obs(state, robot_velocity)
+        else:
+            obs = self._build_model_obs_v3(state, robot_velocity)
 
         with torch.no_grad():
             actions, states = self._rl_model.predict(obs, self._states, deterministic=True)
+            actions = actions[0]
+            actions = unnormalize_symmetric(actions,
+                                            lb=np.array([0., -2.]),
+                                            ub=np.array([2., 2.]))
+            print(actions)
             self._states = states
 
-        return actions[0], self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances
+        return actions, self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances
 
     def set_new_goal(self,
                      current_state: np.ndarray,
