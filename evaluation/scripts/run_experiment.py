@@ -49,7 +49,7 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                      config["pedestrians_init_states"],
                                      config["pedestrians_goals"],
                                      config["ped_model"],
-                                     create_renderer = True)
+                                     create_renderer = False)
     
     predictor = PredictorFactory.create_predictor(config)
 
@@ -133,8 +133,8 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
         statistics.track_simulation_ticks()
         hold_time += simulator.sim_dt
 
-        if statistics.total_collisions >= 1:
-            break
+        # if statistics.total_collisions >= 1:
+        #     break
 
         if config["experiment_run"] == False:
             # Terminate the simulation anytime by pressing ESC
