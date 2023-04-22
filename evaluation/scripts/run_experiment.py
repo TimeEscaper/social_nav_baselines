@@ -1,3 +1,5 @@
+from pyminisim.core import ROBOT_RADIUS
+
 from core.controllers import ControllerFactory
 from core.predictors import PredictorFactory, PedestrianTracker
 from core.planners import PlannerFactory
@@ -88,8 +90,10 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
         if renderer:
             renderer.render()
         if hold_time >= controller.dt:
-            error = np.linalg.norm(planner.global_goal[:2] - state[:2])
-            if error >= config["tolerance_error"]:
+            # error = np.linalg.norm(planner.global_goal[:2] - state[:2])
+            # if error >= config["tolerance_error"]:
+            error = np.linalg.norm(planner.global_goal[:2] - state[:2]) - ROBOT_RADIUS
+            if error >= 0.1:
                 state = simulator.current_state.world.robot.state
                 detected_peds_keys = simulator.current_state.sensors["pedestrian_detector"].reading.pedestrians.keys()
                 robot_velocity = simulator.current_state.world.robot.velocity
