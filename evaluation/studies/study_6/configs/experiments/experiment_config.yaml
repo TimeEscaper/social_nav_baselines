@@ -29,7 +29,9 @@ controller_list: ["ED-MPC-EDC",                   # Specify controllers you woul
                   "ED-MPC-EDC-Ad",                 # All controllers are located here: evaluation/configs/controllers
                   "MD-MPC-EDC",
                   "MD-MPC-EDC-Ad",
-                  "MPC-EDC-Ad"]
+                  "MPC-EDC-Ad",
+                  "MPC-MDC-delta"]
+# controller_list: ["MPC-MDC-delta"]
 
 # Statistics Collection
 metrics: ["failure_status",                     # Specify metrics, only three are currenlty avalaible:

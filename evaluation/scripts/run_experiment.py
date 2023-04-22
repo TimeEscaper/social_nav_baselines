@@ -18,8 +18,8 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/circular_crossing/8/49.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_4/configs/controllers/MD-MPC-EDC.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/circular_crossing/8/99.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"examples/configs/controllers/MPC-MDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -159,7 +159,7 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
     plt.xlabel('Simulation Time, [s]')
     plt.ylabel('Slack Variable: Adaptive Euclidean Constraint')
     plt.title('Slack Variable: Adaptive Euclidean Constraint')
-    
+    #plt.show()
 
     statistics._ground_truth_pedestrian_trajectories = visualizer._ground_truth_pedestrian_trajectories
     statistics._ground_truth_robot_trajectory = visualizer._ground_truth_robot_trajectory

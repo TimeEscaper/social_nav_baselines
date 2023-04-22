@@ -177,7 +177,7 @@ class DoMPCController(AbstractController):
             # lb
             self._mpc.bounds['lower', '_u', 'v'] = lb[0]
             self._mpc.bounds['lower', '_u', 'w'] = lb[1]
-            self._mpc.bounds['lower', '_u', 'sv'] = 0
+            self._mpc.bounds['lower', '_u', 'sv'] = -np.inf
             # ub
             self._mpc.bounds['upper', '_u', 'v'] = ub[0]
             self._mpc.bounds['upper', '_u', 'w'] = ub[1]
@@ -222,7 +222,7 @@ class DoMPCController(AbstractController):
 
             def _get_MB_bounds(cov):
                 array_mahalanobis_bounds = casadi.SX(1, total_peds)
-                V_s = np.pi * (r_rob + r_ped + 1) ** 2
+                V_s = np.pi * 2 * (r_rob + r_ped + 0.3) ** 2
                 for ped_ind in range(self._total_peds):
                     deter = 2 * np.pi * _get_determinant(casadi.reshape(cov[:, ped_ind], 2, 2))
                     deter = casadi.sqrt(deter)
