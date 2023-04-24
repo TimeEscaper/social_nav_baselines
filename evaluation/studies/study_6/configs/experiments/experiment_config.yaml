@@ -30,7 +30,8 @@ controller_list: ["ED-MPC-EDC",                   # Specify controllers you woul
                   "MD-MPC-EDC",
                   "MD-MPC-EDC-Ad",
                   "MPC-EDC-Ad",
-                  "MPC-MDC-delta"]
+                  "MPC-MDC-delta",
+                  "RL_ppo-sarl-v4"]
 # controller_list: ["MPC-MDC-delta"]
 
 # Statistics Collection
