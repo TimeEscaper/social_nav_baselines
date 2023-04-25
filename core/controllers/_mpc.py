@@ -1,3 +1,5 @@
+from pyminisim.core import ROBOT_RADIUS, PEDESTRIAN_RADIUS
+
 from ._controller import AbstractController
 from core.predictors import AbstractPredictor, NeuralPredictor, ConstantVelocityPredictor
 from core.predictors import PedestrianTracker
@@ -99,11 +101,16 @@ class DoMPCController(AbstractController):
         self._state_peds = self._model.set_variable(
             "_tvp", "p_peds", shape=(4, total_peds))
         # covariances
-        self._covariances_peds = self._model.set_variable(
-            "_tvp", "cov_peds", shape=(4, total_peds)) # Each covariance matrix is represented a row [a1, a2, b1, b2]
-        # invariant covariances
-        self._inverse_covariances_peds = self._model.set_variable(
-            "_tvp", "inv_cov_peds", shape=(4, total_peds)) # Each covariance matrix is represented a row [a1, a2, b1, b2]
+        if constraint_type != "ELL":
+            self._covariances_peds = self._model.set_variable(
+                "_tvp", "cov_peds", shape=(4, total_peds)) # Each covariance matrix is represented a row [a1, a2, b1, b2]
+            # invariant covariances
+            self._inverse_covariances_peds = self._model.set_variable(
+                "_tvp", "inv_cov_peds", shape=(4, total_peds)) # Each covariance matrix is represented a row [a1, a2, b1, b2]
+        else:
+            self._ellipsoid_peds = self._model.set_variable(
+                "_tvp", "ellipsoid_peds", shape=(4, total_peds)
+            )
         # goal
         current_goal = self._model.set_variable(
             "_tvp", "current_goal", shape=(len(goal)))
@@ -133,7 +140,7 @@ class DoMPCController(AbstractController):
         if True:
             R = np.array([[0.005, 0, 0],
                           [0, 0.005, 0],
-                          [0, 0, 100000]])
+                          [0, 0, 0.]])
         else:
             R = np.eye(3)
 
@@ -233,8 +240,21 @@ class DoMPCController(AbstractController):
 
             self._mpc.set_nl_cons("mahalanobis_dist_to_peds", -pedestrians_mahalanobis_distances-mahalanobis_bounds,
                                   ub=np.zeros(total_peds))
+
+        elif constraint_type == "ELL":
+            robot_peds_delta = p_rob_hcat - p_peds
+            array_ellipse_bounds = casadi.SX(1, total_peds)
+            for ped_ind in range(self._total_peds):
+                array_ellipse_bounds[ped_ind] = \
+                    robot_peds_delta[:, ped_ind].T @ casadi.reshape(self._ellipsoid_peds[:, ped_ind], 2, 2)\
+                    @ robot_peds_delta[:, ped_ind]
+
+            self._mpc.set_nl_cons("ellipse_bounds", -array_ellipse_bounds,
+                                  ub=-1.)
+
         elif constraint_type == "None":
             pass
+        self._constraint_type = constraint_type
 
         # time-variable-parameter function for pedestrian
         self._mpc_tvp_fun = self._mpc.get_tvp_template()
@@ -267,13 +287,31 @@ class DoMPCController(AbstractController):
 
         predicted_covs_inv = np.linalg.inv(predicted_covs)
         predicted_covs_flatten = predicted_covs.reshape((self._horizon + 1, self._total_peds, 4))
-        predicted_covs_inv_flatten = predicted_covs_inv.reshape((self._horizon + 1, self._total_peds, 4))
 
-        for step in range(len(self._mpc_tvp_fun['_tvp', :, 'p_peds'])):
-            self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_trajectories[step].T
-            self._mpc_tvp_fun['_tvp', step, 'cov_peds'] = predicted_covs_flatten[step].T
-            self._mpc_tvp_fun['_tvp', step, 'inv_cov_peds'] = predicted_covs_inv_flatten[step].T
+        if self._constraint_type != "ELL":
+            predicted_covs_inv_flatten = predicted_covs_inv.reshape((self._horizon + 1, self._total_peds, 4))
+            for step in range(len(self._mpc_tvp_fun['_tvp', :, 'p_peds'])):
+                self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_trajectories[step].T
+                self._mpc_tvp_fun['_tvp', step, 'cov_peds'] = predicted_covs_flatten[step].T
+                self._mpc_tvp_fun['_tvp', step, 'inv_cov_peds'] = predicted_covs_inv_flatten[step].T
+        else:
+            lambdas, es = np.linalg.eig(predicted_covs)
+            half_axes = 3 * np.sqrt(lambdas)
+            phis = -np.arctan2(es[:, :, 1, 0], es[:, :, 0, 0])
+            half_axes = half_axes + ROBOT_RADIUS + PEDESTRIAN_RADIUS
+            ellipses = np.zeros_like(predicted_covs)
+            for i in range(ellipses.shape[0]):
+                for j in range(ellipses.shape[1]):
+                    rot_matrix = np.array([[np.cos(phis[i, j]), -np.sin(phis[i, j])],
+                                           [np.sin(phis[i, j]), np.cos(phis[i, j])]])
+                    ellipses[i, j] = rot_matrix.T @ np.diag((1. / half_axes[i, j]) ** 2) @ rot_matrix
+            ellipses = ellipses.reshape((self._horizon + 1, self._total_peds, 4))
+
+            for step in range(len(self._mpc_tvp_fun['_tvp', :, 'p_peds'])):
+                self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_trajectories[step].T
+                self._mpc_tvp_fun['_tvp', step, 'ellipsoid_peds'] = ellipses[step].T
         return predicted_trajectories, predicted_covs
+
 
     def get_predicted_robot_trajectory(self) -> List[float]:
         rob_x_pred = self._mpc.data.prediction(('_x', 'x'))[0]
