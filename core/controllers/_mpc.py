@@ -108,8 +108,14 @@ class DoMPCController(AbstractController):
             self._inverse_covariances_peds = self._model.set_variable(
                 "_tvp", "inv_cov_peds", shape=(4, total_peds)) # Each covariance matrix is represented a row [a1, a2, b1, b2]
         else:
-            self._ellipsoid_peds = self._model.set_variable(
-                "_tvp", "ellipsoid_peds", shape=(4, total_peds)
+            # self._ellipsoid_peds = self._model.set_variable(
+            #     "_tvp", "ellipsoid_peds", shape=(4, total_peds)
+            # )
+            self._ellipsoid_axes = self._model.set_variable(
+                "_tvp", "ellipsoid_axes", shape=(2, total_peds)
+            )
+            self._ellipsoid_angles = self._model.set_variable(
+                "_tvp", "ellipsoid_angles", shape=total_peds
             )
         # goal
         current_goal = self._model.set_variable(
@@ -147,7 +153,7 @@ class DoMPCController(AbstractController):
         else:
             R = np.array([[0.005, 0, 0],
                           [0, 0.005, 0],
-                          [0, 0, 0.]])
+                          [0, 0, 100000.]])
 
         # stage cost
         u = self._model._u.cat
@@ -189,11 +195,17 @@ class DoMPCController(AbstractController):
             # lb
             self._mpc.bounds['lower', '_u', 'v'] = lb[0]
             self._mpc.bounds['lower', '_u', 'w'] = lb[1]
-            self._mpc.bounds['lower', '_u', 'sv'] = -np.inf
+
             # ub
             self._mpc.bounds['upper', '_u', 'v'] = ub[0]
             self._mpc.bounds['upper', '_u', 'w'] = ub[1]
-            self._mpc.bounds['upper', '_u', 'sv'] = np.inf
+
+            if constraint_type != "ELC":
+                self._mpc.bounds['lower', '_u', 'sv'] = -np.inf
+                self._mpc.bounds['upper', '_u', 'sv'] = np.inf
+            else:
+                self._mpc.bounds['lower', '_u', 'sv'] = 0.
+                self._mpc.bounds['upper', '_u', 'sv'] = 1.
 
         elif model_type == "unicycle_double_integrator":
             # lb
@@ -254,8 +266,16 @@ class DoMPCController(AbstractController):
             #     array_ellipse_bounds[ped_ind] = \
             #         robot_peds_delta[:, ped_ind].T @ casadi.reshape(self._ellipsoid_peds[:, ped_ind], 2, 2)\
             #         @ robot_peds_delta[:, ped_ind]
-                array_ellipse_bounds[ped_ind] = casadi.bilin(casadi.reshape(self._ellipsoid_peds[:, ped_ind], 2, 2),
-                                                             robot_peds_delta[:, ped_ind], robot_peds_delta[:, ped_ind])
+                half_axes = (1 - sv) * self._n_sigma * self._ellipsoid_axes[:, ped_ind] + ROBOT_RADIUS + PEDESTRIAN_RADIUS + 0.3
+                diag_matrix = casadi.diag(1 / (half_axes ** 2))
+                rotation_matrix = casadi.blockcat(casadi.cos(self._ellipsoid_angles[ped_ind]),
+                                                  -casadi.sin(self._ellipsoid_angles[ped_ind]),
+                                                  casadi.sin(self._ellipsoid_angles[ped_ind]),
+                                                  casadi.cos(self._ellipsoid_angles[ped_ind]))
+                ellipse_matrix = rotation_matrix.T @ diag_matrix @ rotation_matrix
+                array_ellipse_bounds[ped_ind] = casadi.bilin(ellipse_matrix,
+                                                             robot_peds_delta[:, ped_ind],
+                                                             robot_peds_delta[:, ped_ind])
 
             self._mpc.set_nl_cons("ellipse_bounds", -array_ellipse_bounds,
                                   ub=-1.)
@@ -306,18 +326,19 @@ class DoMPCController(AbstractController):
             lambdas, es = np.linalg.eig(predicted_covs)
             half_axes = self._n_sigma * np.sqrt(lambdas)
             phis = -np.arctan2(es[:, :, 1, 0], es[:, :, 0, 0])
-            half_axes = half_axes + ROBOT_RADIUS + PEDESTRIAN_RADIUS
-            ellipses = np.zeros_like(predicted_covs)
-            for i in range(ellipses.shape[0]):
-                for j in range(ellipses.shape[1]):
-                    rot_matrix = np.array([[np.cos(phis[i, j]), -np.sin(phis[i, j])],
-                                           [np.sin(phis[i, j]), np.cos(phis[i, j])]])
-                    ellipses[i, j] = rot_matrix.T @ np.diag((1. / half_axes[i, j]) ** 2) @ rot_matrix
-            ellipses_flatten = ellipses.reshape((self._horizon + 1, self._total_peds, 4))
+            # half_axes = half_axes + ROBOT_RADIUS + PEDESTRIAN_RADIUS
+            # ellipses = np.zeros_like(predicted_covs)
+            # for i in range(ellipses.shape[0]):
+            #     for j in range(ellipses.shape[1]):
+            #         rot_matrix = np.array([[np.cos(phis[i, j]), -np.sin(phis[i, j])],
+            #                                [np.sin(phis[i, j]), np.cos(phis[i, j])]])
+            #         ellipses[i, j] = rot_matrix.T @ np.diag((1. / half_axes[i, j]) ** 2) @ rot_matrix
+            # ellipses_flatten = ellipses.reshape((self._horizon + 1, self._total_peds, 4))
 
             for step in range(len(self._mpc_tvp_fun['_tvp', :, 'p_peds'])):
                 self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_trajectories[step].T
-                self._mpc_tvp_fun['_tvp', step, 'ellipsoid_peds'] = ellipses_flatten[step].T
+                self._mpc_tvp_fun['_tvp', step, 'ellipsoid_axes'] = half_axes[step].T
+                self._mpc_tvp_fun['_tvp', step, 'ellipsoid_angles'] = phis[step]
         return predicted_trajectories, predicted_covs
 
 
@@ -333,6 +354,7 @@ class DoMPCController(AbstractController):
                   robot_velocity: Optional[np.ndarray] = None) -> np.ndarray:
         self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances = self.predict(observation)
         control = self._mpc.make_step(state).T[0]
+        print(control)
         return control, self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances
     
     def set_new_goal(self,

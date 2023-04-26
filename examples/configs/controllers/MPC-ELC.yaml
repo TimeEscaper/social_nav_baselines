@@ -25,8 +25,8 @@ model_type: "unicycle"                     # Robot model, ["unicycle", "unicycle
 ped_predictor: "neural"                    # Pedestrian predictor, ["constant_velocity", "neural"]
 cost_function: "GO-MPC"                    # Choose cost function for MPC, ["GO-MPC", "MD-GO-MPC", "ED-GO-MPC"]
 constraint_type: "ELC"                      # Choose constraint type for MPC, ["None", "ED", "MD"]
-constraint_value: 3                      # Minimum safe distance to pedestrians and other objects, [m] for "ED" constraint and Collision probability [0, 1] for "MD"
-Q: 1000                                    # Terminal cost weight
+constraint_value: 0.5                      # Minimum safe distance to pedestrians and other objects, [m] for "ED" constraint and Collision probability [0, 1] for "MD"
+Q: 100                                    # Terminal cost weight
 R: [[1, 0],
     [0, 1]]                                # Control input weighted matrix
 W: 0                                       # Mahalanobis/Euclidean distance weight in cost function
