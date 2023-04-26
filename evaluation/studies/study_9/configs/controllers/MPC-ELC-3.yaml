@@ -1,0 +1,40 @@
+# Scenario: Mahalanobis distance in constraints, basic GO-MPC cost
+
+
+# Robot Model, [model_type]:
+#       1. ["unicycle"] : Unicycle Model with State Vector: [x, y, phi], Control Vector: [v, w]
+#       2. ["unicycle_double_integrator"] : Unicycle Double Integration Model with State Vector: [x, y, phi, v, w], Control Vector: [u_a, u_alpha]
+
+# Pedestrian Model for the controller, [ped_predictor]:
+#       1. ["constant_velocity"] : Constant Velocity Propagation with State Vector: [x, y, vx, vy]
+#       2. ["neural"] : Neural Predictor (work in progress)
+
+# Cost functions avalaible for MPC
+#       1. ["GO-MPC"] : Cost from the paper about GO-MPC, link: https://arxiv.org/pdf/2102.13073.pdf
+#       2. ["MD-GO-MPC"] : GO-MPC cost + Mahalanobis Distance
+#       3. ["ED-GO-MPC"] : cost + Euclidean Distance
+
+# Constraints on MPC Solution
+#       1. ["None"] : No constraints
+#       2. ["ED"] : Euclidean distance constraint
+#       3. ["MD"] : Mahalanobis distance constraint
+
+controller_type: "MPC"                     # Specify controller type, ["DWA", "MPC", "MPPI", "DDP"]
+horizon: 24                                # MPC planning horizon, [steps]
+model_type: "unicycle"                     # Robot model, ["unicycle", "unicycle_double_integrator"]
+ped_predictor: "neural"                    # Pedestrian predictor, ["constant_velocity", "neural"]
+cost_function: "GO-MPC"                    # Choose cost function for MPC, ["GO-MPC", "MD-GO-MPC", "ED-GO-MPC"]
+constraint_type: "ELC"                      # Choose constraint type for MPC, ["None", "ED", "MD"]
+constraint_value: 3                      # Minimum safe distance to pedestrians and other objects, [m] for "ED" constraint and Collision probability [0, 1] for "MD"
+Q: 1000                                    # Terminal cost weight
+R: [[1, 0],
+    [0, 1]]                                # Control input weighted matrix
+W: 0                                       # Mahalanobis/Euclidean distance weight in cost function
+r_rob: 0.35                                # Robot radius, [m]
+r_ped: 0.3                                 # Pedestrian radius, [m]
+lb: [0, -2]                                # Lower bounds for NLP: [v, w], [m/s, rad/s]
+ub: [2, 2]                                 # Upper bounds for NLP: [v, w], [m/s, rad/s]
+state_dummy_ped: [10000, 10000, 0, 0]      # Dummy pedestrian state vector: [x_ped,  y_ped, vx_ped, vy_ped], [m, m, m/s, m/s]
+is_store_robot_predicted_trajectory: True  # Flag to store robot predicted trajectory, [True, False]
+max_ghost_tracking_time: 20                # Amount of steps to track ghost pedestrian, [step]
+solver: "MUMPS"                            # NLP Solver for Casadi, ["MUMPS", "MA27", "MA57", "MA77", "MA86", "MA97"]
