@@ -101,7 +101,7 @@ class DoMPCController(AbstractController):
         self._state_peds = self._model.set_variable(
             "_tvp", "p_peds", shape=(4, total_peds))
         # covariances
-        if constraint_type != "ELL":
+        if constraint_type != "ELC":
             self._covariances_peds = self._model.set_variable(
                 "_tvp", "cov_peds", shape=(4, total_peds)) # Each covariance matrix is represented a row [a1, a2, b1, b2]
             # invariant covariances
@@ -137,12 +137,17 @@ class DoMPCController(AbstractController):
         p_rob_hcat = casadi.hcat([self._model._x.cat[:2] for _ in range(total_peds)])
         p_peds = self._state_peds[:2, :]
 
-        if True:
+        if constraint_type != "ELC":
+            if True:
+                R = np.array([[0.005, 0, 0],
+                              [0, 0.005, 0],
+                              [0, 0, 100000.]])
+            else:
+                R = np.eye(3)
+        else:
             R = np.array([[0.005, 0, 0],
                           [0, 0.005, 0],
                           [0, 0, 0.]])
-        else:
-            R = np.eye(3)
 
         # stage cost
         u = self._model._u.cat
@@ -241,13 +246,16 @@ class DoMPCController(AbstractController):
             self._mpc.set_nl_cons("mahalanobis_dist_to_peds", -pedestrians_mahalanobis_distances-mahalanobis_bounds,
                                   ub=np.zeros(total_peds))
 
-        elif constraint_type == "ELL":
+        elif constraint_type == "ELC":
+            self._n_sigma = constraint_value
             robot_peds_delta = p_rob_hcat - p_peds
             array_ellipse_bounds = casadi.SX(1, total_peds)
             for ped_ind in range(self._total_peds):
-                array_ellipse_bounds[ped_ind] = \
-                    robot_peds_delta[:, ped_ind].T @ casadi.reshape(self._ellipsoid_peds[:, ped_ind], 2, 2)\
-                    @ robot_peds_delta[:, ped_ind]
+            #     array_ellipse_bounds[ped_ind] = \
+            #         robot_peds_delta[:, ped_ind].T @ casadi.reshape(self._ellipsoid_peds[:, ped_ind], 2, 2)\
+            #         @ robot_peds_delta[:, ped_ind]
+                array_ellipse_bounds[ped_ind] = casadi.bilin(casadi.reshape(self._ellipsoid_peds[:, ped_ind], 2, 2),
+                                                             robot_peds_delta[:, ped_ind], robot_peds_delta[:, ped_ind])
 
             self._mpc.set_nl_cons("ellipse_bounds", -array_ellipse_bounds,
                                   ub=-1.)
@@ -288,7 +296,7 @@ class DoMPCController(AbstractController):
         predicted_covs_inv = np.linalg.inv(predicted_covs)
         predicted_covs_flatten = predicted_covs.reshape((self._horizon + 1, self._total_peds, 4))
 
-        if self._constraint_type != "ELL":
+        if self._constraint_type != "ELC":
             predicted_covs_inv_flatten = predicted_covs_inv.reshape((self._horizon + 1, self._total_peds, 4))
             for step in range(len(self._mpc_tvp_fun['_tvp', :, 'p_peds'])):
                 self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_trajectories[step].T
@@ -296,7 +304,7 @@ class DoMPCController(AbstractController):
                 self._mpc_tvp_fun['_tvp', step, 'inv_cov_peds'] = predicted_covs_inv_flatten[step].T
         else:
             lambdas, es = np.linalg.eig(predicted_covs)
-            half_axes = 3 * np.sqrt(lambdas)
+            half_axes = self._n_sigma * np.sqrt(lambdas)
             phis = -np.arctan2(es[:, :, 1, 0], es[:, :, 0, 0])
             half_axes = half_axes + ROBOT_RADIUS + PEDESTRIAN_RADIUS
             ellipses = np.zeros_like(predicted_covs)
@@ -305,11 +313,11 @@ class DoMPCController(AbstractController):
                     rot_matrix = np.array([[np.cos(phis[i, j]), -np.sin(phis[i, j])],
                                            [np.sin(phis[i, j]), np.cos(phis[i, j])]])
                     ellipses[i, j] = rot_matrix.T @ np.diag((1. / half_axes[i, j]) ** 2) @ rot_matrix
-            ellipses = ellipses.reshape((self._horizon + 1, self._total_peds, 4))
+            ellipses_flatten = ellipses.reshape((self._horizon + 1, self._total_peds, 4))
 
             for step in range(len(self._mpc_tvp_fun['_tvp', :, 'p_peds'])):
                 self._mpc_tvp_fun['_tvp', step, 'p_peds'] = predicted_trajectories[step].T
-                self._mpc_tvp_fun['_tvp', step, 'ellipsoid_peds'] = ellipses[step].T
+                self._mpc_tvp_fun['_tvp', step, 'ellipsoid_peds'] = ellipses_flatten[step].T
         return predicted_trajectories, predicted_covs
 
 
