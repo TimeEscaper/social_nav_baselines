@@ -1,0 +1,36 @@
+# Configure experimental parameters in this configuration file, then run experiments_main.py
+# This script will automatically run the following pipeline:
+# Scene Generation -> Parallel Experiments Run -> Statistics Collection
+
+# Possible scenes: 
+# 1. Circular Crossing
+# 2. Parallel Crossing 
+# 3. Random Crossing
+
+# General
+folder_name: "study_9"                   # Folder name of your study
+
+# Scene Generation
+pedestrian_range: [3, 4, 5, 6, 7, 8]                  # List of an amount pedestrians in a scene
+total_scenarios: 100                              # Amount of scenarios per one scene, [#]
+robot_vision_range: 5                           # Robot Vision Range, [m]
+inflation_radius: 0.75                           # robot_radius + pedestrian_radius + safe_distances
+borders_x: [-4, 4]                              # Map X borders range
+borders_y: [-4, 4]                              # Map Y borders range
+generate_scenes: False                          # Flag to generate new scenes. Attention, this will rewrite existed scene files.
+seed: 42                                        # Choose random seed
+
+# Parallel Experiments Run
+scenes_list: ["circular_crossing",              # Specify scenes you want to run, now only three are avalaible     
+              "parallel_crossing", 
+              "random_crossing"]
+
+controller_list: ["MPC-ELC-05-Q100",                     # Specify controllers you would like to run.
+                  "MPC-ELC-1-Q100",                 # All controllers are located here: evaluation/configs/controllers
+                  "MPC-ELC-2-Q100", 
+                  "MPC-ELC-3-Q100"]
+
+# Statistics Collection
+metrics: ["failure_status",                     # Specify metrics, only three are currenlty avalaible:
+          "simulation_ticks",                   # "failure_status", "simulation_ticks", "total_collisions"
+          "total_collisions"]
