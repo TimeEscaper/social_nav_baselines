@@ -8,7 +8,7 @@ from generate_scenes import generate_scenes
 from conduct_experiments import conduct_experiments
 from collect_statistics_2 import collect_statistics
 
-DEFAULT_EXPERIMENT_CONFIG_PATH = r"evaluation/studies/study_7/configs/experiments/experiment_config.yaml"
+DEFAULT_EXPERIMENT_CONFIG_PATH = r"evaluation/studies/study_8/configs/experiments/experiment_config.yaml"
 
 def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH) -> None:
     
