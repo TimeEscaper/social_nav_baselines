@@ -8,7 +8,7 @@ from generate_scenes import generate_scenes
 from conduct_experiments import conduct_experiments
 from collect_statistics_2 import collect_statistics
 
-DEFAULT_EXPERIMENT_CONFIG_PATH = r"evaluation/studies/study_6/configs/experiments/experiment_config.yaml"
+DEFAULT_EXPERIMENT_CONFIG_PATH = r"evaluation/studies/study_9/configs/experiments/experiment_config.yaml"
 
 def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH) -> None:
     
@@ -36,7 +36,7 @@ def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH)
                         experiment_config["seed"])
         print("--------------------Scenes are generated!--------------------")
 
-    if True:
+    if False:
         # Conduct experiments
         print("-------------2. Starting to conduct experiments!-------------")
         input_data_list = []
