@@ -8,7 +8,7 @@ from generate_scenes import generate_scenes
 from conduct_experiments import conduct_experiments
 from collect_statistics_2 import collect_statistics
 
-DEFAULT_EXPERIMENT_CONFIG_PATH = r"evaluation/studies/study_9/configs/experiments/experiment_config.yaml"
+DEFAULT_EXPERIMENT_CONFIG_PATH = r"evaluation/studies/study_10/configs/experiments/experiment_config.yaml"
 
 def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH) -> None:
     
@@ -49,7 +49,7 @@ def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH)
             input_data_i.append(controller)
             input_data_list.append(tuple(input_data_i))
         num_processes = len(experiment_config["controller_list"])
-        pool = multiprocessing.Pool(num_processes)
+        pool = multiprocessing.Pool(1)
         _ = pool.starmap(conduct_experiments, input_data_list)
         print("------------------Experiments are conducted!-----------------")
     

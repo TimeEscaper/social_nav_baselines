@@ -32,7 +32,8 @@ class DoMPCController(AbstractController):
                  solver: str,
                  cost_function: str,
                  constraint_type: str,
-                 constraint_value: float) -> None:
+                 constraint_value: float,
+                 use_adaptive_constraint: bool) -> None:
         """Initiazition of the class instance
 
         Args:
@@ -81,8 +82,8 @@ class DoMPCController(AbstractController):
             # control input variables
             v = self._model.set_variable("_u", "v")
             w = self._model.set_variable("_u", "w")
-            sv = self._model.set_variable("_u", "sv")
-            #sW = self._model.set_variable("_u", "sW")
+            if use_adaptive_constraint:
+                sv = self._model.set_variable("_u", "sv")
         elif model_type == "unicycle_double_integrator":
             # state variables
             v = self._model.set_variable("_x", "v")
@@ -143,17 +144,17 @@ class DoMPCController(AbstractController):
         p_rob_hcat = casadi.hcat([self._model._x.cat[:2] for _ in range(total_peds)])
         p_peds = self._state_peds[:2, :]
 
-        if constraint_type != "ELC":
-            if True:
-                R = np.array([[0.005, 0, 0],
-                              [0, 0.005, 0],
-                              [0, 0, 100000.]])
-            else:
-                R = np.eye(3)
-        else:
-            R = np.array([[0.005, 0, 0],
-                          [0, 0.005, 0],
-                          [0, 0, 100000.]])
+        # if constraint_type != "ELC":
+        #     if True:
+        #         R = np.array([[0.005, 0, 0],
+        #                       [0, 0.005, 0],
+        #                       [0, 0, 100000.]])
+        #     else:
+        #         R = np.eye(3)
+        # else:
+        #     R = np.array([[0.005, 0, 0],
+        #                   [0, 0.005, 0],
+        #                   [0, 0, 100000.]])
 
         # stage cost
         u = self._model._u.cat
@@ -186,7 +187,10 @@ class DoMPCController(AbstractController):
                                 mterm=terminal_cost)
         
         if model_type == "unicycle":
-            self._mpc.set_rterm(v=1e-2, w=1e-2, sv=1e-2,)
+            if use_adaptive_constraint:
+                self._mpc.set_rterm(v=1e-2, w=1e-2, sv=1e-2)
+            else:
+                self._mpc.set_rterm(v=1e-2, w=1e-2)
         elif model_type == "unicycle_double_integrator":                      
             self._mpc.set_rterm(u_a=1e-2, u_alpha=1e-2)
         
@@ -200,12 +204,13 @@ class DoMPCController(AbstractController):
             self._mpc.bounds['upper', '_u', 'v'] = ub[0]
             self._mpc.bounds['upper', '_u', 'w'] = ub[1]
 
-            if constraint_type != "ELC":
-                self._mpc.bounds['lower', '_u', 'sv'] = -np.inf
-                self._mpc.bounds['upper', '_u', 'sv'] = np.inf
-            else:
-                self._mpc.bounds['lower', '_u', 'sv'] = 0.
-                self._mpc.bounds['upper', '_u', 'sv'] = 1.
+            if use_adaptive_constraint:
+                if constraint_type != "ELC":
+                    self._mpc.bounds['lower', '_u', 'sv'] = -np.inf
+                    self._mpc.bounds['upper', '_u', 'sv'] = np.inf
+                else:
+                    self._mpc.bounds['lower', '_u', 'sv'] = 0.
+                    self._mpc.bounds['upper', '_u', 'sv'] = 1.
 
         elif model_type == "unicycle_double_integrator":
             # lb
@@ -226,7 +231,10 @@ class DoMPCController(AbstractController):
             lb_dists_square = np.array([lb_dist_square for _ in range(total_peds)])
             # inequality constrain for pedestrians
             dx_dy_square = (p_rob_hcat - p_peds) ** 2
-            pedestrians_distances_squared = dx_dy_square[0, :] + dx_dy_square[1, :] + sv
+            if use_adaptive_constraint:
+                pedestrians_distances_squared = dx_dy_square[0, :] + dx_dy_square[1, :] + sv
+            else:
+                pedestrians_distances_squared = dx_dy_square[0, :] + dx_dy_square[1, :]
             self._mpc.set_nl_cons("euclidean_dist_to_peds", -pedestrians_distances_squared,
                                   ub=-lb_dists_square)
         elif constraint_type == "MD":
@@ -235,7 +243,10 @@ class DoMPCController(AbstractController):
                 delta = (p_rob - peds)
                 array_mahalanobis_distances = casadi.SX(1, total_peds)
                 for ped_ind in range(self._total_peds):
-                    array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind] + sv
+                    if use_adaptive_constraint:
+                        array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind] + sv
+                    else:
+                        array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind]
                 return array_mahalanobis_distances 
 
             pedestrians_mahalanobis_distances = _get_MD(p_rob_hcat, p_peds, self._inverse_covariances_peds)

@@ -151,8 +151,8 @@ def collect_statistics(folder_name: str,
                 add_box(axs_graph[0], center_range[controller_id], q25, q75, color=DEFAULT_COLOR_HEX_PALETTE[controller_id], width=0.03, alpha=0.5)
             axs_graph[0].grid(True)
             axs_graph[0].set_xlabel("Number of Pedestrians, [#]", fontsize=SIZE)
-            axs_graph[0].set_ylabel("Simulation Steps to Subgoal, [#]", fontsize=SIZE)
-            axs_graph[0].set_title("Simulation Steps to Subgoal, [#]", fontsize=SIZE*1.2)
+            axs_graph[0].set_ylabel("Simulation Steps to Target, [#]", fontsize=SIZE)
+            axs_graph[0].set_title("Simulation Steps to Target, [#]", fontsize=SIZE*1.2)
             axs_graph[0].tick_params(labelsize=12)
             #axs_graph[0].legend(fontsize=size)
             legend_elements = [Line2D([0], [0], color='black', marker="o", lw=0, label='Mean'),
@@ -196,7 +196,7 @@ def collect_statistics(folder_name: str,
         fig_hist.savefig(fr"evaluation/studies/{folder_name}/results/plots/{scene}_distribution.png")
         
         # Save mean plot
-        fig_graph.legend(handles=legend_elements_controllers, bbox_to_anchor=(0.002, 0.363, 0.13, 1.003),
+        fig_graph.legend(handles=legend_elements_controllers, bbox_to_anchor=(0.002, 0.002, 0.13, 1.003),
                         loc='lower left', mode="expand", ncols=1, borderaxespad=0., fontsize=20)
         
         fig_graph.subplots_adjust(left=0.18,

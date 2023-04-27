@@ -25,6 +25,10 @@ class ControllerFactory():
                                        config["state_dummy_ped"],
                                        config["max_ghost_tracking_time"])
         elif config["controller_type"] == "MPC":
+            if "use_adaptive_constraint" in config:
+                use_adaptive_constraint = config["use_adaptive_constraint"]
+            else: 
+                use_adaptive_constraint = False
             controller = DoMPCController(np.array(config["init_state"]),
                                          np.array(config["goal"]),
                                          config["horizon"],
@@ -45,7 +49,8 @@ class ControllerFactory():
                                          config["solver"],
                                          config["cost_function"],
                                          config["constraint_type"],
-                                         config["constraint_value"])
+                                         config["constraint_value"],
+                                         use_adaptive_constraint)
         elif config["controller_type"] == "MPPI":
             controller = MPPIController(init_state=np.array(config["init_state"]),
                                         goal=np.array(config["goal"]),

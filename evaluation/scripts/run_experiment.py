@@ -20,8 +20,8 @@ np.random.seed(SEED)
 torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 
-DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_4/configs/scenes/circular_crossing/8/99.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"examples/configs/controllers/MPC-MDC.yaml"
+DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_10/configs/scenes/parallel_crossing/8/57.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_10/configs/controllers/MD-MPC-MDC.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -51,7 +51,7 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                      config["pedestrians_init_states"],
                                      config["pedestrians_goals"],
                                      config["ped_model"],
-                                     create_renderer = False)
+                                     create_renderer = True)
     
     predictor = PredictorFactory.create_predictor(config)
 
@@ -155,14 +155,14 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                         pygame.quit()
     pygame.quit()
 
-    control_array = np.array(control_array)
-    import matplotlib.pyplot as plt
-    t = np.linspace(0, len(control_array)*config["dt"], len(control_array))
-    plt.plot(t, control_array[:, 2], linewidth=3)
-    plt.grid(True)
-    plt.xlabel('Simulation Time, [s]')
-    plt.ylabel('Slack Variable: Adaptive Euclidean Constraint')
-    plt.title('Slack Variable: Adaptive Euclidean Constraint')
+    # control_array = np.array(control_array)
+    # import matplotlib.pyplot as plt
+    # t = np.linspace(0, len(control_array)*config["dt"], len(control_array))
+    # plt.plot(t, control_array[:, 2], linewidth=3)
+    # plt.grid(True)
+    # plt.xlabel('Simulation Time, [s]')
+    # plt.ylabel('Slack Variable: Adaptive Euclidean Constraint')
+    # plt.title('Slack Variable: Adaptive Euclidean Constraint')
     #plt.show()
 
     statistics._ground_truth_pedestrian_trajectories = visualizer._ground_truth_pedestrian_trajectories
