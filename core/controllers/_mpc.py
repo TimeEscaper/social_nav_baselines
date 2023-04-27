@@ -354,7 +354,7 @@ class DoMPCController(AbstractController):
                   robot_velocity: Optional[np.ndarray] = None) -> np.ndarray:
         self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances = self.predict(observation)
         control = self._mpc.make_step(state).T[0]
-        print(control)
+        #print(control)
         return control, self._predicted_pedestrians_trajectories, self._predicted_pedestrians_covariances
     
     def set_new_goal(self,

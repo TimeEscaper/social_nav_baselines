@@ -25,10 +25,10 @@ scenes_list: ["circular_crossing",              # Specify scenes you want to run
               "parallel_crossing", 
               "random_crossing"]
 
-controller_list: ["MPC-ELC-05",                     # Specify controllers you would like to run.
-                  "MPC-ELC-1",                 # All controllers are located here: evaluation/configs/controllers
-                  "MPC-ELC-2", 
-                  "MPC-ELC-3"]
+controller_list: ["MPC-ELC-05-Q100",                     # Specify controllers you would like to run.
+                  "MPC-ELC-1-Q100",                 # All controllers are located here: evaluation/configs/controllers
+                  "MPC-ELC-2-Q100", 
+                  "MPC-ELC-3-Q100"]
 
 # Statistics Collection
 metrics: ["failure_status",                     # Specify metrics, only three are currenlty avalaible:
