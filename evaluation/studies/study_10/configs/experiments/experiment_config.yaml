@@ -24,6 +24,7 @@ seed: 42                                        # Choose random seed
 scenes_list: ["circular_crossing",              # Specify scenes you want to run, now only three are avalaible     
               "parallel_crossing", 
               "random_crossing"]
+
               
 controller_list: ["ED-MPC",                     # Specify controllers you would like to run.
                   "ED-MPC-EDC",                 # All controllers are located here: evaluation/configs/controllers

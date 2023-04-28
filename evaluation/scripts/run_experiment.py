@@ -21,7 +21,7 @@ torch.manual_seed(SEED)
 torch.cuda.manual_seed(SEED)
 
 DEFAULT_SCENE_CONFIG_PATH = r"evaluation/studies/study_10/configs/scenes/parallel_crossing/8/57.yaml"
-DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_10/configs/controllers/MD-MPC-MDC.yaml"
+DEFAULT_CONTROLLER_CONFIG_PATH = r"evaluation/studies/study_10/configs/controllers/MPC-ELC-3.yaml"
 DEFAULT_RESULT_PATH = r"results/mpc.png"
 
 def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
@@ -51,7 +51,7 @@ def run_experiment(scene_config_path: str = DEFAULT_SCENE_CONFIG_PATH,
                                      config["pedestrians_init_states"],
                                      config["pedestrians_goals"],
                                      config["ped_model"],
-                                     create_renderer = True)
+                                     create_renderer = False)
     
     predictor = PredictorFactory.create_predictor(config)
 

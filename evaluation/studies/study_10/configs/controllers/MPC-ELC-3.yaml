@@ -26,9 +26,11 @@ ped_predictor: "neural"                    # Pedestrian predictor, ["constant_ve
 cost_function: "GO-MPC"                    # Choose cost function for MPC, ["GO-MPC", "MD-GO-MPC", "ED-GO-MPC"]
 constraint_type: "ELC"                      # Choose constraint type for MPC, ["None", "ED", "MD"]
 constraint_value: 3                      # Minimum safe distance to pedestrians and other objects, [m] for "ED" constraint and Collision probability [0, 1] for "MD"
+use_adaptive_constraint: True
 Q: 100                                    # Terminal cost weight
-R: [[1, 0],
-    [0, 1]]                                # Control input weighted matrix
+R: [[0.005, 0, 0],
+    [0, 0.005, 0],
+    [0, 0, 100000.]]                       # Control input weighted matrix
 W: 0                                       # Mahalanobis/Euclidean distance weight in cost function
 r_rob: 0.35                                # Robot radius, [m]
 r_ped: 0.3                                 # Pedestrian radius, [m]

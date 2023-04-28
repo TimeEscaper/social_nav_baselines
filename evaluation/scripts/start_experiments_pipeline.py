@@ -36,7 +36,7 @@ def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH)
                         experiment_config["seed"])
         print("--------------------Scenes are generated!--------------------")
 
-    if False:
+    if True:
         # Conduct experiments
         print("-------------2. Starting to conduct experiments!-------------")
         input_data_list = []
@@ -49,7 +49,7 @@ def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH)
             input_data_i.append(controller)
             input_data_list.append(tuple(input_data_i))
         num_processes = len(experiment_config["controller_list"])
-        pool = multiprocessing.Pool(1)
+        pool = multiprocessing.Pool(num_processes)
         _ = pool.starmap(conduct_experiments, input_data_list)
         print("------------------Experiments are conducted!-----------------")
     
