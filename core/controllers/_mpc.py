@@ -243,10 +243,12 @@ class DoMPCController(AbstractController):
                 delta = (p_rob - peds)
                 array_mahalanobis_distances = casadi.SX(1, total_peds)
                 for ped_ind in range(self._total_peds):
-                    if use_adaptive_constraint:
-                        array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind] + sv
-                    else:
-                        array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind]
+                    array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2,
+                                                                                                2) @ delta[:, ped_ind]
+                    # if use_adaptive_constraint:
+                    #     array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind] + sv
+                    # else:
+                    #     array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind]
                 return array_mahalanobis_distances 
 
             pedestrians_mahalanobis_distances = _get_MD(p_rob_hcat, p_peds, self._inverse_covariances_peds)
@@ -257,7 +259,10 @@ class DoMPCController(AbstractController):
 
             def _get_MB_bounds(cov):
                 array_mahalanobis_bounds = casadi.SX(1, total_peds)
-                V_s = np.pi * 2 * (r_rob + r_ped + 0.3) ** 2
+                if use_adaptive_constraint:
+                    V_s = (4. / 3.) * np.pi * (r_rob + r_ped + 0.3 + sv) ** 3
+                else:
+                    V_s = (4. / 3.) * np.pi * (r_rob + r_ped + 0.3) ** 3
                 for ped_ind in range(self._total_peds):
                     deter = 2 * np.pi * _get_determinant(casadi.reshape(cov[:, ped_ind], 2, 2))
                     deter = casadi.sqrt(deter)
@@ -277,7 +282,10 @@ class DoMPCController(AbstractController):
             #     array_ellipse_bounds[ped_ind] = \
             #         robot_peds_delta[:, ped_ind].T @ casadi.reshape(self._ellipsoid_peds[:, ped_ind], 2, 2)\
             #         @ robot_peds_delta[:, ped_ind]
-                half_axes = (1 - sv) * self._n_sigma * self._ellipsoid_axes[:, ped_ind] + ROBOT_RADIUS + PEDESTRIAN_RADIUS + 0.3
+                if use_adaptive_constraint:
+                    half_axes = (1 - sv) * self._n_sigma * self._ellipsoid_axes[:, ped_ind] + ROBOT_RADIUS + PEDESTRIAN_RADIUS + 0.3
+                else:
+                    half_axes = self._n_sigma * self._ellipsoid_axes[:, ped_ind] + ROBOT_RADIUS + PEDESTRIAN_RADIUS + 0.3
                 diag_matrix = casadi.diag(1 / (half_axes ** 2))
                 rotation_matrix = casadi.blockcat(casadi.cos(self._ellipsoid_angles[ped_ind]),
                                                   -casadi.sin(self._ellipsoid_angles[ped_ind]),
