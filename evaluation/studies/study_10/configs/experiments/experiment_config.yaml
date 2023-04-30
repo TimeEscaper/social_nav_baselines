@@ -35,6 +35,8 @@ controller_list: ["ED-MPC",                     # Specify controllers you would 
                   "MD-MPC-AEDC",
                   "MPC-AEDC",
                   "MPC-AMDC",
+                  "MPC-ELC-2",
+                  "MPC-ELC-3",
                   "MPC-AELC-2",
                   "MPC-AELC-3",
                   "SARL-PPO"]
