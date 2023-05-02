@@ -37,6 +37,7 @@ def run_experiment(experiment_config_path: str = DEFAULT_EXPERIMENT_CONFIG_PATH)
         print("--------------------Scenes are generated!--------------------")
 
     if False:
+        
         # Conduct experiments
         print("-------------2. Starting to conduct experiments!-------------")
         input_data_list = []

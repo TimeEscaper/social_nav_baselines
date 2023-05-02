@@ -55,9 +55,13 @@ def collect_statistics(folder_name: str,
 
         # Create mean plot
         fig_graph, axs_graph = plt.subplot_mosaic([[0, 1, 2]], 
-                                figsize=[25, 7], facecolor='white') #, layout='constrained'
-        #fig_graph.suptitle(scenes_list[scene_id], fontsize=28)
-
+                                figsize=[26, 8.5], facecolor='white') #, layout='constrained'
+        if scene == 'circular_crossing':
+            fig_graph.suptitle(f"Statistical Results for Circular Crossing Scenario" , fontsize=28)
+        elif scene == 'random_crossing':
+            fig_graph.suptitle(f"Statistical Results for Random Crossing Scenario" , fontsize=28)
+        else: 
+            fig_graph.suptitle(f"Statistical Results for Parallel Crossing Scenario" , fontsize=28)
         displacement = np.linspace(-0.25, 0.25, len(controller_list))
         legend_elements_controllers = []
         for controller_id, controller in enumerate(controller_list):
@@ -143,12 +147,12 @@ def collect_statistics(folder_name: str,
             # Create graph
             # Simulation step to goal
             axs_graph[0].scatter(pedestrian_range + displacement[controller_id], mean_tables_data[scene_id, controller_id, :len(pedestrian_range)], linewidth=1, label=f"{controller}", marker="o", color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
-            axs_graph[0].plot(pedestrian_range + displacement[controller_id], median_tables_data[scene_id, controller_id, :len(pedestrian_range)], linewidth=2, linestyle="--", label=f"{controller}", marker="^", markersize=SIZE//2, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
+            axs_graph[0].plot(pedestrian_range + displacement[controller_id], median_tables_data[scene_id, controller_id, :len(pedestrian_range)], linewidth=1.5, linestyle="--", label=f"{controller}", marker="^", markersize=SIZE//3, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
             for i, ped in enumerate(pedestrian_range):
                 center_range = np.linspace(-0.25, 0.25, len(controller_list)) + ped
                 q25 = q25_tables_data[scene_id, controller_id, i]
                 q75 = q75_tables_data[scene_id, controller_id, i]
-                add_box(axs_graph[0], center_range[controller_id], q25, q75, color=DEFAULT_COLOR_HEX_PALETTE[controller_id], width=0.03, alpha=0.5)
+                add_box(axs_graph[0], center_range[controller_id], q25, q75, color=DEFAULT_COLOR_HEX_PALETTE[controller_id], width=0.015, alpha=0.5)
             axs_graph[0].grid(True)
             axs_graph[0].set_xlabel("Number of Pedestrians, [#]", fontsize=SIZE)
             axs_graph[0].set_ylabel("Simulation Steps to Target, [#]", fontsize=SIZE)
@@ -157,18 +161,18 @@ def collect_statistics(folder_name: str,
             #axs_graph[0].legend(fontsize=size)
             legend_elements = [Line2D([0], [0], color='black', marker="o", lw=0, label='Mean'),
                                Line2D([0], [0], marker='^', color='black', label='Median', linestyle='--',
-                          markerfacecolor='black', markersize=10),
+                          markerfacecolor='black', markersize=7),
                                Line2D([0], [0], color='black', alpha=0.5, label='IQR')]
 
             axs_graph[0].legend(handles=legend_elements, bbox_to_anchor=(-.2, 1), loc='upper right', borderaxespad=0., fontsize=20)
             # Collisions
             axs_graph[1].scatter(pedestrian_range + displacement[controller_id], mean_tables_data[scene_id, controller_id, len(pedestrian_range):len(pedestrian_range)*2], linewidth=1, label=f"{controller}",  marker="o", color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
-            axs_graph[1].plot(pedestrian_range + displacement[controller_id], median_tables_data[scene_id, controller_id, len(pedestrian_range):len(pedestrian_range)*2], linewidth=2, linestyle="--",  marker="^", markersize=SIZE//2, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
+            axs_graph[1].plot(pedestrian_range + displacement[controller_id], median_tables_data[scene_id, controller_id, len(pedestrian_range):len(pedestrian_range)*2], linewidth=1.5, linestyle="--",  marker="^", markersize=SIZE//3, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
             for i, ped in enumerate(pedestrian_range):
                 center_range = np.linspace(-0.25, 0.25, len(controller_list)) + ped
                 q25 = q25_tables_data[scene_id, controller_id, i+len(pedestrian_range)]
                 q75 = q75_tables_data[scene_id, controller_id, i+len(pedestrian_range)]
-                add_box(axs_graph[1], center_range[controller_id], q25, q75, color=DEFAULT_COLOR_HEX_PALETTE[controller_id], width=0.03, alpha=0.5)
+                add_box(axs_graph[1], center_range[controller_id], q25, q75, color=DEFAULT_COLOR_HEX_PALETTE[controller_id], width=0.015, alpha=0.5)
             axs_graph[1].grid(True)
             axs_graph[1].set_xlabel("Number of Pedestrians, [#]", fontsize=SIZE)
             axs_graph[1].set_ylabel("Number of Collisions, [#]", fontsize=SIZE)
@@ -177,7 +181,7 @@ def collect_statistics(folder_name: str,
             #axs_graph[1].legend(fontsize=size)
             # Timeouts
             axs_graph[2].scatter(pedestrian_range + displacement[controller_id], mean_tables_data[scene_id, controller_id, len(pedestrian_range)*2:], linewidth=1, label=f"{controller}", marker="o", color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
-            axs_graph[2].plot(pedestrian_range + displacement[controller_id], median_tables_data[scene_id, controller_id, len(pedestrian_range)*2:], linewidth=2, linestyle="--", marker="^", markersize=SIZE//2, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
+            axs_graph[2].plot(pedestrian_range + displacement[controller_id], median_tables_data[scene_id, controller_id, len(pedestrian_range)*2:], linewidth=1.5, linestyle="--", marker="^", markersize=SIZE//3, color=DEFAULT_COLOR_HEX_PALETTE[controller_id])
             # for i, ped in enumerate(pedestrian_range):
             #     center_range = np.linspace(-0.25, 0.25, len(controller_list)) + ped
             #     q25 = q25_tables_data[scene_id, controller_id, i+len(pedestrian_range)*2]
@@ -202,7 +206,7 @@ def collect_statistics(folder_name: str,
         fig_graph.subplots_adjust(left=0.18,
                     bottom=0.09,
                     right=0.999,
-                    top=0.94,
+                    top=0.85,
                     wspace=0.2,
                     hspace=0)
         

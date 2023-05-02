@@ -38,8 +38,8 @@ controller_list: ["ED-MPC",                     # Specify controllers you would 
                   "MPC-ELC-2",
                   "MPC-ELC-3",
                   "MPC-AELC-2",
-                  "MPC-AELC-3",
-                  "SARL-PPO"]
+                  "MPC-AELC-3",]
+                  #"SARL-PPO"]
 
 # Statistics Collection
 metrics: ["failure_status",                     # Specify metrics, only three are currenlty avalaible:
