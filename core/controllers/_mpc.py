@@ -243,12 +243,10 @@ class DoMPCController(AbstractController):
                 delta = (p_rob - peds)
                 array_mahalanobis_distances = casadi.SX(1, total_peds)
                 for ped_ind in range(self._total_peds):
-                    array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2,
-                                                                                                2) @ delta[:, ped_ind]
-                    # if use_adaptive_constraint:
-                    #     array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind] + sv
-                    # else:
-                    #     array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind]
+                    if use_adaptive_constraint:
+                        array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind] + sv
+                    else:
+                        array_mahalanobis_distances[ped_ind] = delta[:, ped_ind].T @ casadi.reshape(inv_cov[:, ped_ind], 2, 2) @ delta[:, ped_ind]
                 return array_mahalanobis_distances 
 
             pedestrians_mahalanobis_distances = _get_MD(p_rob_hcat, p_peds, self._inverse_covariances_peds)
@@ -259,10 +257,7 @@ class DoMPCController(AbstractController):
 
             def _get_MB_bounds(cov):
                 array_mahalanobis_bounds = casadi.SX(1, total_peds)
-                if use_adaptive_constraint:
-                    V_s = (4. / 3.) * np.pi * (r_rob + r_ped + 0.3 + sv) ** 3
-                else:
-                    V_s = (4. / 3.) * np.pi * (r_rob + r_ped + 0.3) ** 3
+                V_s = (4. / 3.) * np.pi * (r_rob + r_ped + 0.3 + sv) ** 3
                 for ped_ind in range(self._total_peds):
                     deter = 2 * np.pi * _get_determinant(casadi.reshape(cov[:, ped_ind], 2, 2))
                     deter = casadi.sqrt(deter)
